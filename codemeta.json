@@ -1,0 +1,61 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "ReLTER.inatEnrich",
+  "description": "What the package does (one paragraph).",
+  "name": "ReLTER.inatEnrich: What the Package Does (One Line, Title Case)",
+  "relatedLink": "https://oggioniale.github.io/ReLTER.inatEnrich/",
+  "codeRepository": "https://github.com/oggioniale/ReLTER.inatEnrich",
+  "issueTracker": "https://github.com/oggioniale/ReLTER.inatEnrich/issues",
+  "license": "`use_mit_license()`, `use_gpl3_license()` or friends to pick a\n    license",
+  "version": "0.0.0.9000",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Alessandro",
+      "familyName": "Oggioni",
+      "email": "alessandro.oggioni@cnr.it",
+      "@id": "https://orcid.org/0000-0002-7997-219X"
+    }
+  ],
+  "funder": [
+    {
+      "@type": "Person",
+      "givenName": "Alessandro",
+      "familyName": "Oggioni",
+      "email": "alessandro.oggioni@cnr.it",
+      "@id": "https://orcid.org/0000-0002-7997-219X"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Alessandro",
+      "familyName": "Oggioni",
+      "email": "alessandro.oggioni@cnr.it",
+      "@id": "https://orcid.org/0000-0002-7997-219X"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "lifecycle",
+      "name": "lifecycle",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=lifecycle"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "111.18KB"
+}

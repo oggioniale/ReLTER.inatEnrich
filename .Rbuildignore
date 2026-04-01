@@ -1,0 +1,27 @@
+# RStudio project files
+^.*\.Rproj$
+^\.Rproj\.user$
+
+# Git
+^\.git$
+^\.gitignore$
+^\.github$
+# Documentation sources
+^README\.Rmd$
+^LICENSE\.md$
+# pkgdown
+^_pkgdown\.yml$
+^pkgdown$
+^docs$
+# Vignettes build artifacts
+^inst/doc$
+# renv
+^renv$
+^renv\.lock$
+# Session files
+^\.Rhistory$
+^\.RData$
+# VS Code
+^\.vscode$
+^CITATION\.cff$
+^codecov\.yml$

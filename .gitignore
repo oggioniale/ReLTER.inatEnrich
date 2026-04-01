@@ -1,0 +1,29 @@
+# ---- R session files ----
+.Rhistory
+.RData
+.Ruserdata
+
+# ---- RStudio ----
+.Rproj.user/
+*.Rproj
+
+# ---- Build artifacts ----
+*.tar.gz
+*.Rcheck/
+
+# ---- pkgdown site ----
+docs/
+pkgdown/
+
+# ---- Vignettes build artifacts ----
+vignettes/*.html
+vignettes/*.pdf
+inst/doc/
+
+# ---- Temporary files ----
+.DS_Store
+*~
+
+# ---- renv (if used) ----
+renv/library/
+renv/staging/
