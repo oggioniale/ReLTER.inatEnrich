@@ -1006,17 +1006,22 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'   addLegend addControl addLayersControl markerClusterOptions colorFactor
 #'   layersControlOptions
 #' @importFrom grDevices hcl.colors
-#' @importFrom ReLTER get_site_info
 #'
 #' @examples
 #' \dontrun{
-#' map <- create_leaflet_occ_map(occ_enriched = occ_eLTER_legal)
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#' 
+#' map <- create_leaflet_occ_map(
+#'   occ_enriched = occ_eLTER_legal,
+#'   site_boundary = site_boundary
+#' )
 #' map
 #'
 #' }
 #'
 ### create_leaflet_occ_map
-create_leaflet_occ_map <- function(occ_enriched) {
+create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
   
   required_cols <- c(
     "status_IUCN",
@@ -1237,9 +1242,6 @@ create_leaflet_occ_map <- function(occ_enriched) {
     showCoverageOnHover  = FALSE,
     zoomToBoundsOnClick  = TRUE
   )
-  
-  # Retrieve eLTER site boundary
-  site_boundary <- ReLTER::get_site_info(deimsid = occ_enriched$uri.1[1])
   
   # Build the Leaflet map
   map <- leaflet::leaflet() |>

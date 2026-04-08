@@ -4,7 +4,7 @@
 \alias{create_leaflet_occ_map}
 \title{Create Leaflet map for enriched iNaturalist occurrences}
 \usage{
-create_leaflet_occ_map(occ_enriched)
+create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
 }
 \arguments{
 \item{occ_enriched}{An \code{sf} tibble of iNaturalist occurrences enriched
@@ -77,7 +77,13 @@ Birds Directive 2009/147/EC and Habitats Directive 92/43/EEC.
 }
 \examples{
 \dontrun{
-map <- create_leaflet_occ_map(occ_enriched = occ_eLTER_legal)
+deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+
+map <- create_leaflet_occ_map(
+  occ_enriched = occ_eLTER_legal,
+  site_boundary = site_boundary
+)
 map
 
 }
