@@ -710,6 +710,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
 #' @importFrom dplyr filter select distinct inner_join left_join
 #' @importFrom purrr map_dfr pluck walk2 map_chr
+#' @export
 #' @examples
 #' \dontrun{
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
