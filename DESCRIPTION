@@ -19,7 +19,18 @@ RoxygenNote: 7.3.3
 URL: https://github.com/oggioniale/ReLTER.inatEnrich, https://oggioniale.github.io/ReLTER.inatEnrich/
 BugReports: https://github.com/oggioniale/ReLTER.inatEnrich/issues
 Imports: 
-    lifecycle
+    lifecycle,
+    dplyr,
+    httr2,
+    httr,
+    jsonlite,
+    purrr,
+    rvest,
+    stringr,
+    rinat,
+    stats,
+    tibble,
+    leaflet
 Suggests: 
     httptest2,
     sf
