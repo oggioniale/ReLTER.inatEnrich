@@ -3,6 +3,7 @@
 export(add_eunis_legal_to_occ)
 export(add_iucn_to_obs)
 export(add_iucn_to_occ)
+export(add_nativeness_to_occ)
 export(create_leaflet_occ_map)
 export(get_conservation_status)
 export(get_eunis_legal_info)
