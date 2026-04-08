@@ -103,7 +103,7 @@ map
 
 ```
 
-[![Example map output](man/figures/map_screenshot.png)](https://elter-ri.github.io/ReLTER.inatEnrich/articles/figures/map_example.html)
+[![Example map output](man/figures/map_screenshot.png)](https://elter-ri.github.io/ReLTER.inatEnrich/figures/map_example.html)
 > *Click the image to open a interactive map.*
 
 For a full walkthrough see the
