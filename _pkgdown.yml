@@ -36,7 +36,7 @@ articles:
       - ReLTER_inatEnrich
   - title: "Reference"
     contents:
-      - ReLTER_inatEnrich_article
+      - articles/ReLTER_inatEnrich_article
   - title: "Visualization"
     contents:
-      - ReLTER_inatEnrich_charts
+      - articles/ReLTER_inatEnrich_charts
