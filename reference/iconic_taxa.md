@@ -1,0 +1,44 @@
+# Plot number of observations and species per iconic taxonomic group
+
+**\[experimental\]**
+
+Takes a tibble of iNaturalist occurrences and produces a grouped bar
+chart showing the total number of observations and unique species for
+each iconic taxonomic group as defined by iNaturalist.
+
+## Usage
+
+``` r
+iconic_taxa(df)
+```
+
+## Arguments
+
+- df:
+
+  An `sf` tibble of iNaturalist occurrences containing at least the
+  columns `taxon.iconic_taxon_name` and `name`.
+
+## Value
+
+A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html) object
+printed to the active device.
+
+## See also
+
+[`top_n_species`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/top_n_species.md),
+[`obs_per_year`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_per_year.md)
+
+## Author
+
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, phD <alice.lenzi@crea.gov.it>
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+iconic_taxa(occ_eLTER_legal)
+} # }
+```

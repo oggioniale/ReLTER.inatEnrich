@@ -1,0 +1,330 @@
+# ReLTER.inatEnrich — Technical Reference
+
+## Overview
+
+This article is a technical complement to the [Getting Started
+vignette](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.md).
+It documents the internal data structures produced at each step of the
+enrichment pipeline, the API endpoints queried, and the recommended
+patterns for accessing nested list-columns in downstream analyses.
+
+------------------------------------------------------------------------
+
+## Package architecture
+
+`ReLTER.inatEnrich` is structured around four public functions that
+operate sequentially on an `sf` tibble of iNaturalist occurrences:
+
+| Function | Data source | Output column(s) |
+|----|----|----|
+| [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md) | iNaturalist API `/v1/taxa/{id}` | `status_IUCN` (list-column) |
+| [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md) | iNaturalist API `/v1/taxa/{id}` | `establishmentMeans` (list-column) |
+| [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md) | EUNIS species database | `directive`, `Annex` (flat columns) |
+| [`create_leaflet_occ_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/create_leaflet_occ_map.md) | — | Leaflet map object |
+
+All API calls use `httr2` with retry logic (`max_tries = 3`,
+`max_seconds = 120`) and return a safe empty tibble on failure, so the
+pipeline never interrupts on a single taxon error.
+
+------------------------------------------------------------------------
+
+## Nested list-column structures
+
+Two of the four enrichment functions produce **list-columns** — columns
+where each cell contains a tibble rather than a scalar value. This
+design allows multiple records per taxon (e.g. one IUCN assessment per
+geographic scope) to coexist in a single row of the occurrence tibble
+without information loss.
+
+### `establishmentMeans`
+
+Produced by
+[`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md).
+Each cell contains a **1 × 2 tibble** with the nativeness status and the
+authority that recorded it, filtered to the specified country.
+
+    # str(occ$establishmentMeans[[1]])
+    tibble [1 × 2] (S3: tbl_df/tbl/data.frame)
+     $ nativeness: chr "native"
+     $ authority : chr "Italy Check List"
+
+**Accessing the values:**
+
+``` r
+
+library(dplyr)
+library(purrr)
+
+# Extract nativeness for all rows as a flat character vector
+occ |>
+  mutate(
+    nativeness = map_chr(establishmentMeans, ~ .x$nativeness[[1]] %||% NA_character_),
+    em_authority = map_chr(establishmentMeans, ~ .x$authority[[1]]  %||% NA_character_)
+  )
+
+# Unnest to a flat tibble (duplicates rows where needed)
+occ |>
+  tidyr::unnest(establishmentMeans)
+```
+
+**When is it `NA`?**
+
+`nativeness` and `authority` are both `NA_character_` when:
+
+- the taxon has no listed taxa records in iNaturalist, or
+- none of the listed taxa records match the specified `country`, or
+- the API call failed after the maximum number of retries.
+
+------------------------------------------------------------------------
+
+### `status_IUCN`
+
+Produced by
+[`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md).
+Each cell contains an **N × 4 tibble**, with one row per geographic
+scope for which an IUCN assessment exists. The number of rows varies by
+taxon.
+
+    # str(occ$status_IUCN[[1]])
+    tibble [3 × 4] (S3: tbl_df/tbl/data.frame)
+     $ status   : chr [1:3] "LC" "LC" "LC"
+     $ authority: chr [1:3] "IUCN Red List" "IUCN Red List" "IUCN Red List"
+     $ name     : chr [1:3] NA "Europe" "Mediterranean"
+     $ url      : chr [1:3] "https://www.iucnredlist.org/..."
+                            "https://www.iucnredlist.org/..."
+                            "https://www.iucnredlist.org/..."
+
+The `name` field identifies the geographic scope of the assessment:
+
+- `NA` — global assessment
+- `"Europe"`, `"Mediterranean"`, etc. — regional assessments
+
+**Accessing the values:**
+
+``` r
+
+# Extract only the global status (name is NA)
+occ |>
+  mutate(
+    iucn_global = map_chr(status_IUCN, function(tbl) {
+      global <- tbl |> filter(is.na(name))
+      if (nrow(global) == 0) NA_character_ else global$status[[1]]
+    })
+  )
+
+# Extract all scopes as a flat tibble (one row per taxon × scope)
+occ |>
+  select(taxon.id, name, status_IUCN) |>
+  tidyr::unnest(status_IUCN) |>
+  rename(
+    scientific_name = name,
+    iucn_scope      = name1,   # name column from the nested tibble
+    iucn_status     = status
+  )
+
+# Get all distinct statuses for a single taxon
+occ$status_IUCN[[1]] |>
+  mutate(scope = coalesce(name, "Global")) |>
+  select(scope, status, url)
+```
+
+**IUCN status codes reference:**
+
+| Code | Meaning               |
+|------|-----------------------|
+| `EX` | Extinct               |
+| `EW` | Extinct in the Wild   |
+| `CR` | Critically Endangered |
+| `EN` | Endangered            |
+| `VU` | Vulnerable            |
+| `NT` | Near Threatened       |
+| `LC` | Least Concern         |
+| `DD` | Data Deficient        |
+| `NE` | Not Evaluated         |
+
+------------------------------------------------------------------------
+
+### `directive` and `Annex` (flat columns)
+
+Produced by
+[`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md).
+Unlike the IUCN and nativeness data, EUNIS legal information is stored
+as **flat character columns**. When a taxon is covered by more than one
+directive, the occurrence tibble contains **multiple rows for the same
+observation** — one per directive/annex combination.
+
+    # Example: a taxon covered by both directives
+    # A tibble: 2 × (n + 2)
+    #   taxon.id  ...  directive                              Annex
+    #   <int>          <chr>                                  <chr>
+    # 1 48484          EU Birds Directive (2009/147/EC)       Annex I
+    # 2 48484          EU Habitats Directive (92/43/EEC)      Annex IV
+
+This means that **row count in `occ_eLTER_legal` may exceed row count in
+`occ_eLTER_nativeness`** for taxa with multiple directive entries. Keep
+this in mind when computing summaries:
+
+``` r
+
+# Count unique observations (not rows) correctly
+n_obs <- occ_eLTER_legal |>
+  dplyr::distinct(taxon.id, observed_on, user.login) |>
+  nrow()
+
+# Summarise directives per taxon without duplicating observations
+directives_per_taxon <- occ_eLTER_legal |>
+  dplyr::select(taxon.id, directive, Annex) |>
+  dplyr::distinct() |>
+  dplyr::group_by(taxon.id) |>
+  dplyr::summarise(
+    n_directives = sum(!is.na(directive)),
+    directives   = paste(na.omit(directive), collapse = "; "),
+    annexes      = paste(na.omit(Annex),     collapse = "; "),
+    .groups      = "drop"
+  )
+```
+
+------------------------------------------------------------------------
+
+## API details
+
+### iNaturalist API
+
+Both
+[`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)
+and
+[`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)
+query the iNaturalist v1 taxa endpoint:
+
+    GET https://api.inaturalist.org/v1/taxa/{taxon_id}
+
+The relevant fields extracted from the response are:
+
+- `results[[1]]$conservation_statuses` → IUCN status, authority, URL
+- `results[[1]]$listed_taxa` → establishment means, place name, list
+  title
+
+Both functions iterate over **unique taxon IDs only**, so each taxon is
+queried exactly once regardless of how many observations exist for it in
+the dataset.
+
+### EUNIS species database
+
+[`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+queries the EUNIS API using the taxon’s scientific name to retrieve
+legal coverage under EU directives. Results are matched back to the
+occurrence tibble via `taxon.id`.
+
+------------------------------------------------------------------------
+
+## Error handling and NA semantics
+
+All three enrichment functions use the same defensive pattern:
+
+``` r
+
+# Conceptual structure shared by all enrichment functions
+result <- tryCatch(
+  query_external_api(taxon.id),
+  error = function(e) {
+    warning("Error for taxon.id: ", taxon.id, " — ", conditionMessage(e))
+    return(empty_fallback_tibble)   # never returns NULL
+  }
+)
+```
+
+This guarantees that:
+
+1.  The pipeline always completes even if individual API calls fail
+2.  Failed taxa are identifiable by `NA` values in the enrichment
+    columns
+3.  A [`warning()`](https://rdrr.io/r/base/warning.html) is emitted for
+    each failure, visible in the R console
+
+To inspect which taxa failed after running the pipeline:
+
+``` r
+
+# Taxa with no IUCN data
+occ |>
+  filter(map_lgl(status_IUCN, ~ all(is.na(.x$status))))
+
+# Taxa with no nativeness data
+occ |>
+  filter(map_lgl(establishmentMeans, ~ is.na(.x$nativeness[[1]])))
+
+# Taxa with no EUNIS legal data
+occ |>
+  filter(is.na(directive)) |>
+  distinct(taxon.id, name)
+```
+
+------------------------------------------------------------------------
+
+## Performance considerations
+
+For large occurrence datasets (\> 1 000 unique taxa), the enrichment
+functions can take several minutes due to the sequential nature of the
+API calls and the retry logic. A few practical tips:
+
+- **Cache intermediate results** between steps using
+  [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) /
+  [`readRDS()`](https://rdrr.io/r/base/readRDS.html) to avoid
+  re-querying on re-runs:
+
+``` r
+
+# Save after the slowest step
+saveRDS(occ_eLTER_IUCN,      "cache/occ_eLTER_IUCN.rds")
+saveRDS(occ_eLTER_nativeness, "cache/occ_eLTER_nativeness.rds")
+saveRDS(occ_eLTER_legal,      "cache/occ_eLTER_legal.rds")
+
+# Reload
+occ_eLTER_legal <- readRDS("cache/occ_eLTER_legal.rds")
+```
+
+- **Filter before enriching**: apply
+  [`sf::st_intersection()`](https://r-spatial.github.io/sf/reference/geos_binary_ops.html)
+  before running the enrichment functions so that only taxa actually
+  within the site boundary are queried.
+- **Rate limits**: the iNaturalist API does not require authentication
+  for read-only taxon queries, but it does apply rate limiting. The
+  built-in retry logic (`max_tries = 3`, `max_seconds = 120`) handles
+  transient failures gracefully.
+
+------------------------------------------------------------------------
+
+## Session info
+
+``` r
+
+sessionInfo()
+#> R version 4.6.0 (2026-04-24)
+#> Platform: x86_64-pc-linux-gnu
+#> Running under: Ubuntu 24.04.4 LTS
+#> 
+#> Matrix products: default
+#> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> 
+#> locale:
+#>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
+#>  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
+#>  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
+#> [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+#> 
+#> time zone: UTC
+#> tzcode source: system (glibc)
+#> 
+#> attached base packages:
+#> [1] stats     graphics  grDevices utils     datasets  methods   base     
+#> 
+#> loaded via a namespace (and not attached):
+#>  [1] digest_0.6.39     desc_1.4.3        R6_2.6.1          fastmap_1.2.0    
+#>  [5] xfun_0.57         cachem_1.1.0      knitr_1.51        htmltools_0.5.9  
+#>  [9] rmarkdown_2.31    lifecycle_1.0.5   cli_3.6.6         sass_0.4.10      
+#> [13] pkgdown_2.2.0     textshaping_1.0.5 jquerylib_0.1.4   systemfonts_1.3.2
+#> [17] compiler_4.6.0    tools_4.6.0       ragg_1.5.2        bslib_0.10.0     
+#> [21] evaluate_1.0.5    yaml_2.3.12       jsonlite_2.0.0    rlang_1.2.0      
+#> [25] fs_2.1.0          htmlwidgets_1.6.4
+```
