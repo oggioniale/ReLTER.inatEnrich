@@ -104,7 +104,7 @@ map
 
 ```
 
-[![Example map output](https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/inst/figures/map_example.png)](https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html)
+[![Example map output](https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/man/figures/map_screenshot.png)](https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html)
 > *Click the image to open an interactive map.*
 
 For a full walkthrough see the
