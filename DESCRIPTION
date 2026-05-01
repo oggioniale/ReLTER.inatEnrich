@@ -32,7 +32,6 @@ Suggests:
     htmltools,
     httptest2,
     knitr,
-    ReLTER,
     lifecycle,
     remotes,
     rmarkdown,
