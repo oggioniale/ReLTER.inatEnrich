@@ -1,0 +1,33 @@
+title: ReLTER.inatEnrich
+url: https://github.com/oggioniale/ReLTER.inatEnrich
+template:
+  bootstrap: 5
+  assets: inst/figures
+params:
+  mathjax: true
+includes:
+  in_header: |
+  <script defer data-domain="" src="https://plausible.io/js/plausible.js"></script>
+  
+  reference:
+  - title: All functions
+contents:
+  - get_conservation_status
+  - get_nativeness_degree
+  - get_eunis_legal_info
+  - add_iucn_to_obs
+  - add_iucn_to_occ
+  - add_nativeness_to_occ
+  - add_eunis_legal_to_occ
+  - create_leaflet_occ_map
+  - iconic_taxa
+  - top_n_species
+  - obs_per_year
+  - obs_per_month
+  - obs_per_hour
+  - species_richness_map
+  - obs_pie_chart
+navbar:
+  structure:
+  left: [reference]
+right: [github]

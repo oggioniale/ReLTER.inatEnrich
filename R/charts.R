@@ -121,7 +121,7 @@ iconic_taxa <- function(df) {
 #' }
 #'
 ### top_n_species
-top_n_species <- function(df) {
+top_n_species <- function(df, n = 10) {
   n = 10
   iconic_levels <- sort(unique(dplyr::coalesce(df$`taxon.iconic_taxon_name`, "Unknown")))
   pal_colors    <- grDevices::hcl.colors(length(iconic_levels), "Set 2")

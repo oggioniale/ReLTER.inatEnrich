@@ -4,7 +4,7 @@
 \alias{top_n_species}
 \title{Plot top N most observed species}
 \usage{
-top_n_species(df)
+top_n_species(df, n = 10)
 }
 \arguments{
 \item{df}{An \code{sf} tibble of iNaturalist occurrences containing at least
