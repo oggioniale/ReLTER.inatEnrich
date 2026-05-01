@@ -141,9 +141,10 @@ devtools::document() # documentation is up to date
 
 If you use `ReLTER.inatEnrich` in your research, please cite it as:
 
-> Oggioni A. (2025). *ReLTER.inatEnrich: Enriching iNaturalist
-> occurrences for eLTER-RI sites*. R package. doi:
-> `[PLACEHOLDER — will be updated upon Zenodo release]`
+> Oggioni A., Lenzi A., Campanaro A., Bergami C. (2026).
+> *ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI
+> sites*. R package version 0.0.0.9000. doi:
+> [10.5281/zenodo.15399015](https://doi.org/10.5281/zenodo.15399015)
 
 You can also retrieve the citation from within R:
 
