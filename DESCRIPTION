@@ -2,35 +2,44 @@ Package: ReLTER.inatEnrich
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: c(
-    person(
-      given = "Alessandro",
-      family = "Oggioni",
-      email = "alessandro.oggioni@cnr.it",
-      role = c("aut", "cre", "fnd"),
-      comment = c(ORCID = "0000-0002-7997-219X")
-    )
+    person("Alessandro", "Oggioni", , "alessandro.oggioni@cnr.it", role = c("aut", "cre", "fnd"),
+           comment = c(ORCID = "0000-0002-7997-219X")),
+    person("Alice", "Lenzi", , "alice.lenzi@crea.gov.it", role = c("aut", "ctb"),
+           comment = c(ORCID = "0000-0002-3456-5726")),
+    person("Alessandro", "Campanaro", , "alessandro.campanaro@crea.gov.it", role = c("aut", "ctb"),
+           comment = c(ORCID = "0000-0003-4043-6362")),
+    person("Caterina", "Bergami", , "caterina.bergami@cnr.it", role = c("aut", "ctb"),
+           comment = c(ORCID = "0000-0002-5284-1317"))
   )
 Description: What the package does (one paragraph).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
+URL: https://github.com/oggioniale/ReLTER.inatEnrich,
+    https://oggioniale.github.io/ReLTER.inatEnrich/
+BugReports: https://github.com/oggioniale/ReLTER.inatEnrich/issues
+Imports: 
+    dplyr,
+    ggplot2,
+    grDevices,
+    httr2,
+    leaflet,
+    purrr,
+    rinat,
+    rvest,
+    sf,
+    stats
+Suggests: 
+    htmltools,
+    httptest2,
+    knitr,
+    ReLTER,
+    lifecycle,
+    remotes,
+    rmarkdown,
+    testthat,
+    rinat,
+    tibble,
+    tidyr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-URL: https://github.com/oggioniale/ReLTER.inatEnrich, https://oggioniale.github.io/ReLTER.inatEnrich/
-BugReports: https://github.com/oggioniale/ReLTER.inatEnrich/issues
-Imports: 
-    lifecycle,
-    dplyr,
-    httr2,
-    httr,
-    jsonlite,
-    purrr,
-    rvest,
-    stringr,
-    rinat,
-    stats,
-    tibble,
-    leaflet
-Suggests: 
-    httptest2,
-    sf

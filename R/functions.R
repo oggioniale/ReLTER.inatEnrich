@@ -23,7 +23,6 @@
 #' `NA` values in all fields.
 #' @author Alessandro Oggioni, phD (2023) \email{alessandro.oggioni@@cnr.it}
 #' @importFrom httr2 request req_method req_headers req_retry req_perform resp_status resp_body_json
-#' @importFrom jsonlite fromJSON
 #' @importFrom dplyr tibble select
 #' @export
 #' @examples
@@ -84,7 +83,10 @@ get_conservation_status <- function(taxon.id) {
   # conservation statuses
   cons_status <- data$results$conservation_statuses[[1]]
   
-  if (is.null(cons_status) || nrow(cons_status) == 0) {
+  if (is.null(cons_status) ||
+      length(cons_status) == 0 ||
+      (is.data.frame(cons_status) && nrow(cons_status) == 0)
+    ) {
     return(empty_tbl)
   }
   
@@ -98,7 +100,9 @@ get_conservation_status <- function(taxon.id) {
   # clean output
   cons_status <- cons_status |>
     dplyr::select(status, authority, place, url) |>
-    tidyr::unnest_wider(place) |>
+    dplyr::mutate(name = sapply(place, function(p) {
+      if (is.null(p) || is.null(p$name)) NA_character_ else as.character(p$name)
+    })) |>
     dplyr::select(status, authority, name, url)
   
   return(cons_status)
@@ -242,11 +246,11 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
 #'
 #' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
 #'
-#' @importFrom httr GET content status_code
-#' @importFrom jsonlite fromJSON
+#' @importFrom httr2 request req_method req_headers req_retry req_perform
+#'   resp_status resp_body_json
 #' @importFrom rvest read_html html_elements html_attr html_table
 #' @importFrom dplyr tibble filter select mutate
-#' @importFrom stringr str_detect str_extract
+#' @importFrom purrr keep
 #' @export
 #'
 #' @examples
@@ -260,10 +264,10 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
 get_eunis_legal_info <- function(taxon.id) {
   safe_return <- function(taxon.id, scientific_name = NA) {
     dplyr::tibble(
-      taxon.id = taxon.id,
+      taxon.id        = taxon.id,
       scientific_name = scientific_name,
-      `Legal text` = NA,
-      Annex = NA
+      `Legal text`    = NA,
+      Annex           = NA
     )
   }
   
@@ -271,22 +275,21 @@ get_eunis_legal_info <- function(taxon.id) {
   url_inat <- paste0("https://api.inaturalist.org/v1/taxa/", taxon.id)
   
   res <- tryCatch({
-    httr::GET(url_inat)
-  }, error = function(e) {
-    return(NULL)
-  })
+    httr2::request(url_inat) |>
+      httr2::req_method("GET") |>
+      httr2::req_headers(Accept = "application/json") |>
+      httr2::req_retry(max_tries = 3, max_seconds = 120) |>
+      httr2::req_perform()
+  }, error = function(e) NULL)
   
-  if (is.null(res) || httr::status_code(res) != 200) {
+  if (is.null(res) || httr2::resp_status(res) != 200) {
     warning("Error in iNaturalist API request")
     return(safe_return(taxon.id))
   }
   
   data <- tryCatch({
-    httr::content(res, as = "text", encoding = "UTF-8") |>
-      jsonlite::fromJSON(simplifyDataFrame = TRUE)
-  }, error = function(e) {
-    return(NULL)
-  })
+    httr2::resp_body_json(res, simplifyVector = TRUE)
+  }, error = function(e) NULL)
   
   if (is.null(data) || length(data$results) == 0) {
     return(safe_return(taxon.id))
@@ -307,16 +310,15 @@ get_eunis_legal_info <- function(taxon.id) {
       rvest::html_attr("href") |>
       na.omit() |>
       as.vector() |>
-      (\(x) x[stringr::str_detect(x, "^species/\\d+$")])()
-  }, error = function(e) {
-    return(character(0))
-  })
+      (\(x) x[grepl("^species/\\d+$", x)])()  # bug fix: pattern primo, x secondo
+  }, error = function(e) character(0))
   
   if (length(link) == 0) {
     return(safe_return(taxon.id, scientific_name))
   }
   
-  species_id <- stringr::str_extract(link[1], "\\d+")
+  m <- regexpr("\\d+", link[1])
+  species_id <- if (m != -1) regmatches(link[1], m) else NA_character_
   
   if (is.na(species_id)) {
     return(safe_return(taxon.id, scientific_name))
@@ -329,17 +331,17 @@ get_eunis_legal_info <- function(taxon.id) {
     rvest::read_html(url_eunis) |>
       rvest::html_elements("table") |>
       rvest::html_table(fill = TRUE)
-  }, error = function(e) {
-    return(NULL)
-  })
+  }, error = function(e) NULL)
   
   if (is.null(page) || length(page) == 0) {
     return(safe_return(taxon.id, scientific_name))
   }
   
   # trova tabella con "Legal"
-  df_legal_list <- page %>%
-    purrr::keep(~ any(stringr::str_detect(names(.x), "Legal")))
+  df_legal_list <- purrr::keep(
+    page,
+    ~ any(grepl("Legal", names(.x)))  # bug fix: pattern primo, names(.x) secondo
+  )
   
   if (length(df_legal_list) == 0) {
     return(safe_return(taxon.id, scientific_name))
@@ -353,16 +355,15 @@ get_eunis_legal_info <- function(taxon.id) {
   }
   
   # filtra direttive EU
-  df_legal <- df_legal %>%
-    dplyr::filter(stringr::str_detect(`Legal text`, "92/43/EEC|2009/147/EC")) %>%
-    dplyr::select(`Legal text`, Annex) %>%
+  df_legal <- df_legal |>
+    dplyr::filter(grepl("92/43/EEC|2009/147/EC", `Legal text`)) |>  # bug fix: pattern primo
+    dplyr::select(`Legal text`, Annex) |>
     dplyr::mutate(
-      taxon.id = taxon.id,
+      taxon.id        = taxon.id,
       scientific_name = scientific_name
-    ) %>%
+    ) |>
     dplyr::select(taxon.id, scientific_name, `Legal text`, Annex)
   
-  # fallback se vuoto
   if (nrow(df_legal) == 0) {
     return(safe_return(taxon.id, scientific_name))
   }
@@ -422,6 +423,16 @@ get_eunis_legal_info <- function(taxon.id) {
 add_iucn_to_obs <- function(project_name) {
   proj_alias <- gsub(" ", "-", tolower(project_name))
   
+  deps <- c("rinat")
+  deps_missing <- !sapply(deps, requireNamespace, quietly = TRUE)
+  
+  if (sum(deps_missing) > 0) {
+    stop(
+      "You need to install the following Suggested packages to use this function.\n",
+      "Please install them with:\n",
+      "install.packages(c(\"rinat\"))"
+    )
+  }
   # Download iNaturalist project info by rinat package
   iNat_project_info <- rinat::get_inat_obs_project(
     proj_alias,
@@ -537,9 +548,8 @@ add_iucn_to_obs <- function(project_name) {
 #' reflects the information available within iNaturalist. This information may
 #' not be up to date with respect to the official IUCN Red List.
 #' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
-#' @importFrom dplyr filter select distinct left_join mutate
+#' @importFrom dplyr filter select distinct left_join mutate tibble
 #' @importFrom purrr map_dfr map_lgl walk walk2
-#' @importFrom tibble tibble
 #' @export
 #' @examples
 #' \dontrun{
@@ -571,7 +581,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
       captive == FALSE
     )
   # Standard empty tibble (no NULL anywhere)
-  empty_status_tbl <- tibble::tibble(
+  empty_status_tbl <- dplyr::tibble(
     status = NA_character_,
     authority = NA_character_,
     name = NA_character_,
@@ -708,7 +718,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'   may refer to the IUCN Red List. It may not always be up to date.
 #' @seealso \code{\link{get_nativeness_degree}} for the underlying API call.
 #' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
-#' @importFrom dplyr filter select distinct inner_join left_join
+#' @importFrom dplyr filter select distinct inner_join left_join tibble
 #' @importFrom purrr map_dfr pluck walk2 map_chr
 #' @export
 #' @examples
@@ -1184,7 +1194,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         # Taxon info
         "<b>Taxon:</b> ",
         if (taxon_name != "-")
-          sprintf('<a href="%s" target="_blank">%s</a>', taxon_url, taxon_name)
+          sprintf('<a href="%s" target="_blank"><i>%s</i></a>', taxon_url, taxon_name)
         else "-",
         "<br/><b>Common name:</b> ", common_name, "<br/>",
         "<b>Observed on:</b> ", observed_on, "<br/>",
@@ -1232,6 +1242,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
   
   occ_open     <- occ_map |> dplyr::filter(geopriv == "open")
   occ_obscured <- occ_map |> dplyr::filter(geopriv == "obscured")
+  occ_private  <- occ_map |> dplyr::filter(!geopriv %in% c("open", "obscured"))
   
   iconic_levels <- sort(unique(occ_map$iconic))
   pal <- leaflet::colorFactor(
@@ -1273,6 +1284,12 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       fillColor   = ~pal(iconic), fillOpacity = 0.35,
       popup       = ~popup, group = "obscured", clusterOptions = cluster_opts
     ) |>
+    leaflet::addCircleMarkers(
+      data        = occ_private,
+      radius      = 8, fill = TRUE, color = "white", weight = 3,
+      fillColor   = ~pal(iconic), fillOpacity = 0.2,
+      popup       = ~popup, group = "unknown", clusterOptions = cluster_opts
+    ) |>
     leaflet::addLegend(
       position = "bottomright",
       pal      = pal,
@@ -1282,17 +1299,19 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
     leaflet::addControl(
       html = paste0(
         "<div style='background:white; padding:8px 10px; border-radius:4px;'>",
-        "<b>Geoprivacy</b> (private not visible)<br/>",
+        "<b>Geoprivacy</b><br/>",
         "<svg width='18' height='18' style='vertical-align:middle; margin-right:4px;'>",
-        "<circle cx='9' cy='9' r='4' fill='gray' stroke='black' stroke-width='1' /></svg> open<br/>",
+        "<circle cx='9' cy='9' r='4' fill='gray' fill-opacity='1' stroke='black' stroke-width='1' /></svg> open<br/>",
         "<svg width='22' height='22' style='vertical-align:middle; margin-right:4px;'>",
-        "<circle cx='11' cy='11' r='7' fill='gray' fill-opacity='0.35' stroke='black' stroke-width='2' /></svg> obscured",
+        "<circle cx='11' cy='11' r='7' fill='gray' fill-opacity='0.35' stroke='black' stroke-width='2' /></svg> obscured<br/>",
+        "<svg width='18' height='18' style='vertical-align:middle; margin-right:4px;'>",
+        "<circle cx='9' cy='9' r='4' fill='gray' fill-opacity='0.2' stroke='black' stroke-width='1' /></svg> unknown",
         "</div>"
       ),
       position = "topright"
     ) |>
     leaflet::addLayersControl(
-      overlayGroups = c("open", "obscured"),
+      overlayGroups = c("open", "obscured", "unknown"),
       options       = leaflet::layersControlOptions(collapsed = FALSE)
     )
   

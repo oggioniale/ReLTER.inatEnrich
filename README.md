@@ -60,7 +60,8 @@ remotes::install_github("ropensci/ReLTER")
 
 ### Dependencies
 
-`ReLTER.inatEnrich` imports: `dplyr`, `purrr`, `httr2`, `sf`, `leaflet`.
+`ReLTER.inatEnrich` imports: `dplyr`, `purrr`, `httr2`, `sf`, `leaflet`, `ggplot2`, `rvest`, `stats`.
+
 All dependencies are installed automatically with the package.
 
 
@@ -103,7 +104,7 @@ map
 
 ```
 
-[![Example map output](man/figures/map_screenshot.png)](https://elter-ri.github.io/ReLTER.inatEnrich/figures/map_example.html)
+[![Example map output](inst/figures/map_example.png)](https://elter-ri.github.io/ReLTER.inatEnrich/figures/map_example.html)
 > *Click the image to open a interactive map.*
 
 For a full walkthrough see the

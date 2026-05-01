@@ -1,0 +1,24 @@
+citHeader("To cite ReLTER.inatEnrich in publications use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "ReLTER.inatEnrich: What the Package Does (One Line, Title Case)",
+  author   = c(
+    person("Alessandro", "Oggioni",
+           email = "alessandro.oggioni@cnr.it",
+           comment = c(ORCID = "0000-0002-7997-219X")),
+    person("Alice", "Lenzi",
+           email = "alice.lenzi@crea.gov.it",
+           comment = c(ORCID = "0000-0002-3456-5726")),
+    person("Alessandro", "Campanaro",
+           email = "alessandro.campanaro@crea.gov.it",
+           comment = c(ORCID = "0000-0003-4043-6362")),
+    person("Caterina", "Bergami",
+           email = "caterina.bergami@cnr.it",
+           comment = c(ORCID = "0000-0002-5284-1317"))
+  ),
+  year     = format(Sys.Date(), "%Y"),
+  note     = paste("R package version", meta$Version),
+  url      = "https://oggioniale.github.io/ReLTER.inatEnrich/",
+  doi      = ""
+)

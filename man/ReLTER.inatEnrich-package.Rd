@@ -20,5 +20,12 @@ Useful links:
 \author{
 \strong{Maintainer}: Alessandro Oggioni \email{alessandro.oggioni@cnr.it} (\href{https://orcid.org/0000-0002-7997-219X}{ORCID}) [funder]
 
+Authors:
+\itemize{
+  \item Alice Lenzi \email{alice.lenzi@crea.gov.it} (\href{https://orcid.org/0000-0002-3456-5726}{ORCID}) [contributor]
+  \item Alessandro Campanaro \email{alessandro.campanaro@crea.gov.it} (\href{https://orcid.org/0000-0003-4043-6362}{ORCID}) [contributor]
+  \item Caterina Bergami \email{caterina.bergami@cnr.it} (\href{https://orcid.org/0000-0002-5284-1317}{ORCID}) [contributor]
+}
+
 }
 \keyword{internal}

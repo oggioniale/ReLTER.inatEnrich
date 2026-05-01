@@ -25,3 +25,4 @@
 ^\.vscode$
 ^CITATION\.cff$
 ^codecov\.yml$
+^dev$

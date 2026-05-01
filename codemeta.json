@@ -22,6 +22,50 @@
       "familyName": "Oggioni",
       "email": "alessandro.oggioni@cnr.it",
       "@id": "https://orcid.org/0000-0002-7997-219X"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Alice",
+      "familyName": "Lenzi",
+      "email": "alice.lenzi@crea.gov.it",
+      "@id": "https://orcid.org/0000-0002-3456-5726"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Alessandro",
+      "familyName": "Campanaro",
+      "email": "alessandro.campanaro@crea.gov.it",
+      "@id": "https://orcid.org/0000-0003-4043-6362"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Caterina",
+      "familyName": "Bergami",
+      "email": "caterina.bergami@cnr.it",
+      "@id": "https://orcid.org/0000-0002-5284-1317"
+    }
+  ],
+  "contributor": [
+    {
+      "@type": "Person",
+      "givenName": "Alice",
+      "familyName": "Lenzi",
+      "email": "alice.lenzi@crea.gov.it",
+      "@id": "https://orcid.org/0000-0002-3456-5726"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Alessandro",
+      "familyName": "Campanaro",
+      "email": "alessandro.campanaro@crea.gov.it",
+      "@id": "https://orcid.org/0000-0003-4043-6362"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Caterina",
+      "familyName": "Bergami",
+      "email": "caterina.bergami@cnr.it",
+      "@id": "https://orcid.org/0000-0002-5284-1317"
     }
   ],
   "funder": [
@@ -42,6 +86,32 @@
       "@id": "https://orcid.org/0000-0002-7997-219X"
     }
   ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "httptest2",
+      "name": "httptest2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=httptest2"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "sf",
+      "name": "sf",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=sf"
+    }
+  ],
   "softwareRequirements": {
     "1": {
       "@type": "SoftwareApplication",
@@ -55,7 +125,132 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lifecycle"
     },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "dplyr",
+      "name": "dplyr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=dplyr"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "httr2",
+      "name": "httr2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=httr2"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "httr",
+      "name": "httr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=httr"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "jsonlite",
+      "name": "jsonlite",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "purrr",
+      "name": "purrr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=purrr"
+    },
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "rvest",
+      "name": "rvest",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rvest"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
+      "identifier": "stringr",
+      "name": "stringr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=stringr"
+    },
+    "9": {
+      "@type": "SoftwareApplication",
+      "identifier": "rinat",
+      "name": "rinat",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rinat"
+    },
+    "10": {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "11": {
+      "@type": "SoftwareApplication",
+      "identifier": "tibble",
+      "name": "tibble",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tibble"
+    },
+    "12": {
+      "@type": "SoftwareApplication",
+      "identifier": "leaflet",
+      "name": "leaflet",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=leaflet"
+    },
     "SystemRequirements": null
   },
-  "fileSize": "111.18KB"
+  "fileSize": "2212.734KB"
 }
