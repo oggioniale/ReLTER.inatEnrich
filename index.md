@@ -1,4 +1,4 @@
-# ReLTER.inatEnrich ![](reference/figures/logo.png)
+# ReLTER.inatEnrich
 
 ## Overview
 
@@ -104,6 +104,9 @@ For a full walkthrough see the [Getting Started
 vignette](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.html)
 and the [Technical Reference
 article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_article.html).
+For an overview of all visualization outputs see the [Visualization
+functions
+article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html).
 
 ## 📖 Documentation
 

@@ -1,4 +1,4 @@
-# ReLTER.inatEnrich ![](reference/figures/logo.png)
+# ReLTER.inatEnrich
 
 ## Overview
 
@@ -104,6 +104,9 @@ For a full walkthrough see the [Getting Started
 vignette](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.html)
 and the [Technical Reference
 article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_article.html).
+For an overview of all visualization outputs see the [Visualization
+functions
+article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html).
 
 ## 📖 Documentation
 
@@ -221,7 +224,12 @@ List](https://www.iucnredlist.org).
 
 # Articles
 
-### All vignettes
+### Get started
+
+- [Enriching iNaturalist Occurrences for eLTER-RI
+  Sites](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.md):
+
+### Reference
 
 - [ReLTER.inatEnrich — Technical
   Reference](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_article.md):
@@ -229,5 +237,7 @@ List](https://www.iucnredlist.org).
   A technical deep-dive into the ReLTER.inatEnrich enrichment pipeline:
   API calls, nested list-column structures, and data access patterns.
 
-- [Enriching iNaturalist Occurrences for eLTER-RI
-  Sites](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.md):
+### Visualization
+
+- [Visualization
+  functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.md):
