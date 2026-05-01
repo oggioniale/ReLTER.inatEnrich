@@ -1,56 +1,7 @@
 # tests/testthat/test-plots.R
 
-# --- shared mock data ---------------------------------------------------
-
-make_mock_df <- function() {
-  
-  df <- tibble::tibble(
-    name                          = c("Anas platyrhynchos", "Quercus robur",
-                                      "Bombus terrestris", "Anas platyrhynchos",
-                                      "Vulpes vulpes", "Ailanthus altissima"),
-    taxon.iconic_taxon_name       = c("Aves", "Plantae", "Insecta",
-                                      "Aves", "Mammalia", "Plantae"),
-    observed_on_details.year      = c(2020L, 2021L, 2021L, 2022L, 2022L, 2023L),
-    observed_on_details.month     = c(3L, 6L, 6L, 3L, 11L, 5L),
-    observed_on_details.hour      = c(8L, 14L, 14L, 9L, 17L, 10L),
-    taxon_geoprivacy              = c("open", "open", "obscured",
-                                      "open", "open", "open"),
-    quality_grade                 = rep("research", 6),
-    observed_on                   = as.Date(c("2020-03-01", "2021-06-15",
-                                              "2021-06-20", "2022-03-10",
-                                              "2022-11-05", "2023-05-01")),
-    public_positional_accuracy    = c(10, 20, 15, 10, 30, 25),
-    user.login                    = c("user_a", "user_b", "user_a",
-                                      "user_c", "user_b", "user_a"),
-    uri                           = paste0("https://www.inaturalist.org/observations/", 1:6),
-    taxon.id                      = c(1L, 2L, 3L, 1L, 4L, 5L),
-    taxon.preferred_common_name   = c("Mallard", "English oak", "Buff-tailed bumblebee",
-                                      "Mallard", "Red fox", "Tree of heaven"),
-    taxon.default_photo.square_url = rep("https://example.com/photo.jpg", 6),
-    directive  = c("EU Birds Directive", NA, NA, "EU Birds Directive",
-                   NA, "EU Habitats Directive"),
-    annex      = c("I", NA, NA, "I", NA, "II"),
-    establishmentMeans = list(
-      tibble::tibble(nativeness = "native",     authority = "GBIF"),
-      tibble::tibble(nativeness = "native",     authority = "GBIF"),
-      tibble::tibble(nativeness = "native",     authority = "GBIF"),
-      tibble::tibble(nativeness = "native",     authority = "GBIF"),
-      tibble::tibble(nativeness = "native",     authority = "GBIF"),
-      tibble::tibble(nativeness = "introduced", authority = "GBIF")
-    ),
-    status_IUCN = replicate(6, tibble::tibble(
-      status    = "LC",
-      authority = "IUCN",
-      name      = "",
-      url       = "https://www.iucnredlist.org"
-    ), simplify = FALSE),
-    lon = c(11.1, 11.2, 11.3, 11.1, 11.4, 11.5),
-    lat = c(45.1, 45.2, 45.3, 45.1, 45.4, 45.5)
-  ) |>
-    sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
-  
-  df
-}
+df <- ReLTER.inatEnrich::occ_eLTER_legal
+site_boundary <- ReLTER.inatEnrich::site_boundary
 
 
 # --- iconic_taxa --------------------------------------------------------
