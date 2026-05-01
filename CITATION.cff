@@ -6,8 +6,9 @@
 cff-version: 1.2.0
 message: 'To cite package "ReLTER.inatEnrich" in publications use:'
 type: software
-title: 'ReLTER.inatEnrich: What the Package Does (One Line, Title Case)'
+title: 'ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI sites'
 version: 0.0.0.9000
+doi: 10.5281/zenodo.19954246
 abstract: What the package does (one paragraph).
 authors:
 - family-names: Oggioni

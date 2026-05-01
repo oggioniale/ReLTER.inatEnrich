@@ -1,6 +1,7 @@
 # ReLTER.inatEnrich <img src="man/figures/logo.png" align="right" height="139" alt="ReLTER" />
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19954246.svg)](https://doi.org/10.5281/zenodo.19954246)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![R-CMD-check](https://github.com/oggioniale/WISP.data/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/oggioniale/WISP.data/actions/workflows/R-CMD-check)
@@ -146,9 +147,9 @@ devtools::document() # documentation is up to date
 
 If you use `ReLTER.inatEnrich` in your research, please cite it as:
 
-> Oggioni A. (2025). *ReLTER.inatEnrich: Enriching iNaturalist occurrences
-> for eLTER-RI sites*. R package.
-> doi: `[PLACEHOLDER — will be updated upon Zenodo release]`
+> Oggioni A., Lenzi A., Campanaro A., Bergami C. (2026). *ReLTER.inatEnrich:
+> Enriching iNaturalist occurrences for eLTER-RI sites*. R package version 0.0.0.9000.
+> doi: [10.5281/zenodo.15399015](https://doi.org/10.5281/zenodo.15399015)
 
 You can also retrieve the citation from within R:
 

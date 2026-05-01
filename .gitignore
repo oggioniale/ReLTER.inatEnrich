@@ -27,3 +27,6 @@ inst/doc/
 # ---- renv (if used) ----
 renv/library/
 renv/staging/
+
+flow.R
+
