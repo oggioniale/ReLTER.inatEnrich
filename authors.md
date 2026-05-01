@@ -17,7 +17,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/oggioniale/ReLTER.inatEnrich/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/oggioniale/ReLTER.inatEnrich/blob/v0.0.0.9000/inst/CITATION)
 
 Oggioni A, Lenzi A, Campanaro A, Bergami C (2026). *ReLTER.inatEnrich:
 What the Package Does (One Line, Title Case)*. R package version
