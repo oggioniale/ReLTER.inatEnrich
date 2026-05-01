@@ -5,6 +5,12 @@
 This article illustrates the visualization functions available in
 `ReLTER.inatEnrich` using a small example dataset.
 
+``` r
+
+df            <- ReLTER.inatEnrich::occ_eLTER_legal
+site_boundary <- ReLTER.inatEnrich::site_boundary
+```
+
 ## Taxonomic composition
 
 [`iconic_taxa()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/iconic_taxa.md)
@@ -74,8 +80,27 @@ obs_pie_chart(df)
 
 ## Interactive maps
 
-The interactive map outputs (species richness grid and occurrence map)
-are best explored directly:
+[`species_richness_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/species_richness_map.md)
+produces an interactive Leaflet map where each grid cell is coloured by
+species richness.
 
-- [Species richness
-  map](https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html)
+``` r
+
+species_richness_map(
+  df            = occ_eLTER_legal,
+  site_boundary = site_boundary,
+  cell_size     = 0.001
+)
+```
+
+[`create_leaflet_occ_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/create_leaflet_occ_map.md)
+shows each observation as a circle marker coloured by iconic taxon
+group, with a detailed popup per observation.
+
+``` r
+
+create_leaflet_occ_map(
+  occ_enriched  = occ_eLTER_legal,
+  site_boundary = site_boundary
+)
+```
