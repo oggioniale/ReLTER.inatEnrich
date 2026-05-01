@@ -1,0 +1,84 @@
+---
+title: "Visualization functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualization functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width  = 7,
+  fig.height = 5,
+  out.width  = "100%"
+)
+library(ReLTER.inatEnrich)
+```
+
+## Overview
+
+This article illustrates the visualization functions available in
+`ReLTER.inatEnrich` using a small example dataset.
+
+```{r mock-data, echo = FALSE}
+# small reproducible dataset
+df <- make_mock_df()
+```
+
+## Taxonomic composition
+
+`iconic_taxa()` shows the number of observations and species per
+iNaturalist iconic taxon group.
+
+```{r iconic-taxa}
+iconic_taxa(df)
+```
+
+## Top observed species
+
+`top_n_species()` displays the most observed species coloured by
+iconic taxon group.
+
+```{r top-species}
+top_n_species(df, n = 10)
+```
+
+## Temporal distribution
+
+### By year
+
+```{r obs-year}
+obs_per_year(df)
+```
+
+### By month
+
+```{r obs-month}
+obs_per_month(df)
+```
+
+### By hour of the day
+
+```{r obs-hour}
+obs_per_hour(df)
+```
+
+## Conservation category
+
+`obs_pie_chart()` summarises species by conservation category
+following a fixed priority order: Alien (IAS) > Habitats Directive >
+Birds Directive > Other.
+
+```{r pie-chart}
+obs_pie_chart(df)
+```
+
+## Interactive maps
+
+The interactive map outputs (species richness grid and occurrence map)
+are best explored directly:
+
+- [Species richness map](https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html)

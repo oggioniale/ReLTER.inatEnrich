@@ -3,7 +3,12 @@ url: https://oggioniale.github.io/ReLTER.inatEnrich/
 template:
   bootstrap: 5
   assets: inst/figures
-
+  
+navbar:
+  logo:
+    image: man/figures/logo.png
+    href: https://oggioniale.github.io/ReLTER.inatEnrich/
+    alt: "ReLTER"
 reference:
   - title: All functions
     contents:
@@ -22,8 +27,17 @@ reference:
       - obs_per_hour
       - species_richness_map
       - obs_pie_chart
-
+articles:
+  - title: "Get started"
+    contents:
+      - ReLTER_inatEnrich
+  - title: "Reference"
+    contents:
+      - ReLTER_inatEnrich_article
+  - title: "Visualization"
+    contents:
+      - ReLTER_inatEnrich_charts
 navbar:
   structure:
-    left: [reference]
+    left: [reference, articles]
     right: [github]

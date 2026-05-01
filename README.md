@@ -1,4 +1,4 @@
-# ReLTER.inatEnrich <img src="man/figures/logo.png" align="right" height="139" alt="" />
+# ReLTER.inatEnrich <img src="man/figures/logo.png" align="right" height="139" alt="ReLTER" />
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -111,6 +111,8 @@ For a full walkthrough see the
 [Getting Started vignette](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.html)
 and the
 [Technical Reference article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_article.html).
+For an overview of all visualization outputs see the
+[Visualization functions article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html).
 
 
 ## :book: Documentation
