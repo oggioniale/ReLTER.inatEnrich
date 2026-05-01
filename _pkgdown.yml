@@ -9,6 +9,9 @@ navbar:
     image: man/figures/logo.png
     href: https://oggioniale.github.io/ReLTER.inatEnrich/
     alt: "ReLTER"
+  structure:
+    left: [reference, articles]
+    right: [github]
 reference:
   - title: All functions
     contents:
@@ -37,7 +40,3 @@ articles:
   - title: "Visualization"
     contents:
       - ReLTER_inatEnrich_charts
-navbar:
-  structure:
-    left: [reference, articles]
-    right: [github]
