@@ -13,7 +13,7 @@ navbar:
     left: [reference, articles]
     right: [github]
 reference:
-  - title: All functions
+  - title: Enrichment functions
     contents:
       - get_conservation_status
       - get_nativeness_degree
@@ -22,6 +22,9 @@ reference:
       - add_iucn_to_occ
       - add_nativeness_to_occ
       - add_eunis_legal_to_occ
+
+  - title: Visualization functions
+    contents:
       - create_leaflet_occ_map
       - iconic_taxa
       - top_n_species
@@ -30,6 +33,11 @@ reference:
       - obs_per_hour
       - species_richness_map
       - obs_pie_chart
+
+  - title: Datasets
+    contents:
+      - occ_eLTER_legal
+      - site_boundary
 articles:
   - title: "Get started"
     contents:
