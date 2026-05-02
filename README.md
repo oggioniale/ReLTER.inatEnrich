@@ -23,7 +23,7 @@ attributes sourced from iNaturalist and the EUNIS species database.
 | `add_iucn_to_occ()` | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments |
 | `add_nativeness_to_occ()` | iNaturalist API | Nativeness / establishment means, filtered by country |
 | `add_eunis_legal_to_occ()` | EUNIS species database | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage |
-| `create_leaflet_occ_map()` | — | Interactive Leaflet map with enriched observation popups |
+| Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
 
 
 ## ReLTER ecosystem

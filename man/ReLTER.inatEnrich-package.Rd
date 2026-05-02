@@ -4,8 +4,10 @@
 \name{ReLTER.inatEnrich-package}
 \alias{ReLTER.inatEnrich}
 \alias{ReLTER.inatEnrich-package}
-\title{ReLTER.inatEnrich: What the Package Does (One Line, Title Case)}
+\title{ReLTER.inatEnrich: ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI sites}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 What the package does (one paragraph).
 }
 \seealso{

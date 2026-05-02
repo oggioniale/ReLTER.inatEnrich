@@ -98,14 +98,26 @@ get_conservation_status <- function(taxon.id) {
   }
   
   # clean output
-  cons_status <- cons_status |>
-    dplyr::select(status, authority, place, url) |>
-    dplyr::mutate(name = sapply(place, function(p) {
-      if (is.null(p) || is.null(p$name)) NA_character_ else as.character(p$name)
-    })) |>
-    dplyr::select(status, authority, name, url)
+  cons_status <- cons_status[cons_status$authority == "IUCN Red List", ]
   
-  return(cons_status)
+  if (nrow(cons_status) == 0) {
+    return(empty_tbl)
+  }
+  
+  place_name <- vapply(seq_len(nrow(cons_status)), function(i) {
+    p <- cons_status$place[[i]]
+    if (is.null(p))                                return(NA_character_)
+    if (is.data.frame(p) && "name" %in% names(p)) return(as.character(p$name[1]))
+    if (is.list(p) && !is.null(p[["name"]]))       return(as.character(p[["name"]][1]))
+    NA_character_
+  }, FUN.VALUE = character(1))
+  
+  return(tibble::tibble(
+    status    = as.character(cons_status$status),
+    authority = as.character(cons_status$authority),
+    name      = place_name,
+    url       = as.character(cons_status$url)
+  ))
 }
 
 #' Get nativeness degree for a taxon from iNaturalist
@@ -1257,21 +1269,27 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
   
   # Build the Leaflet map
   map <- leaflet::leaflet() |>
-    leaflet::addTiles() |>
-    leaflet::addPolygons(
-      data        = site_boundary,
-      color       = "white",
-      weight      = 4,
-      opacity     = 1,
-      fillColor   = "#D8A24A",
-      fillOpacity = 0.45,
-      smoothFactor = 0.5,
-      popup = ~paste0(
-        "<b>Site title:</b><br>",
-        sprintf('<a href="%s" target="_blank">%s</a>', uri, title.x)
-      ),
-      group = "eLTER site boundary"
-    ) |>
+    leaflet::addTiles()
+  
+  if (!is.null(site_boundary)) {
+    map <- map |>
+      leaflet::addPolygons(
+        data         = site_boundary,
+        color        = "white",
+        weight       = 4,
+        opacity      = 1,
+        fillColor    = "#D8A24A",
+        fillOpacity  = 0.45,
+        smoothFactor = 0.5,
+        popup = ~paste0(
+          "<b>Site title:</b><br>",
+          sprintf('<a href="%s" target="_blank">%s</a>', uri, title.x)
+        ),
+        group = "eLTER site boundary"
+      )
+  }
+  
+  map <- map |>
     leaflet::addCircleMarkers(
       data        = occ_open,
       radius      = 6, fill = TRUE, color = "white", weight = 3,
@@ -1314,7 +1332,16 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       overlayGroups = c("open", "obscured", "unknown"),
       options       = leaflet::layersControlOptions(collapsed = FALSE)
     )
+  overlay_groups <- c("open", "obscured", "unknown")
+  if (!is.null(site_boundary)) {
+    overlay_groups <- c(overlay_groups, "eLTER site boundary")
+  }
   
+  map <- map |>
+    leaflet::addLayersControl(
+      overlayGroups = overlay_groups,
+      options       = leaflet::layersControlOptions(collapsed = FALSE)
+    )
   return(map)
 }
 
