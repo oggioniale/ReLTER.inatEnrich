@@ -1,4 +1,4 @@
-# ReLTER.inatEnrich: What the Package Does (One Line, Title Case)
+# ReLTER.inatEnrich: ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI sites
 
 What the package does (one paragraph).
 

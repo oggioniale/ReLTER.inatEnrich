@@ -15,7 +15,7 @@ attributes sourced from iNaturalist and the EUNIS species database.
 | [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md) | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments |
 | [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md) | iNaturalist API | Nativeness / establishment means, filtered by country |
 | [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md) | EUNIS species database | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage |
-| [`create_leaflet_occ_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/create_leaflet_occ_map.md) | — | Interactive Leaflet map with enriched observation popups |
+| Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
 
 ## ReLTER ecosystem
 
@@ -179,7 +179,7 @@ List](https://www.iucnredlist.org).
 
 # Package index
 
-## All functions
+## Enrichment functions
 
 - [`get_conservation_status()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_conservation_status.md)
   **\[experimental\]** : Function to obtain IUCN conservation status for
@@ -202,6 +202,9 @@ List](https://www.iucnredlist.org).
 - [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
   **\[experimental\]** : Enrich iNaturalist occurrences with EUNIS legal
   framework information
+
+## Visualization functions
+
 - [`create_leaflet_occ_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/create_leaflet_occ_map.md)
   **\[experimental\]** : Create Leaflet map for enriched iNaturalist
   occurrences
@@ -222,6 +225,14 @@ List](https://www.iucnredlist.org).
 - [`obs_pie_chart()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_pie_chart.md)
   **\[experimental\]** : Plot a donut chart of species by conservation
   category
+
+## Datasets
+
+- [`occ_eLTER_legal`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/occ_eLTER_legal.md)
+  **\[experimental\]** : Example iNaturalist occurrences enriched with
+  conservation information
+- [`site_boundary`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/site_boundary.md)
+  **\[experimental\]** : eLTER site boundary for Montagna di Torricchio
 
 # Articles
 
