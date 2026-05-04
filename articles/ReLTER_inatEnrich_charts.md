@@ -92,9 +92,9 @@ species richness.
 ``` r
 
 species_richness_map(
-  df            = occ_eLTER_legal,
+  df = occ_eLTER_legal,
   site_boundary = site_boundary,
-  cell_size     = 0.001
+  cell_size = 0.01
 )
 ```
 
@@ -105,7 +105,7 @@ group, with a detailed popup per observation.
 ``` r
 
 create_leaflet_occ_map(
-  occ_enriched  = occ_eLTER_legal,
+  occ_enriched = occ_eLTER_legal,
   site_boundary = site_boundary
 )
 ```
