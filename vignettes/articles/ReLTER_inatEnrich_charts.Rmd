@@ -87,9 +87,9 @@ grid cell is coloured by species richness.
 
 ```{r species-richness-map, out.width = "100%"}
 species_richness_map(
-  df            = occ_eLTER_legal,
+  df = occ_eLTER_legal,
   site_boundary = site_boundary,
-  cell_size     = 0.001
+  cell_size = 0.01
 )
 ```
 
@@ -98,7 +98,7 @@ coloured by iconic taxon group, with a detailed popup per observation.
 
 ```{r occ-map, out.width = "100%"}
 create_leaflet_occ_map(
-  occ_enriched  = occ_eLTER_legal,
+  occ_enriched = occ_eLTER_legal,
   site_boundary = site_boundary
 )
 ```
