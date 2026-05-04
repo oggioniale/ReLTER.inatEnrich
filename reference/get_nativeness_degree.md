@@ -2,9 +2,12 @@
 
 **\[experimental\]** Queries the iNaturalist API to retrieve the
 establishment means (nativeness status and authority) for a given taxon,
-optionally filtered by country. Returns a one-row tibble with a nested
-`establishmentMeans` list-column containing `nativeness` and
-`authority`.
+optionally filtered by country, as provided by iNaturalist checklists.
+Returns a one-row tibble with a nested `establishmentMeans` list-column
+containing `nativeness` and `authority`.
+
+Data are sourced from iNaturalist checklists:
+https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
 
 ## Usage
 

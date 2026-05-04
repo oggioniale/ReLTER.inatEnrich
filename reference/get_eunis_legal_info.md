@@ -4,7 +4,8 @@
 retrieves the corresponding scientific name from the iNaturalist API,
 searches the EUNIS database, and extracts the legal information related
 to the EU Habitats Directive (92/43/EEC) and Birds Directive
-(2009/147/EC).
+(2009/147/EC), as delivered by data retrieved from the
+[EUNIS](https://eunis.eea.europa.eu/) species database.
 
 ## Usage
 

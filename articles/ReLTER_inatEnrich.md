@@ -35,7 +35,12 @@ install.packages(c(
   "purrr",
   "httr2",
   "sf",
-  "leaflet"
+  "leaflet",
+  "ggplot2",
+  "grDevices",
+  "rinat",
+  "rvest",
+  "stats"
 ))
 
 # ReLTER — the parent package providing site info and occurrence download
@@ -86,7 +91,7 @@ The enrichment pipeline consists of eight steps, illustrated below.
 ### Step 1 — Define the eLTER-RI site
 
 Set the DEIMS-ID of the target eLTER-RI site. In this example we use the
-**Bosco Fontana** site (Italy).
+**Montagna di Torricchio** site (Italy).
 
 ``` r
 
@@ -137,11 +142,13 @@ occ_in_site <- sf::st_intersection(
 ### Step 5 — Add IUCN conservation status
 
 [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)
-queries iNaturalist for each unique taxon and appends a nested
-`status_IUCN` list-column. Each element is a tibble with one row per
-geographic scope (global, regional), containing the IUCN status code,
-authority, scope name, and a direct link to the IUCN Red List
-assessment.
+queries [iNaturalist
+lists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712)
+for each unique taxon and appends a nested `status_IUCN` list-column.
+Each element is a tibble with one row per geographic scope (global,
+regional), containing the IUCN status code, authority, scope name, and a
+direct link to the [IUCN Red List
+assessment](https://www.iucnredlist.org).
 
 ``` r
 
@@ -159,10 +166,12 @@ occ_eLTER_IUCN <- add_iucn_to_occ(occ_eLTER = occ_in_site)
 ### Step 6 — Add nativeness / establishment means
 
 [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)
-queries iNaturalist for the establishment means of each unique taxon,
-filtered by the site’s country. Results are stored in a nested
-`establishmentMeans` list-column containing `nativeness` and
-`authority`.
+queries [iNaturalist for the establishment
+means](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist),
+following the definition Of Darwin Core Vocabulary
+(<https://dwc.tdwg.org/em/>) of each unique taxon, filtered by the
+site’s country. Results are stored in a nested `establishmentMeans`
+list-column containing `nativeness` and `authority`.
 
 ``` r
 
@@ -181,9 +190,9 @@ occ_eLTER_nativeness <- add_nativeness_to_occ(
 ### Step 7 — Add EU legal framework (EUNIS)
 
 [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
-queries the EUNIS species database and appends `directive` and `Annex`
-columns indicating coverage under the EU Habitats Directive (92/43/EEC)
-or the EU Birds Directive (2009/147/EC).
+queries the [EUNIS species website](https://eunis.eea.europa.eu) and
+appends `directive` and `Annex` columns indicating coverage under the EU
+Habitats Directive (92/43/EEC) or the EU Birds Directive (2009/147/EC).
 
 ``` r
 
@@ -219,39 +228,15 @@ The popup for each observation includes:
 > **Note:** The map below is a static screenshot. Run the workflow above
 > in your R session to obtain the fully interactive version.
 
-------------------------------------------------------------------------
-
-## Session info
-
 ``` r
 
-sessionInfo()
-#> R version 4.6.0 (2026-04-24)
-#> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.4 LTS
-#> 
-#> Matrix products: default
-#> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
-#> 
-#> locale:
-#>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
-#>  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
-#>  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
-#> [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
-#> 
-#> time zone: UTC
-#> tzcode source: system (glibc)
-#> 
-#> attached base packages:
-#> [1] stats     graphics  grDevices utils     datasets  methods   base     
-#> 
-#> loaded via a namespace (and not attached):
-#>  [1] digest_0.6.39     desc_1.4.3        R6_2.6.1          fastmap_1.2.0    
-#>  [5] xfun_0.57         cachem_1.1.0      knitr_1.51        htmltools_0.5.9  
-#>  [9] rmarkdown_2.31    lifecycle_1.0.5   cli_3.6.6         sass_0.4.10      
-#> [13] pkgdown_2.2.0     textshaping_1.0.5 jquerylib_0.1.4   systemfonts_1.3.2
-#> [17] compiler_4.6.0    tools_4.6.0       ragg_1.5.2        bslib_0.10.0     
-#> [21] evaluate_1.0.5    yaml_2.3.12       jsonlite_2.0.0    rlang_1.2.0      
-#> [25] fs_2.1.0          htmlwidgets_1.6.4
+create_leaflet_occ_map(
+  occ_enriched  = occ_eLTER_legal,
+  site_boundary = site_boundary
+)
 ```
+
+For more information about possible other output please visit
+[Visualization
+functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html)
+article.
