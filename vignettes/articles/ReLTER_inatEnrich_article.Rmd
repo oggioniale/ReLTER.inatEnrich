@@ -297,11 +297,3 @@ occ_eLTER_legal <- readRDS("cache/occ_eLTER_legal.rds")
   read-only taxon queries, but it does apply rate limiting. The built-in
   retry logic (`max_tries = 3`, `max_seconds = 120`) handles transient
   failures gracefully.
-
----
-
-## Session info
-
-```{r session-info, eval = TRUE}
-sessionInfo()
-```

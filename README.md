@@ -20,9 +20,9 @@ attributes sourced from iNaturalist and the EUNIS species database.
 
 | Function | Data source | What it adds |
 |---|---|---|
-| `add_iucn_to_occ()` | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments |
-| `add_nativeness_to_occ()` | iNaturalist API | Nativeness / establishment means, filtered by country |
-| `add_eunis_legal_to_occ()` | EUNIS species database | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage |
+| `add_iucn_to_occ()` | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments, sourced from [iNaturalist checklists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) |
+| `add_nativeness_to_occ()` | iNaturalist API | Nativeness / [establishment means](https://dwc.tdwg.org/em/), filtered by country, directly as recorded on [iNaturalist](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist) |
+| `add_eunis_legal_to_occ()` | EUNIS species database | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage, as delivered by retrieved from the [EUNIS](https://eunis.eea.europa.eu/) species database |
 | Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
 
 

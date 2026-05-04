@@ -22,7 +22,8 @@ A tibble with the following columns:
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 This function takes a \code{taxon.id} from iNaturalist, retrieves the corresponding
 scientific name from the iNaturalist API, searches the EUNIS database, and extracts
-the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC).
+the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC),
+as delivered by data retrieved from the \href{https://eunis.eea.europa.eu/}{EUNIS} species database.
 }
 \examples{
 \dontrun{

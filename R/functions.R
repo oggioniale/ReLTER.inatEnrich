@@ -124,8 +124,13 @@ get_conservation_status <- function(taxon.id) {
 #' @description `r lifecycle::badge("experimental")`
 #' Queries the iNaturalist API to retrieve the establishment means
 #' (nativeness status and authority) for a given taxon, optionally filtered
-#' by country. Returns a one-row tibble with a nested \code{establishmentMeans}
+#' by country, as provided by iNaturalist checklists.
+#' Returns a one-row tibble with a nested \code{establishmentMeans}
 #' list-column containing \code{nativeness} and \code{authority}.
+#' 
+#' Data are sourced from iNaturalist checklists:
+#' https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
+#' 
 #' @param taxon.id \code{integer} or \code{character}. The iNaturalist taxon ID
 #'   to query.
 #' @param country \code{character}. The country name to filter results by
@@ -244,8 +249,9 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
 #' @description `r lifecycle::badge("experimental")`
 #' This function takes a \code{taxon.id} from iNaturalist, retrieves the corresponding
 #' scientific name from the iNaturalist API, searches the EUNIS database, and extracts
-#' the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC).
-#'
+#' the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC),
+#' as delivered by data retrieved from the [EUNIS](https://eunis.eea.europa.eu/) species database.
+#' 
 #' @param taxon.id Integer. The taxon ID of the species in iNaturalist.
 #'
 #' @return A tibble with the following columns:
@@ -1191,7 +1197,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           '<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:31992L0043" target="_blank">EU Habitats Directive (92/43/EEC)</a>.',
           linked_html
         )
-        paste0("<b>EU Directives</b> - ", linked_html)
+        paste0("<b>EU Directives</b>: ", linked_html)
       } else ""
       
       paste0(
@@ -1234,7 +1240,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
         
         # IUCN status
-        "<b>Status (IUCN):</b><br/>", iucn_html, "<br/>",
+        '<b>Status (IUCN):</b><a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712" target="_blank" style="font-size:11px;">ℹ️</a><br/>', iucn_html, '<br/>',
         
         # Establishment means — with link to iNaturalist help
         sprintf(
@@ -1344,4 +1350,3 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
     )
   return(map)
 }
-

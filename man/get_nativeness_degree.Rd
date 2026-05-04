@@ -34,8 +34,12 @@ associated with the establishment means (e.g.,
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Queries the iNaturalist API to retrieve the establishment means
 (nativeness status and authority) for a given taxon, optionally filtered
-by country. Returns a one-row tibble with a nested \code{establishmentMeans}
+by country, as provided by iNaturalist checklists.
+Returns a one-row tibble with a nested \code{establishmentMeans}
 list-column containing \code{nativeness} and \code{authority}.
+
+Data are sourced from iNaturalist checklists:
+https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
 }
 \note{
 The establishment means information is sourced from iNaturalist and

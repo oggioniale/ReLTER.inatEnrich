@@ -47,7 +47,12 @@ install.packages(c(
   "purrr",
   "httr2",
   "sf",
-  "leaflet"
+  "leaflet",
+  "ggplot2",
+  "grDevices",
+  "rinat",
+  "rvest",
+  "stats"
 ))
 
 # ReLTER — the parent package providing site info and occurrence download
@@ -106,7 +111,7 @@ The enrichment pipeline consists of eight steps, illustrated below.
 ### Step 1 — Define the eLTER-RI site
 
 Set the DEIMS-ID of the target eLTER-RI site. In this example we use the
-**Bosco Fontana** site (Italy).
+**Montagna di Torricchio** site (Italy).
 
 ```{r step1}
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
@@ -152,10 +157,9 @@ occ_in_site <- sf::st_intersection(
 
 ### Step 5 — Add IUCN conservation status
 
-`add_iucn_to_occ()` queries iNaturalist for each unique taxon and appends
-a nested `status_IUCN` list-column. Each element is a tibble with one row
+`add_iucn_to_occ()` queries [iNaturalist lists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) for each unique taxon and appends a nested `status_IUCN` list-column. Each element is a tibble with one row
 per geographic scope (global, regional), containing the IUCN status code,
-authority, scope name, and a direct link to the IUCN Red List assessment.
+authority, scope name, and a direct link to the [IUCN Red List assessment](https://www.iucnredlist.org).
 
 ```{r step5}
 occ_eLTER_IUCN <- add_iucn_to_occ(occ_eLTER = occ_in_site)
@@ -173,7 +177,7 @@ occ_eLTER_IUCN <- add_iucn_to_occ(occ_eLTER = occ_in_site)
 
 ### Step 6 — Add nativeness / establishment means
 
-`add_nativeness_to_occ()` queries iNaturalist for the establishment means
+`add_nativeness_to_occ()` queries [iNaturalist for the establishment means](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist), following the definition Of Darwin Core Vocabulary (https://dwc.tdwg.org/em/)
 of each unique taxon, filtered by the site's country. Results are stored
 in a nested `establishmentMeans` list-column containing `nativeness` and
 `authority`.
@@ -195,8 +199,8 @@ occ_eLTER_nativeness <- add_nativeness_to_occ(
 
 ### Step 7 — Add EU legal framework (EUNIS)
 
-`add_eunis_legal_to_occ()` queries the EUNIS species database and appends
-`directive` and `Annex` columns indicating coverage under the EU Habitats
+`add_eunis_legal_to_occ()` queries the [EUNIS species website](https://eunis.eea.europa.eu)
+and appends `directive` and `Annex` columns indicating coverage under the EU Habitats
 Directive (92/43/EEC) or the EU Birds Directive (2009/147/EC).
 
 ```{r step7}
@@ -230,19 +234,11 @@ The popup for each observation includes:
 > **Note:** The map below is a static screenshot. Run the workflow above
 > in your R session to obtain the fully interactive version.
 
-```{r screenshot, echo = FALSE, eval = TRUE, out.width = "100%", fig.cap = "Interactive Leaflet map produced by create_leaflet_occ_map() for the Montagna di Torricchio eLTER-RI site (https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8)."}
-htmltools::tags$iframe(
-  src    = "figures/map_example.html",
-  width  = "100%",
-  height = "500px",
-  style  = "border:none;"
+```{r occ-map, out.width = "100%"}
+create_leaflet_occ_map(
+  occ_enriched  = occ_eLTER_legal,
+  site_boundary = site_boundary
 )
 ```
 
----
-
-## Session info
-
-```{r session-info, eval = TRUE}
-sessionInfo()
-```
+For more information about possible other output please visit [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) article.

@@ -21,10 +21,14 @@ library(ReLTER.inatEnrich)
 ## Overview
 
 This article illustrates the visualization functions available in
-`ReLTER.inatEnrich` using a small example dataset.
+`ReLTER.inatEnrich` using occurrence data from the
+[Gran Paradiso National Park](https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946)
+eLTER site — one of the long-term ecosystem research sites within the eLTER-RI network.
 
 ```{r setup-data}
-df            <- ReLTER.inatEnrich::occ_eLTER_legal
+# Occurrence data from Gran Paradiso National Park eLTER site
+# DEIMS-ID: https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946 <- 
+df <- ReLTER.inatEnrich::occ_eLTER_legal
 site_boundary <- ReLTER.inatEnrich::site_boundary
 ```
 

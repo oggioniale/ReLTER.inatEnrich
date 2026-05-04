@@ -34,4 +34,4 @@ occ_eLTER_legal <- add_eunis_legal_to_occ(
 
 # Save datasets
 usethis::use_data(occ_eLTER_legal, overwrite = TRUE)
-usethis::use_data(site_boundary,   overwrite = TRUE)
+usethis::use_data(site_boundary, overwrite = TRUE)

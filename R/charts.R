@@ -81,6 +81,7 @@ iconic_taxa <- function(df) {
     )
   # output
   print(p)
+  invisible(p)
 }
 
 #' Plot top N most observed species
@@ -122,7 +123,6 @@ iconic_taxa <- function(df) {
 #'
 ### top_n_species
 top_n_species <- function(df, n = 10) {
-  n = 10
   iconic_levels <- sort(unique(dplyr::coalesce(df$`taxon.iconic_taxon_name`, "Unknown")))
   pal_colors    <- grDevices::hcl.colors(length(iconic_levels), "Set 2")
   iconic_colors <- stats::setNames(pal_colors, iconic_levels)
@@ -158,7 +158,7 @@ top_n_species <- function(df, n = 10) {
     ggplot2::scale_fill_manual(values = iconic_colors, name = "Iconic taxon") +
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0, 0.15)),
-      breaks = function(x) seq(0, floor(max(x)), by = 1)
+      breaks = function(x) seq(0, ceiling(max(x)), by = max(1, ceiling(max(x) / 5)))
     ) +
     ggplot2::coord_flip() +
     ggplot2::labs(title = plot_title,
@@ -172,6 +172,7 @@ top_n_species <- function(df, n = 10) {
     )
   
   print(p)
+  invisible(p)
 }
 
 #' Plot number of observations per year
@@ -218,27 +219,44 @@ obs_per_year <- function(df) {
   year_obs <- df |>
     dplyr::filter(!is.na(`observed_on_details.year`),
                   !is.na(`taxon.iconic_taxon_name`)) |>
-    dplyr::group_by(year         = `observed_on_details.year`,
+    dplyr::group_by(year = `observed_on_details.year`,
                     iconic_taxon = `taxon.iconic_taxon_name`) |>
     dplyr::summarise(n_obs = dplyr::n(), .groups = "drop")
   
   all_combinations <- expand.grid(
-    year         = seq(min(year_obs$year), as.integer(format(Sys.Date(), "%Y")), by = 1),
+    year = seq(min(year_obs$year), as.integer(format(Sys.Date(), "%Y")), by = 1),
     iconic_taxon = iconic_levels,
     stringsAsFactors = FALSE
   )
   
-  year_obs <- dplyr::left_join(all_combinations, year_obs,
-                               by = c("year", "iconic_taxon")) |>
+  year_obs <- dplyr::left_join(
+    all_combinations, year_obs,
+    by = c("year", "iconic_taxon")
+    ) |>
     dplyr::mutate(n_obs = ifelse(is.na(n_obs), 0L, n_obs))
+  
+  all_years <- sort(unique(year_obs$year))
+  step      <- max(1, floor(length(all_years) / 10))
+  years_to_show <- as.character(all_years[seq(1, length(all_years), by = step)])
+  
+  year_totals <- year_obs |>
+    dplyr::group_by(year) |>
+    dplyr::summarise(total = sum(n_obs), .groups = "drop") |>
+    dplyr::filter(total > 0)
   
   p <- ggplot2::ggplot(year_obs,
                        ggplot2::aes(x = factor(year), y = n_obs, fill = iconic_taxon)) +
     ggplot2::geom_col(width = 0.6) +
+    ggplot2::geom_text(
+      data = year_totals,
+      ggplot2::aes(x = factor(year), y = total, label = total, fill = NULL),
+      vjust = -0.4, size = 3, color = "grey30"
+    ) +
     ggplot2::scale_fill_manual(values = iconic_colors, name = "Iconic taxon") +
+    ggplot2::scale_x_discrete(breaks = years_to_show) +
     ggplot2::scale_y_continuous(
-      expand = ggplot2::expansion(mult = c(0, 0.15)),
-      breaks = function(x) seq(0, floor(max(x)), by = 1)
+      expand   = ggplot2::expansion(mult = c(0, 0.15)),
+      n.breaks = 5
     ) +
     ggplot2::labs(title = "Observations per year",
                   x     = NULL,
@@ -251,6 +269,7 @@ obs_per_year <- function(df) {
     )
   
   print(p)
+  invisible(p)
 }
 
 #' Plot mean number of observations per month
@@ -331,6 +350,11 @@ obs_per_month <- function(df) {
     ) |>
     dplyr::mutate(month_label = factor(month_labels[month], levels = month_labels))
   
+  # totale medio per mese per le etichette
+  month_totals <- month_stats |>
+    dplyr::filter(mean_tot > 0) |>
+    dplyr::mutate(label = round(mean_tot, 1))
+  
   p <- ggplot2::ggplot() +
     ggplot2::geom_col(
       data = month_mean_taxon,
@@ -343,6 +367,11 @@ obs_per_month <- function(df) {
                    ymin = pmax(mean_tot - se_tot, 0),
                    ymax = mean_tot + se_tot),
       width = 0.25, color = "black", linewidth = 0.7
+    ) +
+    ggplot2::geom_text(
+      data = month_totals,
+      ggplot2::aes(x = month_label, y = mean_tot + se_tot, label = label),
+      vjust = -0.4, size = 3, color = "grey30"
     ) +
     ggplot2::scale_fill_manual(values = iconic_colors, name = "Iconic taxon") +
     ggplot2::scale_y_continuous(
@@ -360,6 +389,7 @@ obs_per_month <- function(df) {
     )
   
   print(p)
+  invisible(p)
 }
 
 #' Plot mean number of observations per hour of the day
@@ -439,6 +469,10 @@ obs_per_hour <- function(df) {
     dplyr::mutate(hour_label = factor(sprintf("%02d:00", hour),
                                       levels = sprintf("%02d:00", 0:23)))
   
+  hour_totals <- hour_stats |>
+    dplyr::filter(mean_tot > 0) |>
+    dplyr::mutate(label = round(mean_tot, 1))
+  
   p <- ggplot2::ggplot() +
     ggplot2::geom_col(
       data = hour_mean_taxon,
@@ -451,6 +485,11 @@ obs_per_hour <- function(df) {
                    ymin = pmax(mean_tot - se_tot, 0),
                    ymax = mean_tot + se_tot),
       width = 0.25, color = "black", linewidth = 0.7
+    ) +
+    ggplot2::geom_text(
+      data = hour_totals,
+      ggplot2::aes(x = hour_label, y = mean_tot + se_tot, label = label),
+      vjust = -0.4, size = 3, color = "grey30"
     ) +
     ggplot2::scale_fill_manual(values = iconic_colors, name = "Iconic taxon") +
     ggplot2::scale_y_continuous(
@@ -469,6 +508,7 @@ obs_per_hour <- function(df) {
     )
   
   print(p)
+  invisible(p)
 }
 
 #' Map species richness on a spatial grid
@@ -727,4 +767,5 @@ obs_pie_chart <- function(df) {
     )
   
   print(p)
+  invisible(p)
 }
