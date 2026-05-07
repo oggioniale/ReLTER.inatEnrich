@@ -32,7 +32,7 @@ module (`get_site_speciesOccurrences()`, `get_site_info()`). See the
 [ReLTER repository](https://github.com/ropensci/ReLTER) and its
 [citation](https://doi.org/10.5281/zenodo.16927384) for details.
 
-## ⏬ Installation
+## Installation
 
 `ReLTER.inatEnrich` is not yet on CRAN. Install the development version
 from GitHub:
@@ -108,7 +108,7 @@ For an overview of all visualization outputs see the [Visualization
 functions
 article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html).
 
-## 📖 Documentation
+## Documentation
 
 Full package documentation is available at: 👉
 **<https://oggioniale.github.io/ReLTER.inatEnrich>**
@@ -137,7 +137,7 @@ devtools::check()    # no ERRORs or WARNINGs
 devtools::document() # documentation is up to date
 ```
 
-## 📔 Citation
+## Citation
 
 If you use `ReLTER.inatEnrich` in your research, please cite it as:
 
@@ -166,7 +166,7 @@ v3.0 (GPL-3)**. See the
 [LICENSE](https://oggioniale.github.io/ReLTER.inatEnrich/LICENSE) file
 for details.
 
-## 👍 Acknowledgements
+## Acknowledgements
 
 This package was developed in the context of the
 [eLTER-RI](https://elter-ri.eu) research infrastructure.
