@@ -350,7 +350,6 @@ obs_per_month <- function(df) {
     ) |>
     dplyr::mutate(month_label = factor(month_labels[month], levels = month_labels))
   
-  # totale medio per mese per le etichette
   month_totals <- month_stats |>
     dplyr::filter(mean_tot > 0) |>
     dplyr::mutate(label = round(mean_tot, 1))
@@ -368,11 +367,11 @@ obs_per_month <- function(df) {
                    ymax = mean_tot + se_tot),
       width = 0.25, color = "black", linewidth = 0.7
     ) +
-    ggplot2::geom_text(
-      data = month_totals,
-      ggplot2::aes(x = month_label, y = mean_tot + se_tot, label = label),
-      vjust = -0.4, size = 3, color = "grey30"
-    ) +
+    # ggplot2::geom_text(
+    #   data = month_totals,
+    #   ggplot2::aes(x = month_label, y = mean_tot + se_tot, label = label),
+    #   vjust = -0.4, size = 3, color = "grey30"
+    # ) +
     ggplot2::scale_fill_manual(values = iconic_colors, name = "Iconic taxon") +
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0, 0.15))
@@ -486,11 +485,11 @@ obs_per_hour <- function(df) {
                    ymax = mean_tot + se_tot),
       width = 0.25, color = "black", linewidth = 0.7
     ) +
-    ggplot2::geom_text(
-      data = hour_totals,
-      ggplot2::aes(x = hour_label, y = mean_tot + se_tot, label = label),
-      vjust = -0.4, size = 3, color = "grey30"
-    ) +
+    # ggplot2::geom_text(
+    #   data = hour_totals,
+    #   ggplot2::aes(x = hour_label, y = mean_tot + se_tot, label = label),
+    #   vjust = -0.4, size = 3, color = "grey30"
+    # ) +
     ggplot2::scale_fill_manual(values = iconic_colors, name = "Iconic taxon") +
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0, 0.15))
@@ -763,6 +762,122 @@ obs_pie_chart <- function(df) {
       legend.direction = "vertical",
       plot.title       = ggplot2::element_text(size = 13, hjust = 0.5),
       plot.subtitle    = ggplot2::element_text(size = 9, color = "grey50",
+                                               hjust = 0.5, lineheight = 1.4)
+    )
+  
+  print(p)
+  invisible(p)
+}
+
+#' Plot a donut chart of observations contributing to eLTER Standard Observations
+#'
+#' @description `r lifecycle::badge("experimental")`
+#'
+#' Produces a donut chart showing the number of observations contributing
+#' to eLTER Standard Observations SOBIO_014 (Flying insects) and
+#' SOBIO_018 (Acoustic recording). Observations can contribute to both
+#' SOs simultaneously (e.g. Orthoptera).
+#'
+#' @param df An \code{sf} tibble of iNaturalist occurrences containing at
+#'   least the columns \code{SOBIO_014} and \code{SOBIO_018}, produced by
+#'   the enrichment pipeline.
+#'
+#' @return A \code{\link[ggplot2]{ggplot}} object printed to the active device.
+#'
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#'
+#' @seealso \code{\link{obs_pie_chart}}
+#'
+#' @export
+#'
+#' @importFrom sf st_drop_geometry
+#' @importFrom dplyr mutate group_by summarise n
+#' @importFrom ggplot2 ggplot aes geom_col annotate coord_polar xlim
+#'   scale_fill_manual labs theme_void theme element_text unit
+#' @importFrom stats setNames
+#'
+#' @examples
+#' \dontrun{
+#' obs_SO_pie_chart(occ_eLTER_legal)
+#' }
+#'
+### obs_SO_pie_chart
+obs_SO_pie_chart <- function(df) {
+  
+  if (!all(c("SOBIO_014", "SOBIO_018") %in% names(df))) {
+    stop("Columns 'SOBIO_014' and 'SOBIO_018' are missing. ",
+         "Run the enrichment pipeline first.")
+  }
+  
+  obs_flat <- df |> sf::st_drop_geometry()
+  
+  n_014 <- sum(obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  n_018 <- sum(obs_flat$SOBIO_018 & !obs_flat$SOBIO_014, na.rm = TRUE)
+  n_both <- sum(obs_flat$SOBIO_014 &  obs_flat$SOBIO_018, na.rm = TRUE)
+  n_neither <- sum(!obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  total_obs <- nrow(obs_flat)
+  
+  so_data <- data.frame(
+    category = c(
+      "SOBIO_014 only\n(Flying insects)",
+      "SOBIO_018 only\n(Acoustic recording)",
+      "Both SOBIO_014\n& SOBIO_018",
+      "No SO"
+    ),
+    n = c(n_014, n_018, n_both, n_neither),
+    stringsAsFactors = FALSE
+  ) |>
+    dplyr::mutate(
+      pct          = n / sum(n) * 100,
+      legend_label = paste0(
+        gsub("\n", " ", category), ": ",
+        n, " obs. (", round(pct, 1), "%)"
+      )
+    )
+  
+  so_colors <- c(
+    "SOBIO_014 only\n(Flying insects)" = "#639922",
+    "SOBIO_018 only\n(Acoustic recording)"  = "#378ADD",
+    "Both SOBIO_014\n& SOBIO_018" = "#7F77DD",
+    "No SO" = "#888780"
+  )
+  
+  p <- ggplot2::ggplot(so_data,
+                       ggplot2::aes(x    = 2,
+                                    y    = pct,
+                                    fill = category)) +
+    ggplot2::geom_col(width = 1, color = "white", linewidth = 0.5) +
+    ggplot2::annotate("text",
+                      x = 0,
+                      y = 0,
+                      label = paste0("Total\n", total_obs, " obs."),
+                      size = 4.5,
+                      fontface = "bold") +
+    ggplot2::coord_polar(theta = "y", start = 0) +
+    ggplot2::xlim(0, 3) +
+    ggplot2::scale_fill_manual(
+      values = so_colors,
+      name   = NULL,
+      labels = stats::setNames(so_data$legend_label, so_data$category)
+    ) +
+    ggplot2::labs(
+      title    = "Observations contributing to eLTER Standard Observations",
+      subtitle = paste0(
+        "SOBIO_014: Flying insects (all the insects) | ",
+        "SOBIO_018: Acoustic recording (birds, bats, amphibians, orthoptera)\n",
+        "Orthoptera contribute to both SOs"
+      ),
+      x = NULL,
+      y = NULL
+    ) +
+    ggplot2::theme_void(base_size = 13) +
+    ggplot2::theme(
+      legend.position = "right",
+      legend.text = ggplot2::element_text(size = 10),
+      legend.key.size = ggplot2::unit(0.5, "cm"),
+      legend.direction = "vertical",
+      plot.title = ggplot2::element_text(size = 13, hjust = 0.5),
+      plot.subtitle = ggplot2::element_text(size = 9, color = "grey50",
                                                hjust = 0.5, lineheight = 1.4)
     )
   
