@@ -24,6 +24,9 @@ This article illustrates the visualization functions available in
 `ReLTER.inatEnrich` using occurrence data from the
 [Gran Paradiso National Park](https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946)
 eLTER site — one of the long-term ecosystem research sites within the eLTER-RI network.
+Functions cover taxonomic composition, conservation status,
+temporal distribution, and the contribution of observations to eLTER
+Standard Observations (SOs).
 
 ```{r setup-data}
 # Occurrence data from Gran Paradiso National Park eLTER site
@@ -78,6 +81,17 @@ Birds Directive > Other.
 
 ```{r pie-chart}
 obs_pie_chart(df)
+```
+
+## eLTER RI Standard Observation
+
+`obs_SO_pie_chart()` shows how observations contribute to eLTER Standard
+Observations SOBIO_014 (Flying insects) and SOBIO_018 (Acoustic recording —
+birds, bats, amphibians and orthoptera). Orthoptera contribute to both SOs
+simultaneously.
+
+```{r pie-SOs}
+obs_SO_pie_chart(df)
 ```
 
 ## Interactive maps

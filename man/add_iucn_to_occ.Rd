@@ -7,34 +7,34 @@
 add_iucn_to_occ(occ_eLTER)
 }
 \arguments{
-\item{occ_eLTER}{A \code{data.frame} or \code{sf} object representing the occurrences
-of an eLTER site acquired by the
-\code{ReLTER::get_site_speciesOccurrences()} function (typically \code{occ_eLTER$inat}).}
+\item{occ_eLTER}{A \code{data.frame} or \code{sf} object representing the
+occurrences of an eLTER site acquired by the
+\code{ReLTER::get_site_speciesOccurrences()} function (typically
+\code{occ_eLTER$inat}).}
 }
 \value{
-A \code{data.frame} or \code{sf} object with the same structure as the input,
-enriched with the following additional columns:
+A \code{data.frame} or \code{sf} object with the same structure as
+the input, enriched with the following additional columns:
 \describe{
-\item{status_IUCN}{A list-column (\code{list} of \code{tibble}s) containing the IUCN
-Red List assessments retrieved from iNaturalist for each \code{taxon.id}.
-Each tibble has the following columns: \code{status}, \code{authority}, \code{name}, \code{url}.
-If no IUCN information is available, a tibble with \code{NA} values is stored.}
-\item{has_IUCN}{A \code{logical} value indicating whether at least one valid
-(non-\code{NA}) IUCN status is available for the given \code{taxon.id}.}
-}
-
-The function also prints informative console messages reporting:
-\itemize{
-\item the progress of API queries for each \code{taxon.id}
-\item whether IUCN data are available or missing
-\item a summary of taxa with and without IUCN status
+\item{status_IUCN}{A list-column (\code{list} of \code{tibble}s)
+containing the IUCN Red List assessments retrieved from iNaturalist
+for each \code{taxon.id}. Each tibble has the columns \code{status},
+\code{authority}, \code{name}, and \code{url}. If no IUCN information
+is available, a tibble with \code{NA} values is stored.}
+\item{has_IUCN}{A \code{logical} value indicating whether at least one
+valid (non-\code{NA}) IUCN status is available for the given
+\code{taxon.id}.}
+\item{SOBIO_014}{\code{logical}. Whether the observation contributes to
+SOBIO_014 (Flying insects). Assigned only if not already present.}
+\item{SOBIO_018}{\code{logical}. Whether the observation contributes to
+SOBIO_018 (Acoustic recording). Assigned only if not already present.}
 }
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 This function enriches all the eLTER site iNaturalist occurrences acquired
-by the \code{ReLTER::get_site_speciesOccurrences()} function with the IUCN Red
-List conservation status as recorded in iNaturalist.
+by the \code{ReLTER::get_site_speciesOccurrences()} function with the IUCN
+Red List conservation status as recorded in iNaturalist.
 
 Observations are filtered to include only "Research Grade" data that meet
 the following criteria: have a valid date and exclude captive or cultivated
@@ -43,19 +43,35 @@ organisms.
 Observations are not filtered with respect to geoprivacy. In iNaturalist,
 each observation can be assigned one of three geoprivacy levels: open,
 obscured, or private (for more information, see:
-https://www.inaturalist.org/pages/geoprivacy). Given the need to gather
-information on species with critical conservation status, even if the
-geographic information is not precise, it is still important to record
+\url{https://www.inaturalist.org/pages/geoprivacy}). Given the need to
+gather information on species with critical conservation status, even if
+the geographic information is not precise, it is still important to record
 the presence of a species within a given area.
 
 The function queries the iNaturalist Taxa API once per unique \code{taxon.id}
 and stores the returned IUCN assessments (if available) in a nested
 list-column.
+
+If not already present, the function automatically assigns eLTER Standard
+Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
+two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
+\code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
+Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+columns are already present (e.g. because a previous enrichment function
+was already run), the assignment step is skipped.
 }
 \details{
 The IUCN conservation status is retrieved from the iNaturalist Taxa API and
 reflects the information available within iNaturalist. This information may
 not be up to date with respect to the official IUCN Red List.
+}
+\note{
+The IUCN conservation status is retrieved from the iNaturalist Taxa API and
+reflects the information available within iNaturalist. This may not be up
+to date with respect to the official IUCN Red List.
+
+eLTER Standard Observation assignments are based on taxonomic ancestry
+(\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
 }
 \examples{
 \dontrun{
@@ -78,6 +94,12 @@ occ <- add_iucn_to_occ(
 }
 ## End (Not run)
 
+}
+\seealso{
+\code{\link{get_conservation_status}},
+\code{\link{add_nativeness_to_occ}},
+\code{\link{add_eunis_legal_to_occ}},
+\code{\link{obs_SO_pie_chart}}
 }
 \author{
 Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}

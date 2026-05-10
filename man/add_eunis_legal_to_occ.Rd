@@ -7,26 +7,46 @@
 add_eunis_legal_to_occ(occ_eLTER)
 }
 \arguments{
-\item{occ_eLTER}{A \code{tibble} containing iNaturalist occurrences. Must contain a column \code{taxon.id}.}
+\item{occ_eLTER}{A \code{tibble} containing iNaturalist occurrences. Must
+contain the columns \code{taxon.id} and \code{taxon.ancestor_ids}.}
 }
 \value{
-A \code{tibble} containing all original columns of \code{occ_eLTER} plus:
+A \code{tibble} containing all original columns of \code{occ_eLTER}
+plus:
 \describe{
-\item{\verb{Legal text}}{Legal directive text from EUNIS (92/43/EEC or 2009/147/EC)}
-\item{Annex}{Annex information from EUNIS table}
+\item{directive}{\code{character}. Legal directive text from EUNIS
+(92/43/EEC or 2009/147/EC), or \code{NA} if not found.}
+\item{annex}{\code{character}. Annex information from EUNIS table,
+or \code{NA} if not found.}
+\item{SOBIO_014}{\code{logical}. Whether the observation contributes to
+SOBIO_014 (Flying insects). Assigned only if not already present.}
+\item{SOBIO_018}{\code{logical}. Whether the observation contributes to
+SOBIO_018 (Acoustic recording). Assigned only if not already present.}
 }
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 This function enriches iNaturalist occurrences with legal protection
-information extracted from the EUNIS database. It uses the scientific
-name retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
+information extracted from the EUNIS database. It uses the scientific name
+retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
 legal directives related to the EU Habitats Directive (92/43/EEC) and
 Birds Directive (2009/147/EC).
 
 Observations are not filtered by geoprivacy or research grade. If a taxon
-has no legal information in EUNIS, NA values are returned for \verb{Legal text}
-and \code{Annex}.
+has no legal information in EUNIS, \code{NA} values are returned for
+\code{directive} and \code{annex}.
+
+If not already present, the function automatically assigns eLTER Standard
+Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
+two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
+\code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
+Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+columns are already present (e.g. because a previous enrichment function
+was already run), the assignment step is skipped.
+}
+\note{
+eLTER Standard Observation assignments are based on taxonomic ancestry
+(\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
 }
 \examples{
 \dontrun{
@@ -44,6 +64,12 @@ occ_legal <- add_eunis_legal_to_occ(
 )
 }
 
+}
+\seealso{
+\code{\link{get_eunis_legal_info}},
+\code{\link{add_iucn_to_occ}},
+\code{\link{add_nativeness_to_occ}},
+\code{\link{obs_SO_pie_chart}}
 }
 \author{
 Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}

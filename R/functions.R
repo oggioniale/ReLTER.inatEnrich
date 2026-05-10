@@ -1,3 +1,46 @@
+#' @keywords internal
+#' @noRd
+.assign_eLTER_SOs <- function(occ) {
+  
+  ANURA_ID <- 20979
+  CHIROPTERA_ID <- 40268
+  ORTHOPTERA_ID <- 47651
+  AVES_ID <- 3
+  INSECTA_ID <- 47158
+  
+  has_ancestor <- function(ancestor_ids, target_id) {
+    if (is.null(ancestor_ids) || length(ancestor_ids) == 0) return(FALSE)
+    target_id %in% unlist(ancestor_ids)
+  }
+  
+  occ |>
+    dplyr::mutate(
+      # .is_aves = !is.na(taxon.iconic_taxon_name) &
+      #   taxon.iconic_taxon_name == "Aves",
+      # .is_insecta = !is.na(taxon.iconic_taxon_name) &
+      #   taxon.iconic_taxon_name == "Insecta",
+      .is_aves = vapply(taxon.ancestor_ids,
+                           function(x) has_ancestor(x, AVES_ID),
+                           FUN.VALUE = logical(1)),
+      .is_insecta = vapply(taxon.ancestor_ids,
+               function(x) has_ancestor(x, INSECTA_ID),
+               FUN.VALUE = logical(1)),
+      .is_anura = vapply(taxon.ancestor_ids,
+                              function(x) has_ancestor(x, ANURA_ID),
+                              FUN.VALUE = logical(1)),
+      .is_chiroptera = vapply(taxon.ancestor_ids,
+                              function(x) has_ancestor(x, CHIROPTERA_ID),
+                              FUN.VALUE = logical(1)),
+      .is_orthoptera = vapply(taxon.ancestor_ids,
+                              function(x) has_ancestor(x, ORTHOPTERA_ID),
+                              FUN.VALUE = logical(1)),
+      SOBIO_018 = .is_aves | .is_anura | .is_chiroptera | .is_orthoptera,
+      SOBIO_014 = .is_insecta
+    ) |>
+    dplyr::select(-.is_aves, -.is_insecta, -.is_anura,
+                  -.is_chiroptera, -.is_orthoptera)
+}
+
 #' Function to obtain IUCN conservation status for a single taxon.id from
 #' iNaturalist API
 #' @description `r lifecycle::badge("experimental")`
@@ -523,44 +566,69 @@ add_iucn_to_obs <- function(project_name) {
 #' Enrich eLTER site iNaturalist occurrences with IUCN conservation status
 #' @description `r lifecycle::badge("experimental")`
 #' This function enriches all the eLTER site iNaturalist occurrences acquired
-#' by the `ReLTER::get_site_speciesOccurrences()` function with the IUCN Red
-#' List conservation status as recorded in iNaturalist.
-#' 
+#' by the \code{ReLTER::get_site_speciesOccurrences()} function with the IUCN
+#' Red List conservation status as recorded in iNaturalist.
+#'
 #' Observations are filtered to include only "Research Grade" data that meet
 #' the following criteria: have a valid date and exclude captive or cultivated
 #' organisms.
-#' 
+#'
 #' Observations are not filtered with respect to geoprivacy. In iNaturalist,
 #' each observation can be assigned one of three geoprivacy levels: open,
 #' obscured, or private (for more information, see:
-#' https://www.inaturalist.org/pages/geoprivacy). Given the need to gather
-#' information on species with critical conservation status, even if the
-#' geographic information is not precise, it is still important to record
+#' \url{https://www.inaturalist.org/pages/geoprivacy}). Given the need to
+#' gather information on species with critical conservation status, even if
+#' the geographic information is not precise, it is still important to record
 #' the presence of a species within a given area.
-#' 
-#' The function queries the iNaturalist Taxa API once per unique `taxon.id`
+#'
+#' The function queries the iNaturalist Taxa API once per unique \code{taxon.id}
 #' and stores the returned IUCN assessments (if available) in a nested
 #' list-column.
-#' @param occ_eLTER A `data.frame` or `sf` object representing the occurrences
-#' of an eLTER site acquired by the
-#' `ReLTER::get_site_speciesOccurrences()` function (typically `occ_eLTER$inat`).
-#' @return A `data.frame` or `sf` object with the same structure as the input,
-#' enriched with the following additional columns:
-#' \describe{
-#'   \item{status_IUCN}{A list-column (`list` of `tibble`s) containing the IUCN
-#'   Red List assessments retrieved from iNaturalist for each `taxon.id`.
-#'   Each tibble has the following columns: `status`, `authority`, `name`, `url`.
-#'   If no IUCN information is available, a tibble with `NA` values is stored.}
-#'   \item{has_IUCN}{A `logical` value indicating whether at least one valid
-#'   (non-`NA`) IUCN status is available for the given `taxon.id`.}
-#' }
+#'
+#' If not already present, the function automatically assigns eLTER Standard
+#' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
+#' two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
+#' \code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
+#' Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+#' columns are already present (e.g. because a previous enrichment function
+#' was already run), the assignment step is skipped.
+#'
+#' @param occ_eLTER A \code{data.frame} or \code{sf} object representing the
+#'   occurrences of an eLTER site acquired by the
+#'   \code{ReLTER::get_site_speciesOccurrences()} function (typically
+#'   \code{occ_eLTER$inat}).
+#'
+#' @return A \code{data.frame} or \code{sf} object with the same structure as
+#'   the input, enriched with the following additional columns:
+#'   \describe{
+#'     \item{status_IUCN}{A list-column (\code{list} of \code{tibble}s)
+#'       containing the IUCN Red List assessments retrieved from iNaturalist
+#'       for each \code{taxon.id}. Each tibble has the columns \code{status},
+#'       \code{authority}, \code{name}, and \code{url}. If no IUCN information
+#'       is available, a tibble with \code{NA} values is stored.}
+#'     \item{has_IUCN}{A \code{logical} value indicating whether at least one
+#'       valid (non-\code{NA}) IUCN status is available for the given
+#'       \code{taxon.id}.}
+#'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
+#'       SOBIO_014 (Flying insects). Assigned only if not already present.}
+#'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
+#'       SOBIO_018 (Acoustic recording). Assigned only if not already present.}
+#'   }
+#'
+#' @note
+#' The IUCN conservation status is retrieved from the iNaturalist Taxa API and
+#' reflects the information available within iNaturalist. This may not be up
+#' to date with respect to the official IUCN Red List.
+#'
+#' eLTER Standard Observation assignments are based on taxonomic ancestry
+#' (\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
+#'
+#' @seealso
+#' \code{\link{get_conservation_status}},
+#' \code{\link{add_nativeness_to_occ}},
+#' \code{\link{add_eunis_legal_to_occ}},
+#' \code{\link{obs_SO_pie_chart}}
 #' 
-#' The function also prints informative console messages reporting:
-#' \itemize{
-#'   \item the progress of API queries for each `taxon.id`
-#'   \item whether IUCN data are available or missing
-#'   \item a summary of taxa with and without IUCN status
-#' }
 #' @details
 #' The IUCN conservation status is retrieved from the iNaturalist Taxa API and
 #' reflects the information available within iNaturalist. This information may
@@ -592,6 +660,14 @@ add_iucn_to_obs <- function(project_name) {
 #' 
 ### add_iucn_to_occ
 add_iucn_to_occ <- function(occ_eLTER) {
+  # assign eLTER SOs if not already present
+  if (!"SOBIO_014" %in% names(occ_eLTER)) {
+    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_018)...\n----\n")
+    occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
+  } else {
+    message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
+  }
+  
   occ_in_site_research_valid <- occ_eLTER |>
     dplyr::filter(
       quality_grade == "research",
@@ -707,26 +783,50 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #' via \code{\link{get_nativeness_degree}}. The results are joined back to
 #' the filtered occurrence tibble as a nested \code{establishmentMeans}
 #' list-column.
+#'
+#' If not already present, the function automatically assigns eLTER Standard
+#' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
+#' two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
+#' \code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
+#' Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+#' columns are already present (e.g. because a previous enrichment function
+#' was already run), the assignment step is skipped.
+#'
 #' @param occ_eLTER \code{\link[dplyr]{tibble}}. A tibble of iNaturalist
 #'   occurrence records, typically obtained via
 #'   \code{ReLTER::get_site_speciesOccurrences()}. Must contain at least the
-#'   columns \code{quality_grade}, \code{observed_on}, \code{captive}, and
-#'   \code{taxon.id}.
+#'   columns \code{quality_grade}, \code{observed_on}, \code{captive},
+#'   \code{taxon.id}, and \code{taxon.ancestor_ids}.
 #' @param country \code{character}. The country name to filter establishment
 #'   means by (e.g., \code{"Italy"}). Must match the place name as recorded
 #'   in iNaturalist. Cannot be \code{NULL}.
+#'
 #' @return A \code{\link[dplyr]{tibble}} of filtered occurrence records
-#'   (research-grade, non-captive, with valid date) with an additional
-#'   \code{establishmentMeans} list-column. Each element of the list-column
-#'   is a one-row tibble containing:
+#'   (research-grade, non-captive, with valid date) with the following
+#'   additional columns:
 #'   \describe{
-#'     \item{nativeness}{\code{character}. The establishment means value
-#'       (e.g., \code{"native"}, \code{"introduced"}), or \code{NA} if
+#'     \item{establishmentMeans}{list-column. Each element is a one-row tibble
+#'       containing \code{nativeness} and \code{authority}, or \code{NA} if
 #'       not recorded in iNaturalist for the specified country.}
-#'     \item{authority}{\code{character}. The checklist or authority title
-#'       associated with the establishment means, or \code{NA} if not
-#'       available.}
+#'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
+#'       SOBIO_014 (Flying insects). Assigned only if not already present.}
+#'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
+#'       SOBIO_018 (Acoustic recording). Assigned only if not already present.}
 #'   }
+#'
+#' @note
+#' The establishment means information is sourced from iNaturalist and may
+#' refer to the IUCN Red List. It may not always be up to date.
+#'
+#' eLTER Standard Observation assignments are based on taxonomic ancestry
+#' (\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
+#'
+#' @seealso
+#' \code{\link{get_nativeness_degree}},
+#' \code{\link{add_iucn_to_occ}},
+#' \code{\link{add_eunis_legal_to_occ}},
+#' \code{\link{obs_SO_pie_chart}}
+#' 
 #' @note Progress messages are printed to the console for each taxon
 #'   processed, including the iNaturalist taxon ID, nativeness status,
 #'   and authority. A summary of taxa with and without establishment means
@@ -734,7 +834,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'
 #'   The establishment means information is sourced from iNaturalist and
 #'   may refer to the IUCN Red List. It may not always be up to date.
-#' @seealso \code{\link{get_nativeness_degree}} for the underlying API call.
+#'   
 #' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
 #' @importFrom dplyr filter select distinct inner_join left_join tibble
 #' @importFrom purrr map_dfr pluck walk2 map_chr
@@ -764,6 +864,15 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
   if (is.null(country)) {
     stop("Argument `country` is required. Please specify a country name (e.g., 'Italy').")
   }
+  
+  # assign eLTER SOs if not already present
+  if (!"SOBIO_014" %in% names(occ_eLTER)) {
+    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_018)...\n----\n")
+    occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
+  } else {
+    message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
+  }
+  
   # Keep only research-grade, non-captive observations with a valid date
   occ_in_site_research_valid <- occ_eLTER |>
     dplyr::filter(quality_grade == "research") |>
@@ -859,20 +968,49 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
 #' Enrich iNaturalist occurrences with EUNIS legal framework information
 #' @description `r lifecycle::badge("experimental")`
 #' This function enriches iNaturalist occurrences with legal protection
-#' information extracted from the EUNIS database. It uses the scientific
-#' name retrieved from the iNaturalist `taxon.id` to query EUNIS and extract
+#' information extracted from the EUNIS database. It uses the scientific name
+#' retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
 #' legal directives related to the EU Habitats Directive (92/43/EEC) and
 #' Birds Directive (2009/147/EC).
 #'
 #' Observations are not filtered by geoprivacy or research grade. If a taxon
-#' has no legal information in EUNIS, NA values are returned for `Legal text`
-#' and `Annex`.
-#' @param occ_eLTER A `tibble` containing iNaturalist occurrences. Must contain a column `taxon.id`.
-#' @return A `tibble` containing all original columns of `occ_eLTER` plus:
+#' has no legal information in EUNIS, \code{NA} values are returned for
+#' \code{directive} and \code{annex}.
+#'
+#' If not already present, the function automatically assigns eLTER Standard
+#' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
+#' two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
+#' \code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
+#' Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+#' columns are already present (e.g. because a previous enrichment function
+#' was already run), the assignment step is skipped.
+#'
+#' @param occ_eLTER A \code{tibble} containing iNaturalist occurrences. Must
+#'   contain the columns \code{taxon.id} and \code{taxon.ancestor_ids}.
+#'
+#' @return A \code{tibble} containing all original columns of \code{occ_eLTER}
+#'   plus:
 #'   \describe{
-#'     \item{`Legal text`}{Legal directive text from EUNIS (92/43/EEC or 2009/147/EC)}
-#'     \item{Annex}{Annex information from EUNIS table}
+#'     \item{directive}{\code{character}. Legal directive text from EUNIS
+#'       (92/43/EEC or 2009/147/EC), or \code{NA} if not found.}
+#'     \item{annex}{\code{character}. Annex information from EUNIS table,
+#'       or \code{NA} if not found.}
+#'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
+#'       SOBIO_014 (Flying insects). Assigned only if not already present.}
+#'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
+#'       SOBIO_018 (Acoustic recording). Assigned only if not already present.}
 #'   }
+#'
+#' @note
+#' eLTER Standard Observation assignments are based on taxonomic ancestry
+#' (\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
+#'
+#' @seealso
+#' \code{\link{get_eunis_legal_info}},
+#' \code{\link{add_iucn_to_occ}},
+#' \code{\link{add_nativeness_to_occ}},
+#' \code{\link{obs_SO_pie_chart}}
+#' 
 #' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
 #' @importFrom dplyr tibble mutate left_join rename
 #' @importFrom purrr map_dfr
@@ -899,6 +1037,14 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
   # Check that taxon.id column exists
   if(!"taxon.id" %in% names(occ_eLTER)) {
     stop("The input tibble must contain a column named 'taxon.id'")
+  }
+  
+  # assign eLTER SOs if not already present
+  if (!"SOBIO_014" %in% names(occ_eLTER)) {
+    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_018)...\n----\n")
+    occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
+  } else {
+    message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
   }
   
   # Extract unique taxon.ids
@@ -955,11 +1101,12 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' @description `r lifecycle::badge("experimental")`
 #'
 #' Takes a tibble of iNaturalist occurrences already enriched with species
-#' nativeness, IUCN conservation status, and EUNIS legal information.
-#' Verifies that all required columns are present, builds observation-level
-#' HTML popups with linked references to iNaturalist, IUCN Red List, and
-#' EUR-Lex directive pages, and returns an interactive Leaflet map with
-#' colour-coded markers by iconic taxon group and marker clustering.
+#' nativeness, IUCN conservation status, EUNIS legal information, and eLTER
+#' Standard Observation assignments. Verifies that all required columns are
+#' present, builds observation-level HTML popups with linked references to
+#' iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
+#' interactive Leaflet map with colour-coded markers by iconic taxon group
+#' and marker clustering.
 #'
 #' @param occ_enriched An \code{sf} tibble of iNaturalist occurrences enriched
 #'   with the following columns:
@@ -974,6 +1121,13 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'       \code{\link{add_eunis_legal_to_occ}}.}
 #'     \item{annex}{character. EU directive annex, produced by
 #'       \code{\link{add_eunis_legal_to_occ}}.}
+#'     \item{SOBIO_014}{logical. Whether the observation contributes to the
+#'       eLTER Standard Observation SOBIO_014 (Flying insects), assigned by
+#'       the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+#'     \item{SOBIO_018}{logical. Whether the observation contributes to the
+#'       eLTER Standard Observation SOBIO_018 (Acoustic recording — birds,
+#'       bats, amphibians, orthoptera), assigned by the enrichment pipeline
+#'       via \code{\link{.assign_eLTER_SOs}}.}
 #'     \item{taxon.id}{integer. iNaturalist taxon ID.}
 #'     \item{name}{character. Scientific name.}
 #'     \item{taxon.preferred_common_name}{character. Common name.}
@@ -990,45 +1144,64 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'     \item{taxon.default_photo.square_url}{character. URL of the taxon
 #'       thumbnail photo shown in the popup.}
 #'   }
+#' @param site_boundary An \code{sf} object representing the eLTER site
+#'   boundary polygon, as returned by \code{ReLTER::get_site_info()}.
+#'   If \code{NULL} (default), no boundary polygon is drawn on the map.
 #'
 #' @return A \code{\link[leaflet]{leaflet}} map object with:
 #'   \itemize{
 #'     \item An OpenStreetMap base tile layer.
-#'     \item The eLTER-RI site boundary polygon (retrieved via
-#'       \code{ReLTER::get_site_info()}).
+#'     \item An optional eLTER site boundary polygon layer.
 #'     \item Circle markers for \code{"open"} observations (radius 6, full
-#'       opacity) and \code{"obscured"} observations (radius 10, reduced
-#'       opacity), both with marker clustering enabled.
-#'     \item Popups per observation showing taxon info, observer details,
-#'       data quality, IUCN status per geographic scope (with links to IUCN
-#'       Red List assessments), establishment means (with link to iNaturalist
-#'       help), and EU directive coverage (with links to EUR-Lex).
+#'       opacity), \code{"obscured"} observations (radius 10, reduced
+#'       opacity), and \code{"unknown"} geoprivacy observations (radius 8,
+#'       low opacity), all with marker clustering enabled.
+#'     \item Popups per observation showing:
+#'       \itemize{
+#'         \item taxon photo, scientific name (linked to iNaturalist),
+#'           common name, observation date, observer (linked to iNaturalist),
+#'           and link to the observation record;
+#'         \item data quality grade, geoprivacy level, and positional
+#'           accuracy;
+#'         \item IUCN Red List status per geographic scope, with links to
+#'           the Red List assessments;
+#'         \item establishment means and authority, with link to iNaturalist
+#'           help;
+#'         \item EU directive coverage (Habitats and Birds Directives) with
+#'           links to EUR-Lex;
+#'         \item eLTER Standard Observations the record contributes to
+#'           (\code{SOBIO_014} Flying insects and/or \code{SOBIO_018}
+#'           Acoustic recording).
+#'       }
 #'     \item A legend for iconic taxon groups.
 #'     \item A geoprivacy legend control (top right).
-#'     \item A layers control to toggle \code{"open"} and \code{"obscured"}
-#'       marker groups.
+#'     \item A layers control to toggle observation groups and site boundary.
 #'   }
 #'
 #' @note
-#' The function calls \code{ReLTER::get_site_info()} internally to retrieve
-#' the site boundary, using the DEIMS-ID stored in \code{occ_enriched$uri.1[1]}.
-#' Observations with \code{taxon_geoprivacy == "private"} are silently
-#' excluded from the map as they have no displayable coordinates.
+#' Observations with \code{taxon_geoprivacy == "private"} are shown on the
+#' map with low opacity as their coordinates are approximate.
 #'
 #' EU directive links point to the EUR-Lex PDF versions:
 #' Birds Directive 2009/147/EC and Habitats Directive 92/43/EEC.
+#'
+#' eLTER Standard Observation assignments are based on taxonomic ancestry
+#' retrieved from the iNaturalist API. SOBIO_014 covers Insecta;
+#' SOBIO_018 covers Aves, Anura, Chiroptera, and Orthoptera. Orthoptera
+#' contribute to both SOs simultaneously.
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #'
 #' @seealso
 #' \code{\link{add_iucn_to_occ}},
 #' \code{\link{add_nativeness_to_occ}},
-#' \code{\link{add_eunis_legal_to_occ}}
+#' \code{\link{add_eunis_legal_to_occ}},
+#' \code{\link{obs_SO_pie_chart}}
 #'
 #' @export
 #'
 #' @importFrom dplyr coalesce mutate filter select distinct group_by
-#'   summarise left_join
+#'   summarise left_join case_when
 #' @importFrom purrr map_chr pmap_chr map2_chr
 #' @importFrom sf st_drop_geometry
 #' @importFrom leaflet leaflet addTiles addPolygons addCircleMarkers
@@ -1040,13 +1213,12 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' \dontrun{
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 #' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
-#' 
+#'
 #' map <- create_leaflet_occ_map(
-#'   occ_enriched = occ_eLTER_legal,
+#'   occ_enriched  = occ_eLTER_legal,
 #'   site_boundary = site_boundary
 #' )
 #' map
-#'
 #' }
 #'
 ### create_leaflet_occ_map
@@ -1116,26 +1288,33 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
   # Create map-ready labels, unpacking nested columns
   occ_map <- occ_enriched |>
     dplyr::mutate(
-      iconic       = dplyr::coalesce(taxon.iconic_taxon_name, "Unknown"),
-      geopriv      = dplyr::coalesce(taxon_geoprivacy, "unknown"),
+      iconic = dplyr::coalesce(taxon.iconic_taxon_name, "Unknown"),
+      geopriv = dplyr::coalesce(taxon_geoprivacy, "unknown"),
       # Unpack establishmentMeans list-column
-      nativeness_lbl    = purrr::map_chr(establishmentMeans, extract_nativeness),
-      em_authority_lbl  = purrr::map_chr(establishmentMeans, extract_em_authority),
-      nativeness_lbl    = ifelse(is.na(nativeness_lbl), "-", nativeness_lbl),
-      em_authority_lbl  = ifelse(is.na(em_authority_lbl), "-", em_authority_lbl),
+      nativeness_lbl = purrr::map_chr(establishmentMeans, extract_nativeness),
+      em_authority_lbl = purrr::map_chr(establishmentMeans, extract_em_authority),
+      nativeness_lbl = ifelse(is.na(nativeness_lbl), "-", nativeness_lbl),
+      em_authority_lbl = ifelse(is.na(em_authority_lbl), "-", em_authority_lbl),
       # Unpack status_IUCN list-column into an HTML string
-      iucn_html    = purrr::map_chr(status_IUCN, extract_iucn_html),
+      iucn_html = purrr::map_chr(status_IUCN, extract_iucn_html),
       # Flat columns
-      obs_quality_lbl   = ifelse(is.na(quality_grade), "-", as.character(quality_grade)),
-      taxon_name_lbl    = ifelse(is.na(name), "-", as.character(name)),
-      common_name_lbl   = ifelse(is.na(taxon.preferred_common_name), "-", as.character(taxon.preferred_common_name)),
-      observed_on_lbl   = ifelse(is.na(observed_on), "-", as.character(observed_on)),
-      posacc_lbl        = ifelse(is.na(public_positional_accuracy), "-", as.character(public_positional_accuracy)),
-      observer_lbl      = ifelse(is.na(user.login), "-", as.character(user.login)),
-      observer_url      = ifelse(is.na(user.login), "-", paste0("https://www.inaturalist.org/people/", user.login)),
-      taxon_url         = paste0("https://www.inaturalist.org/taxa/", taxon.id),
-      obs_url           = ifelse(is.na(uri), "", uri),
-      photo_url         = ifelse(is.na(taxon.default_photo.square_url), "", taxon.default_photo.square_url)
+      obs_quality_lbl = ifelse(is.na(quality_grade), "-", as.character(quality_grade)),
+      taxon_name_lbl = ifelse(is.na(name), "-", as.character(name)),
+      common_name_lbl = ifelse(is.na(taxon.preferred_common_name), "-", as.character(taxon.preferred_common_name)),
+      observed_on_lbl = ifelse(is.na(observed_on), "-", as.character(observed_on)),
+      posacc_lbl = ifelse(is.na(public_positional_accuracy), "-", as.character(public_positional_accuracy)),
+      observer_lbl = ifelse(is.na(user.login), "-", as.character(user.login)),
+      observer_url = ifelse(is.na(user.login), "-", paste0("https://www.inaturalist.org/people/", user.login)),
+      taxon_url = paste0("https://www.inaturalist.org/taxa/", taxon.id),
+      obs_url = ifelse(is.na(uri), "", uri),
+      photo_url = ifelse(is.na(taxon.default_photo.square_url), "", taxon.default_photo.square_url),
+      # SOs
+      so_lbl = dplyr::case_when(
+        SOBIO_014 & SOBIO_018 ~ "SOBIO_014 (Flying insects) | SOBIO_018 (Acoustic recording)",
+        SOBIO_014 & !SOBIO_018 ~ "SOBIO_014 (Flying insects)",
+        !SOBIO_014 & SOBIO_018 ~ "SOBIO_018 (Acoustic recording)",
+        TRUE ~ "-"
+      )
     )
   
   # Collapse directive + Annex per taxon.id into one HTML block (one row per directive)
@@ -1164,25 +1343,26 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
   # Build popups
   occ_map$popup <- purrr::pmap_chr(
     list(
-      obs_quality    = occ_map$obs_quality_lbl,
-      taxon_name     = occ_map$taxon_name_lbl,
-      taxon_url      = occ_map$taxon_url,
-      iucn_html      = occ_map$iucn_html,
-      nativeness     = occ_map$nativeness_lbl,
-      em_authority   = occ_map$em_authority_lbl,
-      common_name    = occ_map$common_name_lbl,
-      observed_on    = occ_map$observed_on_lbl,
-      geopriv        = occ_map$geopriv,
-      posacc         = occ_map$posacc_lbl,
-      observer       = occ_map$observer_lbl,
-      observer_url   = occ_map$observer_url,
-      obs_url        = occ_map$obs_url,
-      photo_url      = occ_map$photo_url,
-      directive_html = occ_map$directive_html
+      obs_quality = occ_map$obs_quality_lbl,
+      taxon_name = occ_map$taxon_name_lbl,
+      taxon_url = occ_map$taxon_url,
+      iucn_html = occ_map$iucn_html,
+      nativeness = occ_map$nativeness_lbl,
+      em_authority = occ_map$em_authority_lbl,
+      common_name = occ_map$common_name_lbl,
+      observed_on = occ_map$observed_on_lbl,
+      geopriv = occ_map$geopriv,
+      posacc = occ_map$posacc_lbl,
+      observer = occ_map$observer_lbl,
+      observer_url = occ_map$observer_url,
+      obs_url = occ_map$obs_url,
+      photo_url = occ_map$photo_url,
+      directive_html = occ_map$directive_html,
+      so_lbl = occ_map$so_lbl
     ),
     function(obs_quality, taxon_name, taxon_url, iucn_html, nativeness, em_authority,
              common_name, observed_on, geopriv, posacc,
-             observer, observer_url, obs_url, photo_url, directive_html) {
+             observer, observer_url, obs_url, photo_url, directive_html, so_lbl) {
       
       # Build directive HTML block with links to EUR-Lex
       directive_block <- if (nzchar(directive_html)) {
@@ -1242,6 +1422,9 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         # IUCN status
         '<b>Status (IUCN):</b><a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712" target="_blank" style="font-size:11px;">ℹ️</a><br/>', iucn_html, '<br/>',
         
+        # Divider
+        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
+        
         # Establishment means — with link to iNaturalist help
         sprintf(
           '<b>Establishment means:</b> %s <a href="https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist" target="_blank" style="font-size:11px;">ℹ️</a><br/>',
@@ -1249,11 +1432,18 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         ),
         "<b>Establishment means authority:</b> ", em_authority,
         
-        # Divider
-        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
+        # EU Directives + eLTER SOs — divider only if there is content
+        if (nzchar(directive_block)) {
+          paste0(
+            '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
+            directive_block
+          )
+        } else "",
         
-        # EU Directives
-        directive_block
+        # eLTER Standard Observations — always shown with its own divider
+        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
+        "<b>eLTER Standard Observations:</b><a href='https://elter-ri.eu/standard-observations-spheres/biosphere' target='_blank' style='font-size:11px;'>ℹ️</a><br/>",
+        "<div style='font-size:12px;'>", so_lbl, "</div>"
       )
     }
   )

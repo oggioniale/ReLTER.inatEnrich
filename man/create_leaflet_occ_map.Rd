@@ -20,6 +20,13 @@ produced by \code{\link{add_iucn_to_occ}}.}
 \code{\link{add_eunis_legal_to_occ}}.}
 \item{annex}{character. EU directive annex, produced by
 \code{\link{add_eunis_legal_to_occ}}.}
+\item{SOBIO_014}{logical. Whether the observation contributes to the
+eLTER Standard Observation SOBIO_014 (Flying insects), assigned by
+the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+\item{SOBIO_018}{logical. Whether the observation contributes to the
+eLTER Standard Observation SOBIO_018 (Acoustic recording — birds,
+bats, amphibians, orthoptera), assigned by the enrichment pipeline
+via \code{\link{.assign_eLTER_SOs}}.}
 \item{taxon.id}{integer. iNaturalist taxon ID.}
 \item{name}{character. Scientific name.}
 \item{taxon.preferred_common_name}{character. Common name.}
@@ -36,44 +43,64 @@ metres.}
 \item{taxon.default_photo.square_url}{character. URL of the taxon
 thumbnail photo shown in the popup.}
 }}
+
+\item{site_boundary}{An \code{sf} object representing the eLTER site
+boundary polygon, as returned by \code{ReLTER::get_site_info()}.
+If \code{NULL} (default), no boundary polygon is drawn on the map.}
 }
 \value{
 A \code{\link[leaflet]{leaflet}} map object with:
 \itemize{
 \item An OpenStreetMap base tile layer.
-\item The eLTER-RI site boundary polygon (retrieved via
-\code{ReLTER::get_site_info()}).
+\item An optional eLTER site boundary polygon layer.
 \item Circle markers for \code{"open"} observations (radius 6, full
-opacity) and \code{"obscured"} observations (radius 10, reduced
-opacity), both with marker clustering enabled.
-\item Popups per observation showing taxon info, observer details,
-data quality, IUCN status per geographic scope (with links to IUCN
-Red List assessments), establishment means (with link to iNaturalist
-help), and EU directive coverage (with links to EUR-Lex).
+opacity), \code{"obscured"} observations (radius 10, reduced
+opacity), and \code{"unknown"} geoprivacy observations (radius 8,
+low opacity), all with marker clustering enabled.
+\item Popups per observation showing:
+\itemize{
+\item taxon photo, scientific name (linked to iNaturalist),
+common name, observation date, observer (linked to iNaturalist),
+and link to the observation record;
+\item data quality grade, geoprivacy level, and positional
+accuracy;
+\item IUCN Red List status per geographic scope, with links to
+the Red List assessments;
+\item establishment means and authority, with link to iNaturalist
+help;
+\item EU directive coverage (Habitats and Birds Directives) with
+links to EUR-Lex;
+\item eLTER Standard Observations the record contributes to
+(\code{SOBIO_014} Flying insects and/or \code{SOBIO_018}
+Acoustic recording).
+}
 \item A legend for iconic taxon groups.
 \item A geoprivacy legend control (top right).
-\item A layers control to toggle \code{"open"} and \code{"obscured"}
-marker groups.
+\item A layers control to toggle observation groups and site boundary.
 }
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
 Takes a tibble of iNaturalist occurrences already enriched with species
-nativeness, IUCN conservation status, and EUNIS legal information.
-Verifies that all required columns are present, builds observation-level
-HTML popups with linked references to iNaturalist, IUCN Red List, and
-EUR-Lex directive pages, and returns an interactive Leaflet map with
-colour-coded markers by iconic taxon group and marker clustering.
+nativeness, IUCN conservation status, EUNIS legal information, and eLTER
+Standard Observation assignments. Verifies that all required columns are
+present, builds observation-level HTML popups with linked references to
+iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
+interactive Leaflet map with colour-coded markers by iconic taxon group
+and marker clustering.
 }
 \note{
-The function calls \code{ReLTER::get_site_info()} internally to retrieve
-the site boundary, using the DEIMS-ID stored in \code{occ_enriched$uri.1[1]}.
-Observations with \code{taxon_geoprivacy == "private"} are silently
-excluded from the map as they have no displayable coordinates.
+Observations with \code{taxon_geoprivacy == "private"} are shown on the
+map with low opacity as their coordinates are approximate.
 
 EU directive links point to the EUR-Lex PDF versions:
 Birds Directive 2009/147/EC and Habitats Directive 92/43/EEC.
+
+eLTER Standard Observation assignments are based on taxonomic ancestry
+retrieved from the iNaturalist API. SOBIO_014 covers Insecta;
+SOBIO_018 covers Aves, Anura, Chiroptera, and Orthoptera. Orthoptera
+contribute to both SOs simultaneously.
 }
 \examples{
 \dontrun{
@@ -81,18 +108,18 @@ deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 
 map <- create_leaflet_occ_map(
-  occ_enriched = occ_eLTER_legal,
+  occ_enriched  = occ_eLTER_legal,
   site_boundary = site_boundary
 )
 map
-
 }
 
 }
 \seealso{
 \code{\link{add_iucn_to_occ}},
 \code{\link{add_nativeness_to_occ}},
-\code{\link{add_eunis_legal_to_occ}}
+\code{\link{add_eunis_legal_to_occ}},
+\code{\link{obs_SO_pie_chart}}
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}

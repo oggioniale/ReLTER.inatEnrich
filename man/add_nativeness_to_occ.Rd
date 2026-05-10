@@ -10,8 +10,8 @@ add_nativeness_to_occ(occ_eLTER, country)
 \item{occ_eLTER}{\code{\link[dplyr]{tibble}}. A tibble of iNaturalist
 occurrence records, typically obtained via
 \code{ReLTER::get_site_speciesOccurrences()}. Must contain at least the
-columns \code{quality_grade}, \code{observed_on}, \code{captive}, and
-\code{taxon.id}.}
+columns \code{quality_grade}, \code{observed_on}, \code{captive},
+\code{taxon.id}, and \code{taxon.ancestor_ids}.}
 
 \item{country}{\code{character}. The country name to filter establishment
 means by (e.g., \code{"Italy"}). Must match the place name as recorded
@@ -19,16 +19,16 @@ in iNaturalist. Cannot be \code{NULL}.}
 }
 \value{
 A \code{\link[dplyr]{tibble}} of filtered occurrence records
-(research-grade, non-captive, with valid date) with an additional
-\code{establishmentMeans} list-column. Each element of the list-column
-is a one-row tibble containing:
+(research-grade, non-captive, with valid date) with the following
+additional columns:
 \describe{
-\item{nativeness}{\code{character}. The establishment means value
-(e.g., \code{"native"}, \code{"introduced"}), or \code{NA} if
+\item{establishmentMeans}{list-column. Each element is a one-row tibble
+containing \code{nativeness} and \code{authority}, or \code{NA} if
 not recorded in iNaturalist for the specified country.}
-\item{authority}{\code{character}. The checklist or authority title
-associated with the establishment means, or \code{NA} if not
-available.}
+\item{SOBIO_014}{\code{logical}. Whether the observation contributes to
+SOBIO_014 (Flying insects). Assigned only if not already present.}
+\item{SOBIO_018}{\code{logical}. Whether the observation contributes to
+SOBIO_018 (Acoustic recording). Assigned only if not already present.}
 }
 }
 \description{
@@ -39,8 +39,22 @@ establishment means information from iNaturalist for each unique taxon
 via \code{\link{get_nativeness_degree}}. The results are joined back to
 the filtered occurrence tibble as a nested \code{establishmentMeans}
 list-column.
+
+If not already present, the function automatically assigns eLTER Standard
+Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
+two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
+\code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
+Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+columns are already present (e.g. because a previous enrichment function
+was already run), the assignment step is skipped.
 }
 \note{
+The establishment means information is sourced from iNaturalist and may
+refer to the IUCN Red List. It may not always be up to date.
+
+eLTER Standard Observation assignments are based on taxonomic ancestry
+(\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
+
 Progress messages are printed to the console for each taxon
 processed, including the iNaturalist taxon ID, nativeness status,
 and authority. A summary of taxa with and without establishment means
@@ -71,7 +85,10 @@ occ <- add_nativeness_to_occ(
 
 }
 \seealso{
-\code{\link{get_nativeness_degree}} for the underlying API call.
+\code{\link{get_nativeness_degree}},
+\code{\link{add_iucn_to_occ}},
+\code{\link{add_eunis_legal_to_occ}},
+\code{\link{obs_SO_pie_chart}}
 }
 \author{
 Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}
