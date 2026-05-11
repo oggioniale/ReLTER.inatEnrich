@@ -33,6 +33,7 @@ reference:
       - obs_per_hour
       - species_richness_map
       - obs_pie_chart
+      - obs_SO_pie_chart
 
   - title: Datasets
     contents:
