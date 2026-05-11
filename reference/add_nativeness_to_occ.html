@@ -5,13 +5,27 @@ research-grade, non-captive observations with a valid date, then fetches
 establishment means information from iNaturalist for each unique taxon
 via get_nativeness_degree. The results are joined back to
 the filtered occurrence tibble as a nested establishmentMeans
-list-column."><meta property="og:description" content="
+list-column.
+If not already present, the function automatically assigns eLTER Standard
+Observations to each record via .assign_eLTER_SOs, adding
+two logical columns: SOBIO_014 (Flying insects — Insecta) and
+SOBIO_018 (Acoustic recording — Aves, Anura, Chiroptera,
+Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+columns are already present (e.g. because a previous enrichment function
+was already run), the assignment step is skipped."><meta property="og:description" content="
 Filters a tibble of iNaturalist occurrence records to retain only
 research-grade, non-captive observations with a valid date, then fetches
 establishment means information from iNaturalist for each unique taxon
 via get_nativeness_degree. The results are joined back to
 the filtered occurrence tibble as a nested establishmentMeans
-list-column."><meta property="og:image" content="https://oggioniale.github.io/ReLTER.inatEnrich/logo.png"></head><body>
+list-column.
+If not already present, the function automatically assigns eLTER Standard
+Observations to each record via .assign_eLTER_SOs, adding
+two logical columns: SOBIO_014 (Flying insects — Insecta) and
+SOBIO_018 (Acoustic recording — Aves, Anura, Chiroptera,
+Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+columns are already present (e.g. because a previous enrichment function
+was already run), the assignment step is skipped."><meta property="og:image" content="https://oggioniale.github.io/ReLTER.inatEnrich/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -50,6 +64,13 @@ establishment means information from iNaturalist for each unique taxon
 via <code><a href="get_nativeness_degree.html">get_nativeness_degree</a></code>. The results are joined back to
 the filtered occurrence tibble as a nested <code>establishmentMeans</code>
 list-column.</p>
+<p>If not already present, the function automatically assigns eLTER Standard
+Observations to each record via <code>.assign_eLTER_SOs</code>, adding
+two logical columns: <code>SOBIO_014</code> (Flying insects — Insecta) and
+<code>SOBIO_018</code> (Acoustic recording — Aves, Anura, Chiroptera,
+Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
+columns are already present (e.g. because a previous enrichment function
+was already run), the assignment step is skipped.</p>
     </div>
 
     <div class="section level2">
@@ -65,8 +86,8 @@ list-column.</p>
 <dd><p><code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></code>. A tibble of iNaturalist
 occurrence records, typically obtained via
 <code>ReLTER::get_site_speciesOccurrences()</code>. Must contain at least the
-columns <code>quality_grade</code>, <code>observed_on</code>, <code>captive</code>, and
-<code>taxon.id</code>.</p></dd>
+columns <code>quality_grade</code>, <code>observed_on</code>, <code>captive</code>,
+<code>taxon.id</code>, and <code>taxon.ancestor_ids</code>.</p></dd>
 
 
 <dt id="arg-country">country<a class="anchor" aria-label="anchor" href="#arg-country"></a></dt>
@@ -78,23 +99,29 @@ in iNaturalist. Cannot be <code>NULL</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></code> of filtered occurrence records
-(research-grade, non-captive, with valid date) with an additional
-<code>establishmentMeans</code> list-column. Each element of the list-column
-is a one-row tibble containing:</p><dl><dt>nativeness</dt>
-<dd><p><code>character</code>. The establishment means value
-(e.g., <code>"native"</code>, <code>"introduced"</code>), or <code>NA</code> if
+(research-grade, non-captive, with valid date) with the following
+additional columns:</p><dl><dt>establishmentMeans</dt>
+<dd><p>list-column. Each element is a one-row tibble
+containing <code>nativeness</code> and <code>authority</code>, or <code>NA</code> if
 not recorded in iNaturalist for the specified country.</p></dd>
 
-<dt>authority</dt>
-<dd><p><code>character</code>. The checklist or authority title
-associated with the establishment means, or <code>NA</code> if not
-available.</p></dd>
+<dt>SOBIO_014</dt>
+<dd><p><code>logical</code>. Whether the observation contributes to
+SOBIO_014 (Flying insects). Assigned only if not already present.</p></dd>
+
+<dt>SOBIO_018</dt>
+<dd><p><code>logical</code>. Whether the observation contributes to
+SOBIO_018 (Acoustic recording). Assigned only if not already present.</p></dd>
 
 
 </dl></div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Progress messages are printed to the console for each taxon
+    <p>The establishment means information is sourced from iNaturalist and may
+refer to the IUCN Red List. It may not always be up to date.</p>
+<p>eLTER Standard Observation assignments are based on taxonomic ancestry
+(<code>taxon.ancestor_ids</code>) retrieved from the iNaturalist API.</p>
+<p>Progress messages are printed to the console for each taxon
 processed, including the iNaturalist taxon ID, nativeness status,
 and authority. A summary of taxa with and without establishment means
 is printed at the end.</p>
@@ -103,7 +130,10 @@ may refer to the IUCN Red List. It may not always be up to date.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="get_nativeness_degree.html">get_nativeness_degree</a></code> for the underlying API call.</p></div>
+    <div class="dont-index"><p><code><a href="get_nativeness_degree.html">get_nativeness_degree</a></code>,
+<code><a href="add_iucn_to_occ.html">add_iucn_to_occ</a></code>,
+<code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>,
+<code><a href="obs_SO_pie_chart.html">obs_SO_pie_chart</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

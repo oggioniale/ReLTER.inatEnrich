@@ -15,7 +15,18 @@ attributes sourced from iNaturalist and the EUNIS species database.
 | [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md) | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments, sourced from [iNaturalist checklists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) |
 | [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md) | iNaturalist API | Nativeness / [establishment means](https://dwc.tdwg.org/em/), filtered by country, directly as recorded on [iNaturalist](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist) |
 | [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md) | EUNIS species database | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage, as delivered by retrieved from the [EUNIS](https://eunis.eea.europa.eu/) species database |
-| Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
+| Visualization functions | — | Charts and interactive maps for enriched occurrence data, including SO contribution — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
+
+### Disclaimer
+
+*`ReLTER.inatEnrich` is designed to standardize iNaturalist data for
+consistent and comparable analysis. While methodological accuracy and
+interoperability of the results is ensured, the authors disclaim any
+responsibility for the quality or accuracy of the raw input data, as the
+functions rely entirely on variables and values provided by iNaturalist
+original source. Given this, users are strongly advised to perform their
+own data quality checks and validation, paying particular attention to
+the fields related to Establishment Means and IUCN status.*
 
 ## ReLTER ecosystem
 
@@ -225,6 +236,9 @@ List](https://www.iucnredlist.org).
 - [`obs_pie_chart()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_pie_chart.md)
   **\[experimental\]** : Plot a donut chart of species by conservation
   category
+- [`obs_SO_pie_chart()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
+  **\[experimental\]** : Plot a donut chart of observations contributing
+  to eLTER Standard Observations
 
 ## Datasets
 

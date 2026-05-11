@@ -46,6 +46,9 @@
 - [`obs_pie_chart()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_pie_chart.md)
   **\[experimental\]** : Plot a donut chart of species by conservation
   category
+- [`obs_SO_pie_chart()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
+  **\[experimental\]** : Plot a donut chart of observations contributing
+  to eLTER Standard Observations
 
 ## Datasets
 

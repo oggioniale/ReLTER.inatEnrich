@@ -8,6 +8,14 @@ each unique taxon via
 The results are joined back to the filtered occurrence tibble as a
 nested `establishmentMeans` list-column.
 
+If not already present, the function automatically assigns eLTER
+Standard Observations to each record via `.assign_eLTER_SOs`, adding two
+logical columns: `SOBIO_014` (Flying insects — Insecta) and `SOBIO_018`
+(Acoustic recording — Aves, Anura, Chiroptera, Orthoptera). Orthoptera
+contribute to both SOs simultaneously. If the columns are already
+present (e.g. because a previous enrichment function was already run),
+the assignment step is skipped.
+
 ## Usage
 
 ``` r
@@ -21,7 +29,8 @@ add_nativeness_to_occ(occ_eLTER, country)
   [`tibble`](https://tibble.tidyverse.org/reference/tibble.html). A
   tibble of iNaturalist occurrence records, typically obtained via
   `ReLTER::get_site_speciesOccurrences()`. Must contain at least the
-  columns `quality_grade`, `observed_on`, `captive`, and `taxon.id`.
+  columns `quality_grade`, `observed_on`, `captive`, `taxon.id`, and
+  `taxon.ancestor_ids`.
 
 - country:
 
@@ -33,21 +42,31 @@ add_nativeness_to_occ(occ_eLTER, country)
 
 A [`tibble`](https://tibble.tidyverse.org/reference/tibble.html) of
 filtered occurrence records (research-grade, non-captive, with valid
-date) with an additional `establishmentMeans` list-column. Each element
-of the list-column is a one-row tibble containing:
+date) with the following additional columns:
 
-- nativeness:
+- establishmentMeans:
 
-  `character`. The establishment means value (e.g., `"native"`,
-  `"introduced"`), or `NA` if not recorded in iNaturalist for the
+  list-column. Each element is a one-row tibble containing `nativeness`
+  and `authority`, or `NA` if not recorded in iNaturalist for the
   specified country.
 
-- authority:
+- SOBIO_014:
 
-  `character`. The checklist or authority title associated with the
-  establishment means, or `NA` if not available.
+  `logical`. Whether the observation contributes to SOBIO_014 (Flying
+  insects). Assigned only if not already present.
+
+- SOBIO_018:
+
+  `logical`. Whether the observation contributes to SOBIO_018 (Acoustic
+  recording). Assigned only if not already present.
 
 ## Note
+
+The establishment means information is sourced from iNaturalist and may
+refer to the IUCN Red List. It may not always be up to date.
+
+eLTER Standard Observation assignments are based on taxonomic ancestry
+(`taxon.ancestor_ids`) retrieved from the iNaturalist API.
 
 Progress messages are printed to the console for each taxon processed,
 including the iNaturalist taxon ID, nativeness status, and authority. A
@@ -59,8 +78,10 @@ refer to the IUCN Red List. It may not always be up to date.
 
 ## See also
 
-[`get_nativeness_degree`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_nativeness_degree.md)
-for the underlying API call.
+[`get_nativeness_degree`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_nativeness_degree.md),
+[`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md),
+[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md),
+[`obs_SO_pie_chart`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
 
 ## Author
 
