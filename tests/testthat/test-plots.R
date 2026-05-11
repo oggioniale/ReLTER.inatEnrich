@@ -221,3 +221,29 @@ testthat::test_that("obs_pie_chart alien category has priority over directives",
   alien_species <- species_data |> dplyr::filter(category == "Alien (IAS)")
   testthat::expect_true(nrow(alien_species) >= 0)
 })
+
+# --- obs_SO_pie_chart -------------------------------------------------------
+
+testthat::test_that("obs_SO_pie_chart returns a ggplot object", {
+  testthat::skip_if_not("SOBIO_014" %in% names(df))
+  p <- obs_SO_pie_chart(df)
+  testthat::expect_s3_class(p, "ggplot")
+})
+
+testthat::test_that("obs_SO_pie_chart stops when SOBIO columns are missing", {
+  df_no_so <- df |> dplyr::select(-SOBIO_014, -SOBIO_018)
+  testthat::expect_error(
+    obs_SO_pie_chart(df_no_so),
+    "SOBIO_014"
+  )
+})
+
+testthat::test_that("obs_SO_pie_chart data sums to total observations", {
+  testthat::skip_if_not("SOBIO_014" %in% names(df))
+  obs_flat <- df |> sf::st_drop_geometry()
+  n_014    <- sum(obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  n_018    <- sum(obs_flat$SOBIO_018 & !obs_flat$SOBIO_014, na.rm = TRUE)
+  n_both   <- sum(obs_flat$SOBIO_014 &  obs_flat$SOBIO_018, na.rm = TRUE)
+  n_neither <- sum(!obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  testthat::expect_equal(n_014 + n_018 + n_both + n_neither, nrow(obs_flat))
+})

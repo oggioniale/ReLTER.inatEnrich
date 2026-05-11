@@ -281,3 +281,65 @@ test_that("create_leaflet_occ_map() handles observations with no directives", {
     create_leaflet_occ_map(occ_enriched = occ_no_dir, site_boundary = sb)
   )
 })
+
+# --- .assign_eLTER_SOs -------------------------------------------------------
+
+testthat::test_that("occ_eLTER_legal has SOBIO_014 and SOBIO_018 columns", {
+  testthat::expect_true("SOBIO_014" %in% names(occ))
+  testthat::expect_true("SOBIO_018" %in% names(occ))
+})
+
+testthat::test_that("SOBIO_014 and SOBIO_018 are logical columns", {
+  testthat::expect_type(occ$SOBIO_014, "logical")
+  testthat::expect_type(occ$SOBIO_018, "logical")
+})
+
+testthat::test_that("SOBIO_014 is TRUE for Insecta observations", {
+  insecta <- occ |>
+    sf::st_drop_geometry() |>
+    dplyr::filter(taxon.iconic_taxon_name == "Insecta")
+  if (nrow(insecta) > 0) {
+    testthat::expect_true(all(insecta$SOBIO_014))
+  } else {
+    testthat::skip("No Insecta observations in dataset")
+  }
+})
+
+testthat::test_that("SOBIO_018 is TRUE for Aves observations", {
+  aves <- occ |>
+    sf::st_drop_geometry() |>
+    dplyr::filter(taxon.iconic_taxon_name == "Aves")
+  if (nrow(aves) > 0) {
+    testthat::expect_true(all(aves$SOBIO_018))
+  } else {
+    testthat::skip("No Aves observations in dataset")
+  }
+})
+
+testthat::test_that("SOBIO columns have no NA values", {
+  obs_flat <- occ |> sf::st_drop_geometry()
+  testthat::expect_false(any(is.na(obs_flat$SOBIO_014)))
+  testthat::expect_false(any(is.na(obs_flat$SOBIO_018)))
+})
+
+testthat::test_that("add_iucn_to_occ skips SO assignment if already present", {
+  testthat::expect_true("SOBIO_014" %in% names(occ))
+  testthat::expect_true("SOBIO_018" %in% names(occ))
+})
+
+testthat::test_that("Orthoptera observations have both SOBIO_014 and SOBIO_018 TRUE", {
+  ORTHOPTERA_ID <- 47651
+  ortho <- occ |>
+    sf::st_drop_geometry() |>
+    dplyr::filter(
+      vapply(taxon.ancestor_ids,
+             function(x) ORTHOPTERA_ID %in% unlist(x),
+             FUN.VALUE = logical(1))
+    )
+  if (nrow(ortho) > 0) {
+    testthat::expect_true(all(ortho$SOBIO_014))
+    testthat::expect_true(all(ortho$SOBIO_018))
+  } else {
+    testthat::skip("No Orthoptera observations in dataset")
+  }
+})
