@@ -713,7 +713,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
               " | iNat taxon id: ", taxon.id,
               " | No IUCN status recorded in iNaturalist")
     } else {
-      message("✅ Progressive: ", record_counter,
+      message("✅ Progressive taxon record:  ", record_counter,
               " | iNat taxon id: ", taxon.id,
               " | Records found: ", sum(!is.na(status_tbl$status)),
               " | Authority: IUCN Red List")

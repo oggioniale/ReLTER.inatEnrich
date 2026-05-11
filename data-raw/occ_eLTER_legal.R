@@ -2,8 +2,8 @@
 
 library(ReLTER.inatEnrich)
 
-# eLTER site DEIMS-ID — Montagna di Torricchio
-deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+# eLTER site DEIMS-ID — Gran Paradiso
+deimsid <- "https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946"
 
 # Site boundary
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
@@ -13,7 +13,13 @@ occ_eLTER <- ReLTER::get_site_speciesOccurrences(
   deimsid  = deimsid,
   list_DS  = "inat",
   show_map = FALSE,
-  limit    = 5000
+  limit = 5000
+)
+
+# Clip occurrences to fit within the site boundary
+occ_in_site <- sf::st_intersection(
+  x = iNat_occ_eLTER_site$inat,
+  y = site_boundary
 )
 
 # Enrich with IUCN conservation status
@@ -24,7 +30,7 @@ occ_eLTER_iucn <- add_iucn_to_occ(
 # Enrich with establishment means
 occ_eLTER_nativeness <- add_nativeness_to_occ(
   occ_eLTER = occ_eLTER_iucn,
-  country   = site_boundary$country
+  country = site_boundary$country
 )
 
 # Enrich with EUNIS legal information
