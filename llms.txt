@@ -154,8 +154,8 @@ If you use `ReLTER.inatEnrich` in your research, please cite it as:
 
 > Oggioni A., Lenzi A., Campanaro A., Bergami C. (2026).
 > *ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI
-> sites*. R package version 0.0.0.9000. doi:
-> [10.5281/zenodo.15399015](https://doi.org/10.5281/zenodo.15399015)
+> sites*. R package version 1.0.0. doi:
+> [10.5281/zenodo.19954245](https://doi.org/10.5281/zenodo.19954245)
 
 You can also retrieve the citation from within R:
 

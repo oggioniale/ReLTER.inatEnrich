@@ -21,15 +21,15 @@ Source:
 
 Oggioni A, Lenzi A, Campanaro A, Bergami C (2026). *ReLTER.inatEnrich:
 Enriching iNaturalist occurrences for eLTER-RI sites*.
-[doi:10.5281/zenodo.19954246](https://doi.org/10.5281/zenodo.19954246).
-R package version 0.0.0.9000,
+[doi:10.5281/zenodo.19954245](https://doi.org/10.5281/zenodo.19954245).
+R package version 1.0.0,
 <https://oggioniale.github.io/ReLTER.inatEnrich/>.
 
     @Manual{,
       title = {ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI sites},
       author = {Alessandro Oggioni and Alice Lenzi and Alessandro Campanaro and Caterina Bergami},
       year = {2026},
-      note = {R package version 0.0.0.9000},
+      note = {R package version 1.0.0},
       url = {https://oggioniale.github.io/ReLTER.inatEnrich/},
-      doi = {10.5281/zenodo.19954246},
+      doi = {10.5281/zenodo.19954245},
     }
