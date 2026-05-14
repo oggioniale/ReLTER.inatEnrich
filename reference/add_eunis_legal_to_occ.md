@@ -11,12 +11,13 @@ taxon has no legal information in EUNIS, `NA` values are returned for
 `directive` and `annex`.
 
 If not already present, the function automatically assigns eLTER
-Standard Observations to each record via `.assign_eLTER_SOs`, adding two
-logical columns: `SOBIO_014` (Flying insects — Insecta) and `SOBIO_018`
-(Acoustic recording — Aves, Anura, Chiroptera, Orthoptera). Orthoptera
-contribute to both SOs simultaneously. If the columns are already
-present (e.g. because a previous enrichment function was already run),
-the assignment step is skipped.
+Standard Observations to each record via `.assign_eLTER_SOs`, adding
+three logical columns: `SOBIO_014` (Flying insects — Insecta),
+`SOBIO_017` (Plants), and `SOBIO_018` (Acoustic recording — Aves, Anura,
+Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
+SOBIO_018 simultaneously. If the columns are already present (e.g.
+because a previous enrichment function was already run), the assignment
+step is skipped.
 
 ## Usage
 
@@ -46,13 +47,21 @@ A `tibble` containing all original columns of `occ_eLTER` plus:
 
 - SOBIO_014:
 
-  `logical`. Whether the observation contributes to SOBIO_014 (Flying
-  insects). Assigned only if not already present.
+  `logical`. Whether the observation contributes to Flying insects
+  (SOBIO_014) eLTER Standard Observation. Assigned only if not already
+  present.
+
+- SOBIO_017:
+
+  `logical`. Whether the observation contributes to Vegetation
+  composition (SOBIO_017) eLTER Standard Observation. Assigned only if
+  not already present.
 
 - SOBIO_018:
 
-  `logical`. Whether the observation contributes to SOBIO_018 (Acoustic
-  recording). Assigned only if not already present.
+  `logical`. Whether the observation contributes to Acoustic recording
+  (SOBIO_018) eLTER Standard Observation. Assigned only if not already
+  present.
 
 ## Note
 

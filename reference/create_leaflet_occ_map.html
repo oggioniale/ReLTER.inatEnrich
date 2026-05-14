@@ -86,14 +86,18 @@ produced by <code><a href="add_iucn_to_occ.html">add_iucn_to_occ</a></code>.</p>
 
 <dt>SOBIO_014</dt>
 <dd><p>logical. Whether the observation contributes to the
-eLTER Standard Observation SOBIO_014 (Flying insects), assigned by
+eLTER Standard Observation Flying insects (SOBIO_014), assigned by
 the enrichment pipeline via <code>.assign_eLTER_SOs</code>.</p></dd>
+
+<dt>SOBIO_017</dt>
+<dd><p>logical. Whether the observation contributes to the
+eLTER Standard Observation Vegetation composition (SOBIO_017),
+assigned by the enrichment pipeline via <code>.assign_eLTER_SOs</code>.</p></dd>
 
 <dt>SOBIO_018</dt>
 <dd><p>logical. Whether the observation contributes to the
-eLTER Standard Observation SOBIO_018 (Acoustic recording — birds,
-bats, amphibians, orthoptera), assigned by the enrichment pipeline
-via <code>.assign_eLTER_SOs</code>.</p></dd>
+eLTER Standard Observation Acoustic recording (SOBIO_018),
+assigned by the enrichment pipeline via <code>.assign_eLTER_SOs</code>.</p></dd>
 
 <dt>taxon.id</dt>
 <dd><p>integer. iNaturalist taxon ID.</p></dd>
@@ -162,8 +166,8 @@ help;</p></li>
 <li><p>EU directive coverage (Habitats and Birds Directives) with
 links to EUR-Lex;</p></li>
 <li><p>eLTER Standard Observations the record contributes to
-(<code>SOBIO_014</code> Flying insects and/or <code>SOBIO_018</code>
-Acoustic recording).</p></li>
+(<code>SOBIO_014</code> Flying insects and/or <code>SOBIO_017</code>
+Vegetation composition and/or <code>SOBIO_018</code> Acoustic recording).</p></li>
 </ul></li>
 <li><p>A legend for iconic taxon groups.</p></li>
 <li><p>A geoprivacy legend control (top right).</p></li>
@@ -178,7 +182,7 @@ Birds Directive 2009/147/EC and Habitats Directive 92/43/EEC.</p>
 <p>eLTER Standard Observation assignments are based on taxonomic ancestry
 retrieved from the iNaturalist API. SOBIO_014 covers Insecta;
 SOBIO_018 covers Aves, Anura, Chiroptera, and Orthoptera. Orthoptera
-contribute to both SOs simultaneously.</p>
+contribute to both SOs simultaneously. SOBIO_017 covers Plants.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -190,6 +194,7 @@ contribute to both SOs simultaneously.</p>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Alessandro Oggioni, PhD <a href="mailto:alessandro.oggioni@cnr.it">alessandro.oggioni@cnr.it</a></p>
+<p>Alice Lenzi, phD <a href="mailto:alice.lenzi@crea.gov.it">alice.lenzi@crea.gov.it</a></p>
     </div>
 
     <div class="section level2">

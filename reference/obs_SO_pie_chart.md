@@ -34,6 +34,8 @@ printed to the active device.
 
 Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
 
+Alice Lenzi, phD <alice.lenzi@crea.gov.it>
+
 ## Examples
 
 ``` r

@@ -8,10 +8,11 @@ the filtered occurrence tibble as a nested establishmentMeans
 list-column.
 If not already present, the function automatically assigns eLTER Standard
 Observations to each record via .assign_eLTER_SOs, adding
-two logical columns: SOBIO_014 (Flying insects — Insecta) and
-SOBIO_018 (Acoustic recording — Aves, Anura, Chiroptera,
-Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-columns are already present (e.g. because a previous enrichment function
+three logical columns: SOBIO_014 (Flying insects — Insecta),
+SOBIO_017 (Plants), and SOBIO_018 (Acoustic recording — Aves,
+Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
+SOBIO_018 simultaneously.
+If the columns are already present (e.g. because a previous enrichment function
 was already run), the assignment step is skipped."><meta property="og:description" content="
 Filters a tibble of iNaturalist occurrence records to retain only
 research-grade, non-captive observations with a valid date, then fetches
@@ -21,10 +22,11 @@ the filtered occurrence tibble as a nested establishmentMeans
 list-column.
 If not already present, the function automatically assigns eLTER Standard
 Observations to each record via .assign_eLTER_SOs, adding
-two logical columns: SOBIO_014 (Flying insects — Insecta) and
-SOBIO_018 (Acoustic recording — Aves, Anura, Chiroptera,
-Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-columns are already present (e.g. because a previous enrichment function
+three logical columns: SOBIO_014 (Flying insects — Insecta),
+SOBIO_017 (Plants), and SOBIO_018 (Acoustic recording — Aves,
+Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
+SOBIO_018 simultaneously.
+If the columns are already present (e.g. because a previous enrichment function
 was already run), the assignment step is skipped."><meta property="og:image" content="https://oggioniale.github.io/ReLTER.inatEnrich/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
@@ -66,10 +68,11 @@ the filtered occurrence tibble as a nested <code>establishmentMeans</code>
 list-column.</p>
 <p>If not already present, the function automatically assigns eLTER Standard
 Observations to each record via <code>.assign_eLTER_SOs</code>, adding
-two logical columns: <code>SOBIO_014</code> (Flying insects — Insecta) and
-<code>SOBIO_018</code> (Acoustic recording — Aves, Anura, Chiroptera,
-Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-columns are already present (e.g. because a previous enrichment function
+three logical columns: <code>SOBIO_014</code> (Flying insects — Insecta),
+<code>SOBIO_017</code> (Plants), and <code>SOBIO_018</code> (Acoustic recording — Aves,
+Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
+SOBIO_018 simultaneously.
+If the columns are already present (e.g. because a previous enrichment function
 was already run), the assignment step is skipped.</p>
     </div>
 
@@ -107,11 +110,18 @@ not recorded in iNaturalist for the specified country.</p></dd>
 
 <dt>SOBIO_014</dt>
 <dd><p><code>logical</code>. Whether the observation contributes to
-SOBIO_014 (Flying insects). Assigned only if not already present.</p></dd>
+Flying insects (SOBIO_014) eLTER Standard Observation.
+Assigned only if not already present.</p></dd>
+
+<dt>SOBIO_017</dt>
+<dd><p><code>logical</code>. Whether the observation contributes to
+Vegetation composition (SOBIO_017) eLTER Standard Observation.
+Assigned only if not already present.</p></dd>
 
 <dt>SOBIO_018</dt>
 <dd><p><code>logical</code>. Whether the observation contributes to
-SOBIO_018 (Acoustic recording). Assigned only if not already present.</p></dd>
+Acoustic recording (SOBIO_018) eLTER Standard Observation.
+Assigned only if not already present.</p></dd>
 
 
 </dl></div>

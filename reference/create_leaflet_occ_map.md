@@ -48,15 +48,20 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
   SOBIO_014
 
   :   logical. Whether the observation contributes to the eLTER Standard
-      Observation SOBIO_014 (Flying insects), assigned by the enrichment
+      Observation Flying insects (SOBIO_014), assigned by the enrichment
       pipeline via `.assign_eLTER_SOs`.
+
+  SOBIO_017
+
+  :   logical. Whether the observation contributes to the eLTER Standard
+      Observation Vegetation composition (SOBIO_017), assigned by the
+      enrichment pipeline via `.assign_eLTER_SOs`.
 
   SOBIO_018
 
   :   logical. Whether the observation contributes to the eLTER Standard
-      Observation SOBIO_018 (Acoustic recording — birds, bats,
-      amphibians, orthoptera), assigned by the enrichment pipeline via
-      `.assign_eLTER_SOs`.
+      Observation Acoustic recording (SOBIO_018), assigned by the
+      enrichment pipeline via `.assign_eLTER_SOs`.
 
   taxon.id
 
@@ -141,7 +146,8 @@ map object with:
     EUR-Lex;
 
   - eLTER Standard Observations the record contributes to (`SOBIO_014`
-    Flying insects and/or `SOBIO_018` Acoustic recording).
+    Flying insects and/or `SOBIO_017` Vegetation composition and/or
+    `SOBIO_018` Acoustic recording).
 
 - A legend for iconic taxon groups.
 
@@ -160,7 +166,7 @@ EU directive links point to the EUR-Lex PDF versions: Birds Directive
 eLTER Standard Observation assignments are based on taxonomic ancestry
 retrieved from the iNaturalist API. SOBIO_014 covers Insecta; SOBIO_018
 covers Aves, Anura, Chiroptera, and Orthoptera. Orthoptera contribute to
-both SOs simultaneously.
+both SOs simultaneously. SOBIO_017 covers Plants.
 
 ## See also
 
@@ -172,6 +178,8 @@ both SOs simultaneously.
 ## Author
 
 Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, phD <alice.lenzi@crea.gov.it>
 
 ## Examples
 
