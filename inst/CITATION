@@ -20,5 +20,5 @@ bibentry(
   year     = format(Sys.Date(), "%Y"),
   note     = paste("R package version", meta$Version),
   url      = "https://oggioniale.github.io/ReLTER.inatEnrich/",
-  doi      = "10.5281/zenodo.19954246"
+  doi      = "10.5281/zenodo.19954245"
 )
