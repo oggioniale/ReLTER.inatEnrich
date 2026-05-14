@@ -18,7 +18,7 @@ occ_eLTER <- ReLTER::get_site_speciesOccurrences(
 
 # Clip occurrences to fit within the site boundary
 occ_in_site <- sf::st_intersection(
-  x = iNat_occ_eLTER_site$inat,
+  x = occ_eLTER$inat,
   y = site_boundary
 )
 

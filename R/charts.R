@@ -695,6 +695,18 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 ### obs_pie_chart
 obs_pie_chart <- function(df) {
   
+  required_cols <- c(
+    "status_IUCN",
+    "establishmentMeans",
+    "directive", "annex"
+  )
+  
+  missing_cols <- setdiff(required_cols, names(df))
+  if (length(missing_cols) > 0) {
+    stop("The following required columns are missing: ", paste(missing_cols, collapse = ", "),
+         "\nRun the enrichment pipeline first.")
+  }
+  
   species_data <- df |>
     sf::st_drop_geometry() |>
     dplyr::select(name, directive, establishmentMeans) |>
@@ -785,7 +797,8 @@ obs_pie_chart <- function(df) {
 #' @return A \code{\link[ggplot2]{ggplot}} object printed to the active device.
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
-#'
+#' @author Alice Lenzi, phD \email{alice.lenzi@@crea.gov.it}
+#' 
 #' @seealso \code{\link{obs_pie_chart}}
 #'
 #' @export
@@ -804,27 +817,29 @@ obs_pie_chart <- function(df) {
 ### obs_SO_pie_chart
 obs_SO_pie_chart <- function(df) {
   
-  if (!all(c("SOBIO_014", "SOBIO_018") %in% names(df))) {
-    stop("Columns 'SOBIO_014' and 'SOBIO_018' are missing. ",
+  if (!all(c("SOBIO_014", "SOBIO_017", "SOBIO_018") %in% names(df))) {
+    stop("Columns 'SOBIO_014', 'SOBIO_017', and 'SOBIO_018' are missing. ",
          "Run the enrichment pipeline first.")
   }
   
   obs_flat <- df |> sf::st_drop_geometry()
   
   n_014 <- sum(obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  n_017 <- sum(obs_flat$SOBIO_017, na.rm = TRUE)
   n_018 <- sum(obs_flat$SOBIO_018 & !obs_flat$SOBIO_014, na.rm = TRUE)
   n_both <- sum(obs_flat$SOBIO_014 &  obs_flat$SOBIO_018, na.rm = TRUE)
-  n_neither <- sum(!obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  n_neither <- sum(!obs_flat$SOBIO_014 & !obs_flat$SOBIO_018 & !obs_flat$SOBIO_017, na.rm = TRUE)
   total_obs <- nrow(obs_flat)
   
   so_data <- data.frame(
     category = c(
-      "SOBIO_014 only\n(Flying insects)",
-      "SOBIO_018 only\n(Acoustic recording)",
-      "Both SOBIO_014\n& SOBIO_018",
+      "Only Flying insects\n(SOBIO_014)",
+      "Only Acoustic recording\n(SOBIO_018)",
+      "Orthoptera that include SOBIO_014\n& SOBIO_018",
+      "Only Vegetation composition\n(SOBIO_017)",
       "No SO"
     ),
-    n = c(n_014, n_018, n_both, n_neither),
+    n = c(n_014, n_018, n_017, n_both, n_neither),
     stringsAsFactors = FALSE
   ) |>
     dplyr::mutate(
@@ -836,9 +851,10 @@ obs_SO_pie_chart <- function(df) {
     )
   
   so_colors <- c(
-    "SOBIO_014 only\n(Flying insects)" = "#639922",
-    "SOBIO_018 only\n(Acoustic recording)"  = "#378ADD",
-    "Both SOBIO_014\n& SOBIO_018" = "#7F77DD",
+    "Only Flying insects\n(SOBIO_014)" = "#639922",
+    "Only Acoustic recording\n(SOBIO_018)"  = "#378ADD",
+    "Orthoptera that include SOBIO_014\n& SOBIO_018" = "#7F77DD",
+    "Only Vegetation composition\n(SOBIO_017)" = "#EEB565",
     "No SO" = "#888780"
   )
   
@@ -865,7 +881,8 @@ obs_SO_pie_chart <- function(df) {
       subtitle = paste0(
         "SOBIO_014: Flying insects (all the insects) | ",
         "SOBIO_018: Acoustic recording (birds, bats, amphibians, orthoptera)\n",
-        "Orthoptera contribute to both SOs"
+        "SOBIO_017: Vegetation composition (all plants)\n",
+        "Orthoptera contribute to SOBIO_014 and SOBIO_018"
       ),
       x = NULL,
       y = NULL

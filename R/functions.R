@@ -7,6 +7,7 @@
   ORTHOPTERA_ID <- 47651
   AVES_ID <- 3
   INSECTA_ID <- 47158
+  PLANTS_ID <- 47126
   
   has_ancestor <- function(ancestor_ids, target_id) {
     if (is.null(ancestor_ids) || length(ancestor_ids) == 0) return(FALSE)
@@ -15,10 +16,6 @@
   
   occ |>
     dplyr::mutate(
-      # .is_aves = !is.na(taxon.iconic_taxon_name) &
-      #   taxon.iconic_taxon_name == "Aves",
-      # .is_insecta = !is.na(taxon.iconic_taxon_name) &
-      #   taxon.iconic_taxon_name == "Insecta",
       .is_aves = vapply(taxon.ancestor_ids,
                            function(x) has_ancestor(x, AVES_ID),
                            FUN.VALUE = logical(1)),
@@ -34,11 +31,15 @@
       .is_orthoptera = vapply(taxon.ancestor_ids,
                               function(x) has_ancestor(x, ORTHOPTERA_ID),
                               FUN.VALUE = logical(1)),
+      .is_plants = vapply(taxon.ancestor_ids,
+                              function(x) has_ancestor(x, PLANTS_ID),
+                              FUN.VALUE = logical(1)),
       SOBIO_018 = .is_aves | .is_anura | .is_chiroptera | .is_orthoptera,
-      SOBIO_014 = .is_insecta
+      SOBIO_014 = .is_insecta,
+      SOBIO_017 = .is_plants
     ) |>
     dplyr::select(-.is_aves, -.is_insecta, -.is_anura,
-                  -.is_chiroptera, -.is_orthoptera)
+                  -.is_chiroptera, -.is_orthoptera, -.is_plants)
 }
 
 #' Function to obtain IUCN conservation status for a single taxon.id from
@@ -587,10 +588,11 @@ add_iucn_to_obs <- function(project_name) {
 #'
 #' If not already present, the function automatically assigns eLTER Standard
 #' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-#' two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
-#' \code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
-#' Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-#' columns are already present (e.g. because a previous enrichment function
+#' three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
+#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves, 
+#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and 
+#' SOBIO_018 simultaneously.
+#' If the columns are already present (e.g. because a previous enrichment function
 #' was already run), the assignment step is skipped.
 #'
 #' @param occ_eLTER A \code{data.frame} or \code{sf} object representing the
@@ -610,9 +612,14 @@ add_iucn_to_obs <- function(project_name) {
 #'       valid (non-\code{NA}) IUCN status is available for the given
 #'       \code{taxon.id}.}
 #'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
-#'       SOBIO_014 (Flying insects). Assigned only if not already present.}
+#'       Flying insects (SOBIO_014) eLTER Standard Observation.
+#'       Assigned only if not already present.}
+#'     \item{SOBIO_017}{\code{logical}. Whether the observation contributes to
+#'       Vegetation composition (SOBIO_017) eLTER Standard Observation.
+#'       Assigned only if not already present.}
 #'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
-#'       SOBIO_018 (Acoustic recording). Assigned only if not already present.}
+#'       Acoustic recording (SOBIO_018) eLTER Standard Observation.
+#'       Assigned only if not already present.}
 #'   }
 #'
 #' @note
@@ -662,7 +669,7 @@ add_iucn_to_obs <- function(project_name) {
 add_iucn_to_occ <- function(occ_eLTER) {
   # assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
-    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_018)...\n----\n")
+    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
     occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
   } else {
     message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
@@ -786,10 +793,11 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'
 #' If not already present, the function automatically assigns eLTER Standard
 #' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-#' two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
-#' \code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
-#' Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-#' columns are already present (e.g. because a previous enrichment function
+#' three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
+#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves, 
+#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and 
+#' SOBIO_018 simultaneously.
+#' If the columns are already present (e.g. because a previous enrichment function
 #' was already run), the assignment step is skipped.
 #'
 #' @param occ_eLTER \code{\link[dplyr]{tibble}}. A tibble of iNaturalist
@@ -809,9 +817,14 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'       containing \code{nativeness} and \code{authority}, or \code{NA} if
 #'       not recorded in iNaturalist for the specified country.}
 #'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
-#'       SOBIO_014 (Flying insects). Assigned only if not already present.}
+#'       Flying insects (SOBIO_014) eLTER Standard Observation.
+#'       Assigned only if not already present.}
+#'     \item{SOBIO_017}{\code{logical}. Whether the observation contributes to
+#'       Vegetation composition (SOBIO_017) eLTER Standard Observation.
+#'       Assigned only if not already present.}
 #'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
-#'       SOBIO_018 (Acoustic recording). Assigned only if not already present.}
+#'       Acoustic recording (SOBIO_018) eLTER Standard Observation.
+#'       Assigned only if not already present.}
 #'   }
 #'
 #' @note
@@ -867,7 +880,7 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
   
   # assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
-    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_018)...\n----\n")
+    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
     occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
   } else {
     message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
@@ -979,10 +992,11 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
 #'
 #' If not already present, the function automatically assigns eLTER Standard
 #' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-#' two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
-#' \code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
-#' Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-#' columns are already present (e.g. because a previous enrichment function
+#' three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
+#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves, 
+#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and 
+#' SOBIO_018 simultaneously.
+#' If the columns are already present (e.g. because a previous enrichment function
 #' was already run), the assignment step is skipped.
 #'
 #' @param occ_eLTER A \code{tibble} containing iNaturalist occurrences. Must
@@ -996,9 +1010,14 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
 #'     \item{annex}{\code{character}. Annex information from EUNIS table,
 #'       or \code{NA} if not found.}
 #'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
-#'       SOBIO_014 (Flying insects). Assigned only if not already present.}
+#'       Flying insects (SOBIO_014) eLTER Standard Observation.
+#'       Assigned only if not already present.}
+#'     \item{SOBIO_017}{\code{logical}. Whether the observation contributes to
+#'       Vegetation composition (SOBIO_017) eLTER Standard Observation.
+#'       Assigned only if not already present.}
 #'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
-#'       SOBIO_018 (Acoustic recording). Assigned only if not already present.}
+#'       Acoustic recording (SOBIO_018) eLTER Standard Observation.
+#'       Assigned only if not already present.}
 #'   }
 #'
 #' @note
@@ -1041,7 +1060,7 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
   
   # assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
-    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_018)...\n----\n")
+    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
     occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
   } else {
     message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
@@ -1122,12 +1141,14 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'     \item{annex}{character. EU directive annex, produced by
 #'       \code{\link{add_eunis_legal_to_occ}}.}
 #'     \item{SOBIO_014}{logical. Whether the observation contributes to the
-#'       eLTER Standard Observation SOBIO_014 (Flying insects), assigned by
+#'       eLTER Standard Observation Flying insects (SOBIO_014), assigned by
 #'       the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+#'     \item{SOBIO_017}{logical. Whether the observation contributes to the
+#'       eLTER Standard Observation Vegetation composition (SOBIO_017),
+#'       assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
 #'     \item{SOBIO_018}{logical. Whether the observation contributes to the
-#'       eLTER Standard Observation SOBIO_018 (Acoustic recording — birds,
-#'       bats, amphibians, orthoptera), assigned by the enrichment pipeline
-#'       via \code{\link{.assign_eLTER_SOs}}.}
+#'       eLTER Standard Observation Acoustic recording (SOBIO_018),
+#'       assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
 #'     \item{taxon.id}{integer. iNaturalist taxon ID.}
 #'     \item{name}{character. Scientific name.}
 #'     \item{taxon.preferred_common_name}{character. Common name.}
@@ -1170,8 +1191,8 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'         \item EU directive coverage (Habitats and Birds Directives) with
 #'           links to EUR-Lex;
 #'         \item eLTER Standard Observations the record contributes to
-#'           (\code{SOBIO_014} Flying insects and/or \code{SOBIO_018}
-#'           Acoustic recording).
+#'           (\code{SOBIO_014} Flying insects and/or \code{SOBIO_017}
+#'           Vegetation composition and/or \code{SOBIO_018} Acoustic recording).
 #'       }
 #'     \item A legend for iconic taxon groups.
 #'     \item A geoprivacy legend control (top right).
@@ -1188,9 +1209,10 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' eLTER Standard Observation assignments are based on taxonomic ancestry
 #' retrieved from the iNaturalist API. SOBIO_014 covers Insecta;
 #' SOBIO_018 covers Aves, Anura, Chiroptera, and Orthoptera. Orthoptera
-#' contribute to both SOs simultaneously.
+#' contribute to both SOs simultaneously. SOBIO_017 covers Plants.
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, phD \email{alice.lenzi@@crea.gov.it}
 #'
 #' @seealso
 #' \code{\link{add_iucn_to_occ}},
@@ -1231,7 +1253,8 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
     "taxon.id", "name",
     "taxon.preferred_common_name", "taxon.iconic_taxon_name", "taxon_geoprivacy",
     "quality_grade", "observed_on", "public_positional_accuracy",
-    "user.login", "uri", "taxon.default_photo.square_url"
+    "user.login", "uri", "taxon.default_photo.square_url",
+    "SOBIO_014", "SOBIO_017", "SOBIO_018"
   )
   
   missing_cols <- setdiff(required_cols, names(occ_enriched))
@@ -1309,11 +1332,17 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       obs_url = ifelse(is.na(uri), "", uri),
       photo_url = ifelse(is.na(taxon.default_photo.square_url), "", taxon.default_photo.square_url),
       # SOs
-      so_lbl = dplyr::case_when(
-        SOBIO_014 & SOBIO_018 ~ "SOBIO_014 (Flying insects) | SOBIO_018 (Acoustic recording)",
-        SOBIO_014 & !SOBIO_018 ~ "SOBIO_014 (Flying insects)",
-        !SOBIO_014 & SOBIO_018 ~ "SOBIO_018 (Acoustic recording)",
-        TRUE ~ "-"
+      so_lbl = apply(
+        cbind(
+          ifelse(SOBIO_014, "SOBIO_014 (Flying insects)",     NA),
+          ifelse(SOBIO_017, "SOBIO_017 (Vegetation composition)", NA),
+          ifelse(SOBIO_018, "SOBIO_018 (Acoustic recording)", NA)
+        ),
+        1,
+        function(x) {
+          active <- x[!is.na(x)]
+          if (length(active) == 0) "-" else paste(active, collapse = " | ")
+        }
       )
     )
   

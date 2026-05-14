@@ -33,4 +33,6 @@ obs_SO_pie_chart(occ_eLTER_legal)
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, phD \email{alice.lenzi@crea.gov.it}
 }

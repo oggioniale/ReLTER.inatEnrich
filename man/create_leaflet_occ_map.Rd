@@ -21,12 +21,14 @@ produced by \code{\link{add_iucn_to_occ}}.}
 \item{annex}{character. EU directive annex, produced by
 \code{\link{add_eunis_legal_to_occ}}.}
 \item{SOBIO_014}{logical. Whether the observation contributes to the
-eLTER Standard Observation SOBIO_014 (Flying insects), assigned by
+eLTER Standard Observation Flying insects (SOBIO_014), assigned by
 the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+\item{SOBIO_017}{logical. Whether the observation contributes to the
+eLTER Standard Observation Vegetation composition (SOBIO_017),
+assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
 \item{SOBIO_018}{logical. Whether the observation contributes to the
-eLTER Standard Observation SOBIO_018 (Acoustic recording — birds,
-bats, amphibians, orthoptera), assigned by the enrichment pipeline
-via \code{\link{.assign_eLTER_SOs}}.}
+eLTER Standard Observation Acoustic recording (SOBIO_018),
+assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
 \item{taxon.id}{integer. iNaturalist taxon ID.}
 \item{name}{character. Scientific name.}
 \item{taxon.preferred_common_name}{character. Common name.}
@@ -71,8 +73,8 @@ help;
 \item EU directive coverage (Habitats and Birds Directives) with
 links to EUR-Lex;
 \item eLTER Standard Observations the record contributes to
-(\code{SOBIO_014} Flying insects and/or \code{SOBIO_018}
-Acoustic recording).
+(\code{SOBIO_014} Flying insects and/or \code{SOBIO_017}
+Vegetation composition and/or \code{SOBIO_018} Acoustic recording).
 }
 \item A legend for iconic taxon groups.
 \item A geoprivacy legend control (top right).
@@ -100,7 +102,7 @@ Birds Directive 2009/147/EC and Habitats Directive 92/43/EEC.
 eLTER Standard Observation assignments are based on taxonomic ancestry
 retrieved from the iNaturalist API. SOBIO_014 covers Insecta;
 SOBIO_018 covers Aves, Anura, Chiroptera, and Orthoptera. Orthoptera
-contribute to both SOs simultaneously.
+contribute to both SOs simultaneously. SOBIO_017 covers Plants.
 }
 \examples{
 \dontrun{
@@ -123,4 +125,6 @@ map
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, phD \email{alice.lenzi@crea.gov.it}
 }

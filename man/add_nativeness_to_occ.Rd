@@ -26,9 +26,14 @@ additional columns:
 containing \code{nativeness} and \code{authority}, or \code{NA} if
 not recorded in iNaturalist for the specified country.}
 \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
-SOBIO_014 (Flying insects). Assigned only if not already present.}
+Flying insects (SOBIO_014) eLTER Standard Observation.
+Assigned only if not already present.}
+\item{SOBIO_017}{\code{logical}. Whether the observation contributes to
+Vegetation composition (SOBIO_017) eLTER Standard Observation.
+Assigned only if not already present.}
 \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
-SOBIO_018 (Acoustic recording). Assigned only if not already present.}
+Acoustic recording (SOBIO_018) eLTER Standard Observation.
+Assigned only if not already present.}
 }
 }
 \description{
@@ -42,10 +47,11 @@ list-column.
 
 If not already present, the function automatically assigns eLTER Standard
 Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-two logical columns: \code{SOBIO_014} (Flying insects — Insecta) and
-\code{SOBIO_018} (Acoustic recording — Aves, Anura, Chiroptera,
-Orthoptera). Orthoptera contribute to both SOs simultaneously. If the
-columns are already present (e.g. because a previous enrichment function
+three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
+\code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves,
+Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
+SOBIO_018 simultaneously.
+If the columns are already present (e.g. because a previous enrichment function
 was already run), the assignment step is skipped.
 }
 \note{
