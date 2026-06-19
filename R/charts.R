@@ -21,12 +21,32 @@
 #'
 #' @importFrom dplyr group_by summarise n n_distinct arrange desc mutate
 #' @importFrom ggplot2 ggplot aes geom_col geom_text position_dodge
-#'   scale_fill_manual scale_y_continuous expansion labs theme_minimal
-#'   theme element_text
+#' @importFrom ggplot2 scale_fill_manual scale_y_continuous expansion labs
+#' @importFrom ggplot2 theme_minimal theme element_text
 #'
 #' @examples
 #' \dontrun{
-#' iconic_taxa(occ_eLTER_legal)
+#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' iconic_taxa(occ_eLTER_enrich)
 #' }
 #'
 ### iconic_taxa
@@ -108,17 +128,37 @@ iconic_taxa <- function(df) {
 #' @export
 #'
 #' @importFrom dplyr filter group_by summarise n arrange desc slice_head
-#'   coalesce
+#' @importFrom dplyr coalesce
 #' @importFrom grDevices hcl.colors
 #' @importFrom stats setNames
 #' @importFrom ggplot2 ggplot aes geom_col geom_text scale_fill_manual
-#'   scale_y_continuous expansion coord_flip labs theme_minimal theme
-#'   element_text
+#' @importFrom ggplot2 scale_y_continuous expansion coord_flip labs 
+#' @importFrom ggplot2 theme_minimal theme element_text
 #'
 #' @examples
 #' \dontrun{
-#' top_n_species(occ_eLTER_legal)
-#' top_n_species(occ_eLTER_legal, n = 20)
+#' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' top_n_species(occ_eLTER_enrich)
+#' top_n_species(occ_eLTER_enrich, n = 20)
 #' }
 #'
 ### top_n_species
@@ -202,11 +242,31 @@ top_n_species <- function(df, n = 10) {
 #' @importFrom grDevices hcl.colors
 #' @importFrom stats setNames
 #' @importFrom ggplot2 ggplot aes geom_col scale_fill_manual scale_y_continuous
-#'   expansion labs theme_minimal theme element_text
+#' @importFrom ggplot2 expansion labs theme_minimal theme element_text
 #'
 #' @examples
 #' \dontrun{
-#' obs_per_year(occ_eLTER_legal)
+#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' obs_per_year(occ_eLTER_enrich)
 #' }
 #'
 ### obs_per_year
@@ -296,15 +356,35 @@ obs_per_year <- function(df) {
 #' @export
 #'
 #' @importFrom dplyr filter group_by summarise n n_distinct left_join mutate
-#'   coalesce
+#' @importFrom dplyr coalesce
 #' @importFrom grDevices hcl.colors
 #' @importFrom stats setNames sd
 #' @importFrom ggplot2 ggplot aes geom_col geom_errorbar scale_fill_manual
-#'   scale_y_continuous expansion labs theme_minimal theme element_text
+#' @importFrom ggplot2 scale_y_continuous expansion labs theme_minimal theme element_text
 #'
 #' @examples
 #' \dontrun{
-#' obs_per_month(occ_eLTER_legal)
+#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' obs_per_month(occ_eLTER_enrich)
 #' }
 #'
 ### obs_per_month
@@ -415,15 +495,35 @@ obs_per_month <- function(df) {
 #' @export
 #'
 #' @importFrom dplyr filter group_by summarise n n_distinct left_join mutate
-#'   coalesce
+#' @importFrom dplyr coalesce
 #' @importFrom grDevices hcl.colors
 #' @importFrom stats setNames sd
 #' @importFrom ggplot2 ggplot aes geom_col geom_errorbar scale_fill_manual
-#'   scale_y_continuous expansion labs theme_minimal theme element_text
+#' @importFrom ggplot2 scale_y_continuous expansion labs theme_minimal theme element_text
 #'
 #' @examples
 #' \dontrun{
-#' obs_per_hour(occ_eLTER_legal)
+#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' obs_per_hour(occ_eLTER_enrich)
 #' }
 #'
 ### obs_per_hour
@@ -549,17 +649,34 @@ obs_per_hour <- function(df) {
 #' @importFrom sf st_make_grid st_sf st_join
 #' @importFrom dplyr mutate row_number group_by summarise n_distinct filter
 #' @importFrom leaflet leaflet addTiles addPolygons addLegend addLayersControl
-#'   colorNumeric layersControlOptions
+#' @importFrom leaflet colorNumeric layersControlOptions
 #'
 #' @examples
 #' \dontrun{
+#' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 #' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 #'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 500
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'
 #' species_richness_map(
-#'   df            = occ_eLTER_legal,
+#'   df = occ_eLTER_enrich,
 #'   site_boundary = site_boundary,
-#'   cell_size     = 0.005
+#'   cell_size = 0.005
 #' )
 #' }
 #'
@@ -653,7 +770,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'     \item{name}{character. Scientific name.}
 #'     \item{directive}{character. EU directive name, produced by
 #'       \code{\link{add_eunis_legal_to_occ}}.}
-#'     \item{establishmentMeans}{list-column of tibbles with a \code{nativeness}
+#'     \item{establishmentMeans}{list-column of tibbles with a \code{iNat_nativeness}
 #'       field, produced by \code{\link{add_nativeness_to_occ}}.}
 #'   }
 #'
@@ -685,11 +802,31 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #' @importFrom purrr map_chr
 #' @importFrom stats setNames
 #' @importFrom ggplot2 ggplot aes geom_col annotate coord_polar xlim
-#'   scale_fill_manual labs theme_void theme element_text unit
+#' @importFrom ggplot2 scale_fill_manual labs theme_void theme element_text unit
 #'
 #' @examples
 #' \dontrun{
-#' obs_pie_chart(occ_eLTER_legal)
+#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' obs_pie_chart(occ_eLTER_enrich)
 #' }
 #'
 ### obs_pie_chart
@@ -713,7 +850,7 @@ obs_pie_chart <- function(df) {
     dplyr::distinct(name, .keep_all = TRUE) |>
     dplyr::mutate(
       nativeness = purrr::map_chr(establishmentMeans, function(em) {
-        val <- tryCatch(em$nativeness[[1]], error = function(e) NA_character_)
+        val <- tryCatch(em$iNat_nativeness[[1]], error = function(e) NA_character_)
         if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
       }),
       category = dplyr::case_when(
@@ -806,12 +943,32 @@ obs_pie_chart <- function(df) {
 #' @importFrom sf st_drop_geometry
 #' @importFrom dplyr mutate group_by summarise n
 #' @importFrom ggplot2 ggplot aes geom_col annotate coord_polar xlim
-#'   scale_fill_manual labs theme_void theme element_text unit
+#' @importFrom ggplot2 scale_fill_manual labs theme_void theme element_text unit
 #' @importFrom stats setNames
 #'
 #' @examples
 #' \dontrun{
-#' obs_SO_pie_chart(occ_eLTER_legal)
+#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
+#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid = deimsid,
+#'   list_DS = "inat",
+#'   show_map = TRUE,
+#'   limit = 50
+#' )
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'   
+#' obs_SO_pie_chart(occ_eLTER_enrich)
 #' }
 #'
 ### obs_SO_pie_chart

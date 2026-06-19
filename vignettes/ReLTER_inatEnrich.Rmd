@@ -143,25 +143,13 @@ site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 country       <- site_boundary$country
 ```
 
-### Step 4 — Clip occurrences to the site boundary
-
-Use a spatial intersection to retain only the observations that fall
-within the site boundary polygon.
-
-```{r step4}
-occ_in_site <- sf::st_intersection(
-  x = iNat_occ_eLTER_site$inat,
-  y = site_boundary
-)
-```
-
-### Step 5 — Add IUCN conservation status
+### Step 4 — Add IUCN conservation status
 
 `add_iucn_to_occ()` queries [iNaturalist lists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) for each unique taxon and appends a nested `status_IUCN` list-column. Each element is a tibble with one row
 per geographic scope (global, regional), containing the IUCN status code,
 authority, scope name, and a direct link to the [IUCN Red List assessment](https://www.iucnredlist.org).
 
-```{r step5}
+```{r step4}
 occ_eLTER_IUCN <- add_iucn_to_occ(occ_eLTER = occ_in_site)
 ```
 

@@ -22,8 +22,10 @@ attributes sourced from iNaturalist and the EUNIS species database.
 |---|---|---|
 | `add_iucn_to_occ()` | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments, sourced from [iNaturalist checklists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) |
 | `add_nativeness_to_occ()` | iNaturalist API | Nativeness / [establishment means](https://dwc.tdwg.org/em/), filtered by country, directly as recorded on [iNaturalist](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist) |
+| `add_nativeness_to_occ()` | EASIN API | IAS information from EASIN - European Alien Species Information Network |
 | `add_eunis_legal_to_occ()` | EUNIS species database | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage, as delivered by retrieved from the [EUNIS](https://eunis.eea.europa.eu/) species database |
-| Visualization functions | — | Charts and interactive maps for enriched occurrence data, including SO contribution — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
+| all three functions above | iNaturalist API (taxonomic ancestry) | Automatic assignment of [eLTER Standard Observations](https://elter-ri.eu/standard-observations-spheres) ([`SOBIO_014` Flying insects](https://elter-ri.eu/standard-observations-spheres/biosphere), [`SOBIO_017` Vegetation composition](https://elter-ri.eu/standard-observations-spheres/biosphere), [`SOBIO_018` Acoustic recording](https://elter-ri.eu/standard-observations-spheres/biosphere)) based on taxonomic ancestry — performed once at the first enrichment step and skipped thereafter |
+| Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
 
 ### Disclaimer
 _`ReLTER.inatEnrich` is designed to standardize iNaturalist data for consistent and comparable analysis. While methodological accuracy and interoperability of the results is ensured, the authors disclaim any responsibility for the quality or accuracy of the raw input data, as the functions rely entirely on variables and values provided by iNaturalist original source. Given this, users are strongly advised to perform their own data quality checks and validation, paying particular attention to the fields related to Establishment Means and IUCN status._
@@ -64,59 +66,30 @@ remotes::install_github("ropensci/ReLTER")
 
 ### Dependencies
 
-`ReLTER.inatEnrich` imports: `dplyr`, `purrr`, `httr2`, `sf`, `leaflet`, `ggplot2`, `rvest`, `stats`.
+`ReLTER.inatEnrich` imports: `ReLTER`, `dplyr`, `purrr`, `httr2`, `sf`, `leaflet`, `ggplot2`, `rvest`, `stats`.
 
 All dependencies are installed automatically with the package.
 
 
-## Quick start
+## Package workflow
 
-```r
-library(ReLTER)
-library(ReLTER.inatEnrich)
+put here the picture of WF ...
 
-# 1. Define the eLTER-RI site by DEIMS-ID
-deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+<a href="https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html">
+  <img src="https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/man/figures/map_screenshot.png" 
+       alt="Example map output" 
+       width="60%"/>
+</a>
 
-# 2. Download iNaturalist occurrences for the site
-iNat_occ <- get_site_speciesOccurrences(
-  deimsid  = deimsid,
-  list_DS  = "inat",
-  show_map = FALSE,
-  limit    = 5000
-)
+*Click the image to open an interactive map.*
 
-# 3. Get site boundary and country
-site_boundary <- get_site_info(deimsid = deimsid)
-country <- site_boundary$country
-
-# 4. Clip to site boundary
-occ_in_site <- sf::st_intersection(
-  x = iNat_occ$inat,
-  y = site_boundary
-)
-
-# 5. Enrich with IUCN status, nativeness, and EU legal framework
-occ_enriched <- occ_in_site |>
-  add_iucn_to_occ() |>
-  add_nativeness_to_occ(country = country) |>
-  add_eunis_legal_to_occ()
-
-# 6. Visualise
-map <- create_leaflet_occ_map(occ_enriched = occ_enriched)
-map
-
-```
-
-[![Example map output](https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/man/figures/map_screenshot.png)](https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html)
-> *Click the image to open an interactive map.*
+For an overview of all visualization outputs see the
+[Visualization functions article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html).
 
 For a full walkthrough see the
 [Getting Started vignette](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich.html)
 and the
 [Technical Reference article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_article.html).
-For an overview of all visualization outputs see the
-[Visualization functions article](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html).
 
 
 ## Documentation
@@ -151,7 +124,7 @@ devtools::document() # documentation is up to date
 If you use `ReLTER.inatEnrich` in your research, please cite it as:
 
 > Oggioni A., Lenzi A., Campanaro A., Bergami C. (2026). *ReLTER.inatEnrich:
-> Enriching iNaturalist occurrences for eLTER-RI sites*. R package version 1.0.0.
+> Enriching iNaturalist occurrences for eLTER-RI sites*. R package version 1.1.0.
 > doi: [10.5281/zenodo.19954245](https://doi.org/10.5281/zenodo.19954245)
 
 You can also retrieve the citation from within R:
@@ -159,11 +132,6 @@ You can also retrieve the citation from within R:
 ```r
 citation("ReLTER.inatEnrich")
 ```
-
-Please also cite the core `ReLTER` package:
-
-> Oggioni A. et al. (2023). *ReLTER: An Interface for the eLTER Community*.
-> doi: [10.5281/zenodo.16927384](https://doi.org/10.5281/zenodo.16927384)
 
 
 ## License

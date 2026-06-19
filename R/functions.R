@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @noRd
 .assign_eLTER_SOs <- function(occ) {
   
@@ -42,9 +43,152 @@
                   -.is_chiroptera, -.is_orthoptera, -.is_plants)
 }
 
+#' @keywords internal
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @noRd
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' # https://easin.jrc.ec.europa.eu/apixg/catxg/term/Falco%20tinnunculus
+#' .assign_EASIN_info(specie_name = "Falco tinnunculus")
+#' 
+#' # https://easin.jrc.ec.europa.eu/apixg/catxg/term/Vespa%20velutina%20nigrithorax
+#' .assign_EASIN_info(specie_name = "Vespa velutina")
+#' }
+#' 
+.assign_EASIN_info <- function(specie_name) {
+  easin_empty_tbl <- dplyr::tibble(
+    EASIN_url = NA_character_,
+    EASIN_id = NA_character_,
+    EASIN_LSID = NA_character_,
+    EASIN_firstIntroductionsInEU_year = NA_character_,
+    EASIN_firstIntroductions_Country = NA_character_,
+    EASIN_status = NA_character_,
+    EASIN_hasImpact = NA_character_,
+    EASIN_IsEUConcern = NA_character_,
+  )
+  
+  easin_api_url <- paste0(
+    'https://easin.jrc.ec.europa.eu/apixg/catxg/term/',
+    URLencode(specie_name)
+  )
+  
+  easin_response <- tryCatch({
+    httr2::request(easin_api_url) |> 
+      httr2::req_method("GET") |> 
+      httr2::req_headers(Accept = "application/json") |> 
+      httr2::req_retry(max_tries = 3, max_seconds = 120) |> 
+      httr2::req_perform()
+  }, error = function(e) {
+    return(NULL)
+  })
+  
+  # check easin_response
+  if (is.null(easin_response) || httr2::resp_status(easin_response) != 200) {
+    return(easin_empty_tbl)
+  }
+  
+  # parse JSON
+  easin_data <- tryCatch({
+    httr2::resp_body_json(easin_response, simplifyVector = TRUE)
+  }, error = function(e) {
+    return(NULL)
+  })
+  
+  if (is.null(easin_data) || length(easin_data) == 0 || !is.null(easin_data$Empty)) {
+    return(easin_empty_tbl)
+  }
+  
+  .safe_intro_field <- function(intro, field) {
+    if (is.null(intro) || length(intro) == 0) return(NA_character_)
+    if (!is.list(intro)) return(NA_character_)
+    first <- intro[[1]]
+    if (!is.list(first)) return(NA_character_)   # <-- blocca se intro[[1]] è atomico
+    val <- first[[field]]
+    if (is.null(val) || length(val) == 0) return(NA_character_)
+    as.character(val)
+  }
+  
+  return(tibble::tibble(
+    EASIN_url  = paste0(
+      "https://easin.jrc.ec.europa.eu/spexplorer/species/factsheet/",
+      easin_data$EASINID
+    ),
+    EASIN_id   = as.character(easin_data$EASINID),
+    EASIN_LSID = paste0(
+      "urn:lsid:easin.jrc.ec.europa.eu:species:",
+      easin_data$EASINID
+    ),
+    EASIN_firstIntroductionsInEU_year = .safe_intro_field(
+      easin_data$FirstIntroductionsInEU, "Year"
+    ),
+    EASIN_firstIntroductions_Country  = .safe_intro_field(
+      easin_data$FirstIntroductionsInEU, "Country"
+    ),
+    EASIN_status      = as.character(easin_data$Status     %||% NA_character_),
+    EASIN_hasImpact   = as.character(easin_data$HasImpact  %||% NA_character_),
+    EASIN_IsEUConcern = as.character(easin_data$IsEUConcern %||% NA_character_)
+  ))
+}
+
+#' @keywords internal
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @noRd
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' .country_to_flag(country = "Italy")
+#' }
+.country_to_flag <- function(country) {
+  
+  country_codes <- c(
+    "Albania" = "AL", "Andorra" = "AD", "Austria" = "AT",
+    "Belarus" = "BY", "Belgium" = "BE", "Bosnia and Herzegovina" = "BA",
+    "Bulgaria" = "BG", "Croatia" = "HR", "Cyprus" = "CY",
+    "Czech Republic" = "CZ", "Czechia" = "CZ", "Denmark" = "DK",
+    "Estonia" = "EE", "Finland" = "FI", "France" = "FR",
+    "Germany" = "DE", "Greece" = "GR", "Hungary" = "HU",
+    "Iceland" = "IS", "Ireland" = "IE", "Italy" = "IT",
+    "Kosovo" = "XK", "Latvia" = "LV", "Liechtenstein" = "LI",
+    "Lithuania" = "LT", "Luxembourg" = "LU", "Malta" = "MT",
+    "Moldova" = "MD", "Monaco" = "MC", "Montenegro" = "ME",
+    "Netherlands" = "NL", "North Macedonia" = "MK", "Norway" = "NO",
+    "Poland" = "PL", "Portugal" = "PT", "Romania" = "RO",
+    "Russia" = "RU", "San Marino" = "SM", "Serbia" = "RS",
+    "Slovakia" = "SK", "Slovenia" = "SI", "Spain" = "ES",
+    "Sweden" = "SE", "Switzerland" = "CH", "Turkey" = "TR",
+    "Ukraine" = "UA", "United Kingdom" = "GB", "Vatican" = "VA"
+  )
+  
+  if (is.na(country) || country == "-") return("-")
+  
+  country <- as.character(country)
+  
+  if (nchar(country) == 2 && grepl("^[A-Z]{2}$", toupper(country))) {
+    code <- toupper(country)
+    country_name <- names(country_codes)[country_codes == code][1]
+    if (is.na(country_name)) country_name <- code
+  } else {
+    code <- country_codes[country]
+    if (is.na(code)) return(country)
+    country_name <- country
+  }
+  
+  # costruzione flag
+  chars <- strsplit(code, "")[[1]]
+  flag <- paste0(
+    vapply(chars, function(ch) {
+      intToUtf8(utf8ToInt("\U0001F1E6") + utf8ToInt(ch) - utf8ToInt("A"))
+    }, character(1)),
+    collapse = ""
+  )
+  
+  paste0(flag, " ", country_name)
+}
+
 #' Function to obtain IUCN conservation status for a single taxon.id from
 #' iNaturalist API
-#' @description `r lifecycle::badge("experimental")`
+#' @description `r lifecycle::badge("stable")`
 #' This function generates a request to the iNaturalist API of a given
 #' `taxon.id` to obtain, if updated, the IUCN conservation status, where
 #' the authority is the "IUCN Red List".
@@ -65,21 +209,29 @@
 #' `authority`, `name`, and `url`. If the parsing fails or no IUCN Red List
 #' conservation status is available, the function returns a tibble with
 #' `NA` values in all fields.
-#' @author Alessandro Oggioni, phD (2023) \email{alessandro.oggioni@@cnr.it}
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #' @importFrom httr2 request req_method req_headers req_retry req_perform resp_status resp_body_json
 #' @importFrom dplyr tibble select
 #' @export
 #' @examples
 #' \dontrun{
 #' ## Not run:
+#' # with 1 IUCN red list conservation status declared
+#' # Sclerophrys pantherina
 #' get_conservation_status(
 #'   taxon.id = 517449
 #' )
 #' 
+#' # without IUCN red list conservation status declared
+#' # Protoparmeliopsis muralis
 #' get_conservation_status(
 #'   taxon.id = 632126
 #' )
 #' 
+#' # with 3 IUCN red list conservation status declared
+#' # Falco tinnunculus
 #' get_conservation_status(
 #'   taxon.id = 472766
 #' )
@@ -93,7 +245,7 @@ get_conservation_status <- function(taxon.id) {
   empty_tbl <- dplyr::tibble(
       status = NA_character_,
       authority = NA_character_,
-      name = NA_character_,
+      scope_of_assesment = NA_character_,
       url = NA_character_
     )
   iNat_api_url <- paste0("https://api.inaturalist.org/v1/taxa/", taxon.id)
@@ -149,64 +301,130 @@ get_conservation_status <- function(taxon.id) {
   }
   
   place_name <- vapply(seq_len(nrow(cons_status)), function(i) {
-    p <- cons_status$place[[i]]
-    if (is.null(p))                                return(NA_character_)
-    if (is.data.frame(p) && "name" %in% names(p)) return(as.character(p$name[1]))
-    if (is.list(p) && !is.null(p[["name"]]))       return(as.character(p[["name"]][1]))
-    NA_character_
+    p <- cons_status$place[i,]
+    if (is.null(p)) return("Globally")
+    if (is.data.frame(p) && "name" %in% names(p)) {
+      name_val <- p$name[1]
+      if (is.na(name_val)) return("Globally")
+      return(as.character(name_val))
+    }
+    if (is.list(p) && !is.null(p[["name"]])) {
+      name_val <- p[["name"]][1]
+      if (is.na(name_val)) return("Globally")
+      return(as.character(name_val))
+    }
+    "Globally"
   }, FUN.VALUE = character(1))
   
   return(tibble::tibble(
-    status    = as.character(cons_status$status),
+    status = as.character(cons_status$status),
     authority = as.character(cons_status$authority),
-    name      = place_name,
-    url       = as.character(cons_status$url)
+    scope_of_assesment = place_name,
+    url = as.character(cons_status$url)
   ))
 }
 
-#' Get nativeness degree for a taxon from iNaturalist
-#' @description `r lifecycle::badge("experimental")`
+#' Get nativeness degree for a taxon from iNaturalist and EASIN
+#' @description `r lifecycle::badge("stable")`
 #' Queries the iNaturalist API to retrieve the establishment means
 #' (nativeness status and authority) for a given taxon, optionally filtered
-#' by country, as provided by iNaturalist checklists.
-#' Returns a one-row tibble with a nested \code{establishmentMeans}
-#' list-column containing \code{nativeness} and \code{authority}.
-#' 
-#' Data are sourced from iNaturalist checklists:
-#' https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
-#' 
+#' by country, as provided by iNaturalist checklists. Additionally queries
+#' the EASIN (European Alien Species Information Network) database to retrieve
+#' alien species information for the same taxon.
+#'
+#' Data are sourced from:
+#' \enumerate{
+#'   \item iNaturalist checklists —
+#'     \url{https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712}
+#'   \item EASIN — European Alien Species Information Network —
+#'     \url{https://easin.jrc.ec.europa.eu/easin}
+#' }
+#'
 #' @param taxon.id \code{integer} or \code{character}. The iNaturalist taxon ID
 #'   to query.
 #' @param country \code{character}. The country name to filter results by
 #'   (e.g., \code{"Italy"}). Must match the place name as recorded in
 #'   iNaturalist. If \code{NULL}, a warning is issued and an empty result
 #'   is returned to avoid ambiguous cross-country data.
+#'
 #' @return A \code{\link[dplyr]{tibble}} with one row and one list-column:
 #'   \describe{
-#'     \item{establishmentMeans}{\code{list} of one-row tibbles, each containing:
+#'     \item{establishmentMeans}{\code{list} of one-row tibbles, each
+#'       containing:
 #'       \describe{
-#'         \item{nativeness}{\code{character}. The establishment means value
-#'           (e.g., \code{"native"}, \code{"introduced"}), or \code{NA} if
-#'           not available.}
-#'         \item{authority}{\code{character}. The authority or checklist title
-#'           associated with the establishment means (e.g.,
+#'         \item{iNat_nativeness}{\code{character}. The establishment means
+#'           value from iNaturalist (e.g., \code{"native"},
+#'           \code{"introduced"}), or \code{NA} if not available.}
+#'         \item{iNat_authority}{\code{character}. The checklist title
+#'           associated with the establishment means in iNaturalist (e.g.,
 #'           \code{"Italy Check List"}), or \code{NA} if not available.}
+#'         \item{iNat_checkList_uri}{\code{character}. The URL of the
+#'           iNaturalist checklist associated with the establishment means,
+#'           or \code{NA} if not available.}
+#'         \item{EASIN_url}{\code{character}. URL of the EASIN species
+#'           factsheet, or \code{NA} if the taxon is not in EASIN.}
+#'         \item{EASIN_id}{\code{character}. EASIN species identifier,
+#'           or \code{NA} if not available.}
+#'         \item{EASIN_LSID}{\code{character}. Life Science Identifier
+#'           for the species in EASIN
+#'           (e.g., \code{"urn:lsid:easin.jrc.ec.europa.eu:species:XXXX"}),
+#'           or \code{NA} if not available.}
+#'         \item{EASIN_firstIntroductionsInEU_year}{\code{character}. Year of
+#'           first introduction in the EU as recorded in EASIN, or \code{NA}
+#'           if not available.}
+#'         \item{EASIN_firstIntroductions_Country}{\code{character}. Country
+#'           of first introduction in the EU as recorded in EASIN, or
+#'           \code{NA} if not available.}
+#'         \item{EASIN_status}{\code{character}. Alien species status as
+#'           recorded in EASIN, or \code{NA} if not available.}
+#'         \item{EASIN_hasImpact}{\code{character}. Whether the species has
+#'           a documented impact as recorded in EASIN (\code{"True"} or
+#'           \code{"False"}), or \code{NA} if not available.}
+#'         \item{EASIN_IsEUConcern}{\code{character}. Whether the species is
+#'           listed as a species of EU concern under Regulation (EU)
+#'           No 1143/2014 (\code{"True"} or \code{"False"}), or \code{NA}
+#'           if not available.}
 #'       }
 #'     }
 #'   }
-#' @note The establishment means information is sourced from iNaturalist and
-#'   may refer to the IUCN Red List. It may not always be up to date.
-#' @seealso \code{\link{add_nativeness_to_occ}} for applying this function
-#'   across a full occurrence tibble.
-#' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
-#' @importFrom httr2 request req_method req_headers req_retry req_perform
-#'   resp_status resp_body_json
+#'
+#' @note
+#' The establishment means information is sourced from iNaturalist and may
+#' refer to the IUCN Red List. It may not always be up to date.
+#'
+#' EASIN data are retrieved from the JRC API
+#' (\url{https://easin.jrc.ec.europa.eu/apixg/catxg/term/}) and reflect
+#' the information available in the EASIN catalogue. If the taxon is not
+#' present in EASIN, all \code{EASIN_*} fields are \code{NA}.
+#' 
+#' \strong{Disclaimer}: EASIN reports alien (i.e., non-native) status at the
+#' country level and does not distinguish cases where a species is non-native
+#' only in specific sub-national areas (e.g., islands) but native in others
+#' within the same country. Therefore, EASIN information may overgeneralize
+#' the nativeness status when applied to heterogeneous territories such as
+#' Italy
+#'
+#' @seealso
+#' \code{\link{add_nativeness_to_occ}} for applying this function across
+#' a full occurrence tibble.
+#' \code{\link{.assign_EASIN_info}} for the underlying EASIN API call.
+#'
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
+#'
+#' @importFrom httr2 request req_method req_headers req_retry
+#' @importFrom httr2 req_perform resp_status resp_body_json
 #' @importFrom dplyr tibble
 #' @importFrom purrr keep
+#'
 #' @examples
 #' \dontrun{
-#' # Get nativeness for a taxon in Italy
+#' # Get nativeness and EASIN info for a taxon in Italy
 #' get_nativeness_degree(taxon.id = 48484, country = "Italy")
+#'
+#' # Species of EU concern example
+#' get_nativeness_degree(taxon.id = 61976, country = "Italy")
 #' }
 #'
 ### get_nativeness_degree
@@ -216,8 +434,17 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
   empty_nested <- dplyr::tibble(
     establishmentMeans = list(
       dplyr::tibble(
-        nativeness = NA_character_,
-        authority  = NA_character_
+        iNat_nativeness = NA_character_,
+        iNat_authority = NA_character_,
+        iNat_checkList_uri = NA_character_,
+        EASIN_url = NA_character_,
+        EASIN_id = NA_character_,
+        EASIN_LSID = NA_character_,
+        EASIN_firstIntroductionsInEU_year = NA_character_,
+        EASIN_firstIntroductions_Country = NA_character_,
+        EASIN_status = NA_character_,
+        EASIN_hasImpact = NA_character_,
+        EASIN_IsEUConcern = NA_character_,
       )
     )
   )
@@ -249,6 +476,10 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
     httr2::resp_body_json(response)
   }, error = function(e) NULL)
   
+  # parse info from EASIN EU Database
+  specie_name <- parsed$results[[1]]$name
+  easin_info <- .assign_EASIN_info(specie_name = specie_name)
+  
   # Return empty tibble if parsing failed or no results found
   if (is.null(parsed) || length(parsed$results) == 0) {
     return(empty_nested)
@@ -276,21 +507,24 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
   record <- record[[1]]
   
   nativeness_value <- record$establishment_means
-  authority_value  <- record$list$title
+  authority_value <- record$list$title
+  checkList_uri <- paste0("https://www.inaturalist.org/lists/", record$list$id)
   
   # Return a tibble with establishmentMeans as a nested list-column
   dplyr::tibble(
     establishmentMeans = list(
       dplyr::tibble(
-        nativeness = if (is.null(nativeness_value)) NA_character_ else as.character(nativeness_value),
-        authority  = if (is.null(authority_value))  NA_character_ else as.character(authority_value)
+        iNat_nativeness = if (is.null(nativeness_value)) NA_character_ else as.character(nativeness_value),
+        iNat_authority = if (is.null(authority_value))  NA_character_ else as.character(authority_value),
+        iNat_checkList_uri = if (is.null(checkList_uri))  NA_character_ else as.character(checkList_uri),
+        easin_info
       )
     )
   )
 }
 
 #' Get EUNIS Legal Information for a Species Using iNaturalist Taxon ID
-#' @description `r lifecycle::badge("experimental")`
+#' @description `r lifecycle::badge("stable")`
 #' This function takes a \code{taxon.id} from iNaturalist, retrieves the corresponding
 #' scientific name from the iNaturalist API, searches the EUNIS database, and extracts
 #' the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC),
@@ -306,10 +540,10 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
 #'     \item{Annex}{Annex information from EUNIS table}
 #'   }
 #'
-#' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #'
 #' @importFrom httr2 request req_method req_headers req_retry req_perform
-#'   resp_status resp_body_json
+#' @importFrom httr2 resp_status resp_body_json
 #' @importFrom rvest read_html html_elements html_attr html_table
 #' @importFrom dplyr tibble filter select mutate
 #' @importFrom purrr keep
@@ -468,7 +702,9 @@ get_eunis_legal_info <- function(taxon.id) {
 #' The function also prints some console messages to inform the user about the
 #' status results for each `taxon.id`, as well as the number of taxa that
 #' encountered a JSON parsing error.
-#' @author Alessandro Oggioni, phD (2023) \email{alessandro.oggioni@@cnr.it}
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #' @importFrom rinat get_inat_obs_project
 #' @importFrom dplyr mutate filter tibble select distinct left_join
 #' @importFrom purrr map_dfr walk2
@@ -565,7 +801,7 @@ add_iucn_to_obs <- function(project_name) {
 }
 
 #' Enrich eLTER site iNaturalist occurrences with IUCN conservation status
-#' @description `r lifecycle::badge("experimental")`
+#' @description `r lifecycle::badge("stable")`
 #' This function enriches all the eLTER site iNaturalist occurrences acquired
 #' by the \code{ReLTER::get_site_speciesOccurrences()} function with the IUCN
 #' Red List conservation status as recorded in iNaturalist.
@@ -640,7 +876,9 @@ add_iucn_to_obs <- function(project_name) {
 #' The IUCN conservation status is retrieved from the iNaturalist Taxa API and
 #' reflects the information available within iNaturalist. This information may
 #' not be up to date with respect to the official IUCN Red List.
-#' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #' @importFrom dplyr filter select distinct left_join mutate tibble
 #' @importFrom purrr map_dfr map_lgl walk walk2
 #' @export
@@ -656,7 +894,7 @@ add_iucn_to_obs <- function(project_name) {
 #'   deimsid = deimsid,
 #'   list_DS = "inat",
 #'   show_map = FALSE,
-#'   limit = 5000
+#'   limit = 50
 #' )
 #' 
 #' occ <- add_iucn_to_occ(
@@ -696,22 +934,22 @@ add_iucn_to_occ <- function(occ_eLTER) {
   record_counter <- 0
   status_results <- purrr::map_dfr(unique_taxon.ids, function(taxon.id) {
     record_counter <<- record_counter + 1
-    status <- tryCatch(
+    status_tbl <- tryCatch(
       get_conservation_status(taxon.id),
       error = function(e) NULL
     )
     # Normalize output
-    if (is.null(status)) {
-      status_tbl <- empty_status_tbl
-    } else if (inherits(status, "data.frame")) {
-      if (nrow(status) == 0) {
-        status_tbl <- empty_status_tbl
-      } else {
-        status_tbl <- status
-      }
-    } else {
-      status_tbl <- empty_status_tbl
-    }
+    # if (is.na(status)) {
+    #   status_tbl <- empty_status_tbl
+    # } else if (inherits(status, "data.frame")) {
+    #   if (nrow(status) == 0) {
+    #     status_tbl <- empty_status_tbl
+    #   } else {
+    #     status_tbl <- status
+    #   }
+    # } else {
+    #   status_tbl <- empty_status_tbl
+    # }
     # Check validity
     valid <- has_valid_status(status_tbl)
     # Logging
@@ -776,14 +1014,14 @@ add_iucn_to_occ <- function(occ_eLTER) {
   occ_in_site_research_valid <- occ_in_site_research_valid |>
     dplyr::left_join(
       status_results |>
-        dplyr::select(taxon.id, status_IUCN, has_IUCN),
+        dplyr::select(taxon.id, has_IUCN, status_IUCN),
       by = "taxon.id"
     )
   return(occ_in_site_research_valid)
 }
 
 #' Add nativeness information to iNaturalist occurrence records
-#' @description `r lifecycle::badge("experimental")`
+#' @description `r lifecycle::badge("stable")`
 #' Filters a tibble of iNaturalist occurrence records to retain only
 #' research-grade, non-captive observations with a valid date, then fetches
 #' establishment means information from iNaturalist for each unique taxon
@@ -813,9 +1051,17 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'   (research-grade, non-captive, with valid date) with the following
 #'   additional columns:
 #'   \describe{
+#'     \item{has_establishmentMeans}{\code{logical}. Whether at least one
+#'       valid (non-\code{NA}) establishment means value is available for
+#'       the given \code{taxon.id}.}
 #'     \item{establishmentMeans}{list-column. Each element is a one-row tibble
-#'       containing \code{nativeness} and \code{authority}, or \code{NA} if
-#'       not recorded in iNaturalist for the specified country.}
+#'       containing \code{iNat_nativeness}, \code{iNat_authority} (from
+#'       iNaturalist), plus the EASIN fields \code{EASIN_url},
+#'       \code{EASIN_id}, \code{EASIN_LSID},
+#'       \code{EASIN_firstIntroductionsInEU_year},
+#'       \code{EASIN_firstIntroductions_Country}, \code{EASIN_status},
+#'       \code{EASIN_hasImpact}, \code{EASIN_IsEUConcern}. All fields
+#'       are \code{NA} if not available.}
 #'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
 #'       Flying insects (SOBIO_014) eLTER Standard Observation.
 #'       Assigned only if not already present.}
@@ -848,27 +1094,31 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'   The establishment means information is sourced from iNaturalist and
 #'   may refer to the IUCN Red List. It may not always be up to date.
 #'   
-#' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #' @importFrom dplyr filter select distinct inner_join left_join tibble
 #' @importFrom purrr map_dfr pluck walk2 map_chr
 #' @export
 #' @examples
 #' \dontrun{
+#' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 #'
 #' occ_eLTER <- ReLTER::get_site_speciesOccurrences(
 #'   deimsid = deimsid,
 #'   list_DS = "inat",
 #'   show_map = FALSE,
-#'   limit = 5000
+#'   limit = 50
 #' )
 #'
 #' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
-#' country <- site_boundary$country
 #'
 #' occ <- add_nativeness_to_occ(
 #'   occ_eLTER = occ_eLTER$inat,
-#'   country = country
+#'   country = site_boundary$country
 #' )
 #' }
 #'
@@ -907,8 +1157,8 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
     raw <- get_nativeness_degree(taxon.id, country = country)
     
     # Extract nativeness and authority from the nested tibble for logging
-    nativeness_val <- purrr::pluck(raw, "establishmentMeans", 1, "nativeness", 1)
-    authority_val  <- purrr::pluck(raw, "establishmentMeans", 1, "authority",  1)
+    nativeness_val <- purrr::pluck(raw, "establishmentMeans", 1, "iNat_nativeness", 1)
+    authority_val <- purrr::pluck(raw, "establishmentMeans", 1, "iNat_authority",  1)
     
     # Log result to console
     if (is.na(nativeness_val)) {
@@ -925,13 +1175,18 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
     
     # Return a one-row tibble with taxon.id and the nested establishmentMeans
     dplyr::tibble(
-      taxon.id           = taxon.id,
+      taxon.id = taxon.id,
       establishmentMeans = raw$establishmentMeans
     )
   })
   
   # Helper to extract nativeness string from the list-column for filtering
-  get_nat <- function(em_list) purrr::map_chr(em_list, ~ .x$nativeness %||% NA_character_)
+  get_nat <- function(em_list) purrr::map_chr(em_list, ~ {
+    val <- .x$iNat_nativeness %||% NA_character_
+    if (length(val) == 0) return(NA_character_)
+    if (length(val) > 1) return(val[1])
+    val
+  })
   
   nativeness_vec <- get_nat(nativeness_results$establishmentMeans)
   
@@ -975,11 +1230,20 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
   
   # Left join to attach the establishmentMeans list-column to the full occurrence tibble
   occ_in_site_research_valid |>
-    dplyr::left_join(nativeness_results, by = "taxon.id")
+    dplyr::left_join(nativeness_results, by = "taxon.id") |>
+    # has_establishmentMeans
+    dplyr::mutate(
+      has_establishmentMeans = !is.na(
+        vapply(establishmentMeans, function(em) {
+          val <- tryCatch(em$iNat_nativeness[[1]], error = function(e) NA_character_)
+          if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
+        }, FUN.VALUE = character(1))
+      )
+    )
 }
 
 #' Enrich iNaturalist occurrences with EUNIS legal framework information
-#' @description `r lifecycle::badge("experimental")`
+#' @description `r lifecycle::badge("stable")`
 #' This function enriches iNaturalist occurrences with legal protection
 #' information extracted from the EUNIS database. It uses the scientific name
 #' retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
@@ -1030,19 +1294,23 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
 #' \code{\link{add_nativeness_to_occ}},
 #' \code{\link{obs_SO_pie_chart}}
 #' 
-#' @author Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@@cnr.it}
+#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #' @importFrom dplyr tibble mutate left_join rename
 #' @importFrom purrr map_dfr
 #' @export
 #' @examples
 #' \dontrun{
-#' # Example: enrich iNaturalist occurrences with legal info
+#' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 #' occ_iNat <- ReLTER::get_site_speciesOccurrences(
 #'   deimsid = deimsid,
 #'   list_DS = "inat",
 #'   show_map = FALSE,
-#'   limit = 5000
+#'   limit = 50
 #' )
 #'
 #' occ_legal <- add_eunis_legal_to_occ(
@@ -1117,11 +1385,13 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 
 #' Create Leaflet map for enriched iNaturalist occurrences
 #'
-#' @description `r lifecycle::badge("experimental")`
+#' @description `r lifecycle::badge("stable")`
 #'
 #' Takes a tibble of iNaturalist occurrences already enriched with species
-#' nativeness, IUCN conservation status, EUNIS legal information, and eLTER
-#' Standard Observation assignments. Verifies that all required columns are
+#' nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ()}}),
+#' nativeness (\code{\link{add_nativeness_to_occ()}}), and EUNIS legal 
+#' information (\code{\link{add_eunis_to_occ()}}), and eLTER Standard
+#' Observations (SOs) assignments. Verifies that all required columns are
 #' present, builds observation-level HTML popups with linked references to
 #' iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
 #' interactive Leaflet map with colour-coded markers by iconic taxon group
@@ -1130,11 +1400,14 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' @param occ_enriched An \code{sf} tibble of iNaturalist occurrences enriched
 #'   with the following columns:
 #'   \describe{
-#'     \item{establishmentMeans}{list-column of 1 × 2 tibbles with
-#'       \code{nativeness} and \code{authority}, produced by
-#'       \code{\link{add_nativeness_to_occ}}.}
+#'     \item{establishmentMeans}{list-column of 1 × 11 tibbles fron iNaturalist
+#'       \code{iNat_nativeness}, \code{iNat_authority}, and \code{iNat_checkList_uri},
+#'       from EASIN \code{EASIN_url}, \code{EASIN_id}, \code{EASIN_LSID},
+#'       \code{EASIN_firstIntroductionsInEU_year}, \code{EASIN_firstIntroductions_Country},
+#'       \code{EASIN_status}, \code{EASIN_hasImpact}, \code{EASIN_IsEUConcern}
+#'       produced by \code{\link{add_nativeness_to_occ}}.}
 #'     \item{status_IUCN}{list-column of N × 4 tibbles with \code{status},
-#'       \code{authority}, \code{name} (geographic scope), and \code{url},
+#'       \code{authority}, \code{scope_of_assesment} (geographic scope), and \code{url},
 #'       produced by \code{\link{add_iucn_to_occ}}.}
 #'     \item{directive}{character. EU directive name, produced by
 #'       \code{\link{add_eunis_legal_to_occ}}.}
@@ -1212,7 +1485,8 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' contribute to both SOs simultaneously. SOBIO_017 covers Plants.
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
-#' @author Alice Lenzi, phD \email{alice.lenzi@@crea.gov.it}
+#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
+#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #'
 #' @seealso
 #' \code{\link{add_iucn_to_occ}},
@@ -1223,21 +1497,39 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' @export
 #'
 #' @importFrom dplyr coalesce mutate filter select distinct group_by
-#'   summarise left_join case_when
+#' @importFrom dplyr summarise left_join case_when
 #' @importFrom purrr map_chr pmap_chr map2_chr
 #' @importFrom sf st_drop_geometry
 #' @importFrom leaflet leaflet addTiles addPolygons addCircleMarkers
-#'   addLegend addControl addLayersControl markerClusterOptions colorFactor
-#'   layersControlOptions
+#' @importFrom leaflet addLegend addControl addLayersControl markerClusterOptions colorFactor
+#' @importFrom leaflet layersControlOptions
 #' @importFrom grDevices hcl.colors
 #'
 #' @examples
 #' \dontrun{
+#' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # get_site_speciesOccurrences() function
+#' # e.g. Montagna di Torricchio eLTER site
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 #' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 #'
+#' iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+#'  deimsid = deimsid,
+#'  list_DS = "inat",
+#'  show_map = TRUE,
+#'  limit = 50
+#' )
+#'
+#' occ_eLTER_enrich <- add_iucn_to_occ(
+#'   occ_eLTER = iNat_occ_eLTER_site$inat
+#' ) |>
+#'   add_nativeness_to_occ(
+#'     country = site_boundary$country
+#'   ) |>
+#'   add_eunis_legal_to_occ()
+#'
 #' map <- create_leaflet_occ_map(
-#'   occ_enriched  = occ_eLTER_legal,
+#'   occ_enriched = occ_eLTER_enrich,
 #'   site_boundary = site_boundary
 #' )
 #' map
@@ -1274,26 +1566,19 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
     "NE" = "Not Evaluated"
   )
   
-  # Helper: extract nativeness from nested establishmentMeans tibble
-  extract_nativeness <- function(em) {
-    val <- tryCatch(em$nativeness[[1]], error = function(e) NA_character_)
-    if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
-  }
-  
-  # Helper: extract nativeness authority from nested establishmentMeans tibble
-  extract_em_authority <- function(em) {
-    val <- tryCatch(em$authority[[1]], error = function(e) NA_character_)
-    if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
-  }
-  
   # Helper: build HTML block for IUCN status from nested status_IUCN tibble
   # Shows one row per geographic scope (global + regional)
   extract_iucn_html <- function(iucn_tbl) {
     if (is.null(iucn_tbl) || nrow(iucn_tbl) == 0) return("-")
-    rows <- purrr::pmap_chr(iucn_tbl, function(status, authority, name, url) {
-      scope <- if (is.na(name) || name == "") "Global" else name
-      label <- iucn_labels[status]
-      label <- if (is.na(label)) status else paste0(status, " – ", label)
+    rows <- purrr::pmap_chr(iucn_tbl, function(...) {
+      args <- list(...)
+      status <- args[["status"]]
+      authority <- args[["authority"]]
+      scope_of_assesment <- args[["scope_of_assesment"]]
+      url <- args[["url"]]
+      scope <- if (is.na(scope_of_assesment) || scope_of_assesment == "") "-" else scope_of_assesment
+      label <- if (is.na(iucn_labels[status]) || iucn_labels[status] == "") "-" else iucn_labels[status]
+      # label <- if (is.na(label)) status else paste0(status, " \u2013 ", label)
       if (!is.na(url) && nzchar(url)) {
         paste0(
           "<div style='font-size:12px;'>",
@@ -1314,10 +1599,18 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       iconic = dplyr::coalesce(taxon.iconic_taxon_name, "Unknown"),
       geopriv = dplyr::coalesce(taxon_geoprivacy, "unknown"),
       # Unpack establishmentMeans list-column
-      nativeness_lbl = purrr::map_chr(establishmentMeans, extract_nativeness),
-      em_authority_lbl = purrr::map_chr(establishmentMeans, extract_em_authority),
-      nativeness_lbl = ifelse(is.na(nativeness_lbl), "-", nativeness_lbl),
-      em_authority_lbl = ifelse(is.na(em_authority_lbl), "-", em_authority_lbl),
+      nativeness_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$iNat_nativeness[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      em_authority_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$iNat_authority[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      em_authority_uri_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$iNat_checkList_uri[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
       # Unpack status_IUCN list-column into an HTML string
       iucn_html = purrr::map_chr(status_IUCN, extract_iucn_html),
       # Flat columns
@@ -1334,7 +1627,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       # SOs
       so_lbl = apply(
         cbind(
-          ifelse(SOBIO_014, "SOBIO_014 (Flying insects)",     NA),
+          ifelse(SOBIO_014, "SOBIO_014 (Flying insects)", NA),
           ifelse(SOBIO_017, "SOBIO_017 (Vegetation composition)", NA),
           ifelse(SOBIO_018, "SOBIO_018 (Acoustic recording)", NA)
         ),
@@ -1343,6 +1636,38 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           active <- x[!is.na(x)]
           if (length(active) == 0) "-" else paste(active, collapse = " | ")
         }
+      ),
+      # Unpack EASIN fields from nested establishmentMeans
+      EASIN_url_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_url[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      EASIN_id_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_id[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      EASIN_status_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_status[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      EASIN_impact_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_hasImpact[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      EASIN_concern_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_IsEUConcern[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      EASIN_intro_year_lbl = vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_firstIntroductionsInEU_year[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+      }, FUN.VALUE = character(1)),
+      EASIN_intro_country_lbl = purrr::map_chr(
+        vapply(establishmentMeans, function(em) {
+        val <- tryCatch(em$EASIN_firstIntroductions_Country[[1]], error = function(e) NA_character_)
+        if (is.null(val) || is.na(val)) "-" else as.character(val)
+        }, FUN.VALUE = character(1)),
+        .country_to_flag
       )
     )
   
@@ -1378,6 +1703,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       iucn_html = occ_map$iucn_html,
       nativeness = occ_map$nativeness_lbl,
       em_authority = occ_map$em_authority_lbl,
+      em_authority_uri = occ_map$em_authority_uri_lbl,
       common_name = occ_map$common_name_lbl,
       observed_on = occ_map$observed_on_lbl,
       geopriv = occ_map$geopriv,
@@ -1387,11 +1713,21 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       obs_url = occ_map$obs_url,
       photo_url = occ_map$photo_url,
       directive_html = occ_map$directive_html,
-      so_lbl = occ_map$so_lbl
+      so_lbl = occ_map$so_lbl,
+      EASIN_url = occ_map$EASIN_url_lbl,
+      EASIN_id = occ_map$EASIN_id_lbl,
+      EASIN_status = occ_map$EASIN_status_lbl,
+      EASIN_impact = occ_map$EASIN_impact_lbl,
+      EASIN_concern = occ_map$EASIN_concern_lbl,
+      EASIN_intro_year = occ_map$EASIN_intro_year_lbl,
+      EASIN_intro_country = occ_map$EASIN_intro_country_lbl
     ),
     function(obs_quality, taxon_name, taxon_url, iucn_html, nativeness, em_authority,
+             em_authority_uri,
              common_name, observed_on, geopriv, posacc,
-             observer, observer_url, obs_url, photo_url, directive_html, so_lbl) {
+             observer, observer_url, obs_url, photo_url, directive_html, so_lbl,
+             EASIN_url, EASIN_id, EASIN_status, EASIN_impact, EASIN_concern,
+             EASIN_intro_year, EASIN_intro_country) {
       
       # Build directive HTML block with links to EUR-Lex
       directive_block <- if (nzchar(directive_html)) {
@@ -1409,16 +1745,24 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         paste0("<b>EU Directives</b>: ", linked_html)
       } else ""
       
+      
       paste0(
-        # Photo
+        # --- Photo ---
         if (nzchar(photo_url))
           sprintf(
             '<div style="margin-bottom:8px;text-align:center;">
-               <img src="%s" style="width:110px;height:auto;border-radius:8px;">
-             </div>', photo_url)
+         <img src="%s" style="width:110px;height:auto;border-radius:8px;">
+       </div>', photo_url)
         else "",
         
-        # Taxon info
+        # --- Section: iNaturalist observation data ---
+        '<div style="background:#f0f7f0;border-left:3px solid #74ac00;
+               padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+        '<img src="https://static.inaturalist.org/wiki_page_attachments/1419-original.png"
+        style="height:18px;width:auto;vertical-align:middle;">',
+        '<span style="font-size:11px;color:#555;font-weight:500;">iNaturalist observation</span>',
+        '</div>',
         "<b>Taxon:</b> ",
         if (taxon_name != "-")
           sprintf('<a href="%s" target="_blank"><i>%s</i></a>', taxon_url, taxon_name)
@@ -1431,48 +1775,225 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         else "-",
         "<br/>",
         if (nzchar(obs_url))
-          sprintf('<b>Observation:</b> <a href="%s" target="_blank">open record</a>', obs_url)
+          sprintf('<b>Observation:</b> <a href="%s" target="_blank">open record</a><br/>', obs_url)
         else "",
-        
-        # Divider
-        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
-        
-        # Data quality — geoprivacy with link
-        "<b>Obs quality:</b> ", obs_quality, " <a href='https://help.inaturalist.org/en/support/solutions/articles/151000169936-what-is-the-data-quality-assessment-and-how-do-observations-qualify-to-become-research-grade-' target='_blank' style='font-size:11px;'>ℹ️</a><br/>",
-        sprintf(
-          '<b>Geoprivacy:</b> %s <a href="https://www.inaturalist.org/pages/geoprivacy" target="_blank" style="font-size:11px;">ℹ️</a><br/>',
-          geopriv
-        ),
+        '<div style="margin-top:4px;">',
+        "<b>Obs quality:</b> ", obs_quality,
+        sprintf(' <a href="https://help.inaturalist.org/en/support/solutions/articles/151000169936"
+              target="_blank" style="font-size:11px;">ℹ️</a><br/>'),
+        sprintf('<b>Geoprivacy:</b> %s
+           <a href="https://www.inaturalist.org/pages/geoprivacy"
+              target="_blank" style="font-size:11px;">ℹ️</a><br/>', geopriv),
         "<b>Positional accuracy (m):</b> ", posacc,
+        '</div>',
+        '</div>',
         
-        # Divider
-        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
+        # --- Section: IUCN Red List (via iNaturalist) ---
+        if (grepl('-: -', iucn_html)) {
+          paste0(
+            '<div style="background:#fff8f0;border-left:3px solid #e8401c;
+                 padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/ec/IUCN_Red_List.svg/330px-IUCN_Red_List.svg.png"
+          style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">IUCN Red List
+      <a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712"
+         target="_blank" style="font-size:11px;">ℹ️</a>
+      <span style="font-weight:300;font-style:italic;">(via iNaturalist, provided by IUCN)</span>
+    </span>',
+            '</div>',
+            'This taxon has no IUCN Red List status recorded in iNaturalist',
+            '</div>'
+          )
+        } else {
+          paste0(
+            '<div style="background:#fff8f0;border-left:3px solid #e8401c;
+                 padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/ec/IUCN_Red_List.svg/330px-IUCN_Red_List.svg.png"
+          style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">IUCN Red List
+      <a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712"
+         target="_blank" style="font-size:11px;">ℹ️</a>
+      <span style="font-weight:300;font-style:italic;">(via iNaturalist, provided by IUCN)</span>
+    </span>',
+            '</div>',
+            iucn_html,
+            '</div>'
+          )
+        },
         
-        # IUCN status
-        '<b>Status (IUCN):</b><a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712" target="_blank" style="font-size:11px;">ℹ️</a><br/>', iucn_html, '<br/>',
+        # --- Section: EASIN ---
+        if (EASIN_id == "-") {
+          paste0(
+            '<div style="background:#fff5f5;border-left:3px solid #c00000;
+                 padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://easin.jrc.ec.europa.eu/easin/Content/ECL/images/logo/positive/logo-ec--en.svg"
+          style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">EASIN
+      <span style="font-weight:300;font-style:italic;">
+        — European Alien Species Information Network
+      </span><a href="https://easin.jrc.ec.europa.eu/easin"
+       target="_blank" style="font-size:11px;">ℹ️</a>
+    </span>',
+            '</div>',
+            'This taxon is not present in EASIN database',
+            '</div>'
+          )
+        } else {
+          paste0(
+            '<div style="background:#fff5f5;border-left:3px solid #c00000;
+                 padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://easin.jrc.ec.europa.eu/easin/Content/ECL/images/logo/positive/logo-ec--en.svg"
+          style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">EASIN
+      <span style="font-weight:300;font-style:italic;">
+        — European Alien Species Information Network
+      </span><a href="https://easin.jrc.ec.europa.eu/easin"
+       target="_blank" style="font-size:11px;">ℹ️</a>
+    </span>',
+            '</div>',
+            dplyr::case_when(
+              EASIN_url == "-" ~ '<b>Species:</b> <span style="color:#999;">-</span><br/>',
+              TRUE ~ sprintf('<b>Species:</b> <a href="%s" target="_blank">factsheet</a><br/>', EASIN_url)
+            ),
+            dplyr::case_when(
+              EASIN_id == "-" ~ '<b>LSID:</b> <span style="color:#999;">-</span><br/>',
+              TRUE ~ sprintf('<b>LSID:</b> <span style="font-size:11px;">urn:lsid:easin.jrc.ec.europa.eu:species:%s</span><br/>', EASIN_id)
+            ),
+            paste0(
+              dplyr::case_when(
+                EASIN_status == "A" ~ '<b>Status:</b> Alien - species introduced outside its native range ',
+                EASIN_status == "Q" ~ '<b>Status:</b> Cryptogenic - species with unknown native range or pathway of introduction ',
+                EASIN_status == "C" ~ '<b>Status:</b> Questionable - species with unresolved taxonomic status or not verified by experts ',
+                EASIN_id == "-" ~ '<b>Status:</b> - '
+              ),
+              '<a href="https://easin.jrc.ec.europa.eu/easin/Catalogue/Protocol" target="_blank" style="font-size:11px;">ℹ️</a><br/>'
+            ),
+            dplyr::case_when(
+              EASIN_impact == "FALSE" ~ '<b>Has documented impact:</b> No <br/>',
+              EASIN_impact == "TRUE" ~ '<b>Has documented impact:</b> Yes <br/>',
+              EASIN_id == "-" ~ '<b>Has documented impact:</b> - </br>'
+            ),
+            dplyr::case_when(
+              EASIN_concern == "FALSE" ~ '<b>Species of EU concern:</b> No <br/>',
+              EASIN_concern == "TRUE" ~ '<b>Species of EU concern:</b> Yes <br/>',
+              EASIN_concern == "-" ~ '<b>Species of EU concern:</b> - </br>'
+            ),
+            sprintf('<b>First introduction in EU:</b> %s in %s<br/>',
+                    EASIN_intro_year, EASIN_intro_country),
+            '</div>'
+          )
+        },
         
-        # Divider
-        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
+        # --- Section: Establishment means (iNaturalist) ---
+        # --- Section: Establishment means (iNaturalist) ---
+        if (nativeness == "-" && em_authority == "-") {
+          paste0(
+            '<div style="background:#f0f7f0;border-left:3px solid #74ac00;
+                 padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://static.inaturalist.org/wiki_page_attachments/1419-original.png"
+          style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">Establishment means
+      <a href="https://help.inaturalist.org/en/support/solutions/articles/151000176171"
+         target="_blank" style="font-size:11px;">ℹ️</a>
+      <span style="font-weight:300;font-style:italic;">(via iNaturalist)</span>
+    </span>',
+            '</div>',
+            'No establishment means recorded in iNaturalist for this taxon',
+            '</div>'
+          )
+        } else {
+          paste0(
+            '<div style="background:#f0f7f0;border-left:3px solid #74ac00;
+                 padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://static.inaturalist.org/wiki_page_attachments/1419-original.png"
+          style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">Establishment means
+      <a href="https://help.inaturalist.org/en/support/solutions/articles/151000176171"
+         target="_blank" style="font-size:11px;">ℹ️</a>
+      <span style="font-weight:300;font-style:italic;">(via iNaturalist)</span>
+    </span>',
+            '</div>',
+            sprintf('<b>Establishment means:</b> %s<br/>', nativeness),
+            dplyr::case_when(
+              em_authority_uri == "-" ~ '<b>Establishment means authority:</b> -<br/>',
+              TRUE ~ sprintf(
+                '<b>Establishment means authority:</b> <a href="%s" target="_blank">%s</a><br/>',
+                em_authority_uri, em_authority
+              )
+            ),
+            '</div>'
+          )
+        },
         
-        # Establishment means — with link to iNaturalist help
-        sprintf(
-          '<b>Establishment means:</b> %s <a href="https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist" target="_blank" style="font-size:11px;">ℹ️</a><br/>',
-          nativeness
-        ),
-        "<b>Establishment means authority:</b> ", em_authority,
-        
-        # EU Directives + eLTER SOs — divider only if there is content
+        # --- Section: EU Directives (EUNIS) ---
         if (nzchar(directive_block)) {
           paste0(
-            '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
-            directive_block
+            '<div style="background:#f0f4ff;border-left:3px solid #004b87;
+                   padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://www.eea.europa.eu/static/media/eea-logo.55fb94a4.svg"
+            style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">EU Legal framework
+        <span style="font-weight:300;font-style:italic;">(via EUNIS)</span>
+      </span>',
+            '</div>',
+            directive_block,
+            '</div>'
           )
-        } else "",
+        } else {
+          paste0(
+            '<div style="background:#f0f4ff;border-left:3px solid #004b87;
+                   padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+            '<img src="https://www.eea.europa.eu/static/media/eea-logo.55fb94a4.svg"
+            style="height:18px;width:auto;vertical-align:middle;">',
+            '<span style="font-size:11px;color:#555;font-weight:500;">EU Legal framework
+        <span style="font-weight:300;font-style:italic;">(via EUNIS)</span>
+      </span>',
+            '</div>',
+            'This taxon is not included in any Directives',
+            '</div>'
+          )
+        },
         
-        # eLTER Standard Observations — always shown with its own divider
-        '<div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>',
-        "<b>eLTER Standard Observations:</b><a href='https://elter-ri.eu/standard-observations-spheres/biosphere' target='_blank' style='font-size:11px;'>ℹ️</a><br/>",
-        "<div style='font-size:12px;'>", so_lbl, "</div>"
+        # --- Section: eLTER Standard Observations ---
+        if (so_lbl == "-") {
+          paste0('<div style="background:#f5f0ff;border-left:3px solid #000F22;
+               padding:6px 8px;margin-bottom:2px;border-radius:0 4px 4px 0;">',
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+          '<img src="https://elter-ri.eu/media-center/logo?&download=131&file_name=eLTER_Logo"
+        style="height:18px;width:auto;vertical-align:middle;background:white;
+               padding:2px 4px;border-radius:3px;">',
+          '<span style="font-size:11px;color:#555;font-weight:500;">eLTER Standard Observations (SOs)
+    <a href="https://elter-ri.eu/standard-observations-spheres/biosphere"
+       target="_blank" style="font-size:11px;">ℹ️</a>
+  </span>',
+          '</div>',
+          "<div style='font-size:12px;'>This observation can't contribute to any eLTER SOs ", 
+          "</div>",
+          '</div>')
+        } else {
+          paste0('<div style="background:#f5f0ff;border-left:3px solid #000F22;
+               padding:6px 8px;margin-bottom:2px;border-radius:0 4px 4px 0;">',
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+          '<img src="https://elter-ri.eu/media-center/logo?&download=131&file_name=eLTER_Logo"
+        style="height:18px;width:auto;vertical-align:middle;background:white;
+               padding:2px 4px;border-radius:3px;">',
+          '<span style="font-size:11px;color:#555;font-weight:500;">eLTER Standard Observations (SOs)
+    <a href="https://elter-ri.eu/standard-observations-spheres/biosphere"
+       target="_blank" style="font-size:11px;">ℹ️</a>
+  </span>',
+          '</div>',
+          "<div style='font-size:12px;'>This observation can contribute to: ", 
+          so_lbl, "</div>",
+          '</div>')
+        }
       )
     }
   )
@@ -1565,7 +2086,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
   map <- map |>
     leaflet::addLayersControl(
       overlayGroups = overlay_groups,
-      options       = leaflet::layersControlOptions(collapsed = FALSE)
+      options = leaflet::layersControlOptions(collapsed = FALSE)
     )
   return(map)
 }

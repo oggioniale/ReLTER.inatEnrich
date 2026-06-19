@@ -10,11 +10,14 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
 \item{occ_enriched}{An \code{sf} tibble of iNaturalist occurrences enriched
 with the following columns:
 \describe{
-\item{establishmentMeans}{list-column of 1 × 2 tibbles with
-\code{nativeness} and \code{authority}, produced by
-\code{\link{add_nativeness_to_occ}}.}
+\item{establishmentMeans}{list-column of 1 × 11 tibbles fron iNaturalist
+\code{iNat_nativeness}, \code{iNat_authority}, and \code{iNat_checkList_uri},
+from EASIN \code{EASIN_url}, \code{EASIN_id}, \code{EASIN_LSID},
+\code{EASIN_firstIntroductionsInEU_year}, \code{EASIN_firstIntroductions_Country},
+\code{EASIN_status}, \code{EASIN_hasImpact}, \code{EASIN_IsEUConcern}
+produced by \code{\link{add_nativeness_to_occ}}.}
 \item{status_IUCN}{list-column of N × 4 tibbles with \code{status},
-\code{authority}, \code{name} (geographic scope), and \code{url},
+\code{authority}, \code{scope_of_assesment} (geographic scope), and \code{url},
 produced by \code{\link{add_iucn_to_occ}}.}
 \item{directive}{character. EU directive name, produced by
 \code{\link{add_eunis_legal_to_occ}}.}
@@ -82,11 +85,13 @@ Vegetation composition and/or \code{SOBIO_018} Acoustic recording).
 }
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 
 Takes a tibble of iNaturalist occurrences already enriched with species
-nativeness, IUCN conservation status, EUNIS legal information, and eLTER
-Standard Observation assignments. Verifies that all required columns are
+nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ()}}),
+nativeness (\code{\link{add_nativeness_to_occ()}}), and EUNIS legal
+information (\code{\link{add_eunis_to_occ()}}), and eLTER Standard
+Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
 interactive Leaflet map with colour-coded markers by iconic taxon group
@@ -106,11 +111,29 @@ contribute to both SOs simultaneously. SOBIO_017 covers Plants.
 }
 \examples{
 \dontrun{
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 
+iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+ deimsid = deimsid,
+ list_DS = "inat",
+ show_map = TRUE,
+ limit = 50
+)
+
+occ_eLTER_enrich <- add_iucn_to_occ(
+  occ_eLTER = iNat_occ_eLTER_site$inat
+) |>
+  add_nativeness_to_occ(
+    country = site_boundary$country
+  ) |>
+  add_eunis_legal_to_occ()
+
 map <- create_leaflet_occ_map(
-  occ_enriched  = occ_eLTER_legal,
+  occ_enriched = occ_eLTER_enrich,
   site_boundary = site_boundary
 )
 map
@@ -126,5 +149,7 @@ map
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
 
-Alice Lenzi, phD \email{alice.lenzi@crea.gov.it}
+Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
+
+Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

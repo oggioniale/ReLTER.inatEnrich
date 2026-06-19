@@ -30,7 +30,7 @@ Assigned only if not already present.}
 }
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 This function enriches iNaturalist occurrences with legal protection
 information extracted from the EUNIS database. It uses the scientific name
 retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
@@ -56,13 +56,15 @@ eLTER Standard Observation assignments are based on taxonomic ancestry
 }
 \examples{
 \dontrun{
-# Example: enrich iNaturalist occurrences with legal info
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 occ_iNat <- ReLTER::get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 5000
+  limit = 50
 )
 
 occ_legal <- add_eunis_legal_to_occ(
@@ -78,5 +80,9 @@ occ_legal <- add_eunis_legal_to_occ(
 \code{\link{obs_SO_pie_chart}}
 }
 \author{
-Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}
+Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
+
+Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

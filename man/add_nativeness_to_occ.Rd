@@ -22,9 +22,17 @@ A \code{\link[dplyr]{tibble}} of filtered occurrence records
 (research-grade, non-captive, with valid date) with the following
 additional columns:
 \describe{
+\item{has_establishmentMeans}{\code{logical}. Whether at least one
+valid (non-\code{NA}) establishment means value is available for
+the given \code{taxon.id}.}
 \item{establishmentMeans}{list-column. Each element is a one-row tibble
-containing \code{nativeness} and \code{authority}, or \code{NA} if
-not recorded in iNaturalist for the specified country.}
+containing \code{iNat_nativeness}, \code{iNat_authority} (from
+iNaturalist), plus the EASIN fields \code{EASIN_url},
+\code{EASIN_id}, \code{EASIN_LSID},
+\code{EASIN_firstIntroductionsInEU_year},
+\code{EASIN_firstIntroductions_Country}, \code{EASIN_status},
+\code{EASIN_hasImpact}, \code{EASIN_IsEUConcern}. All fields
+are \code{NA} if not available.}
 \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
 Flying insects (SOBIO_014) eLTER Standard Observation.
 Assigned only if not already present.}
@@ -37,7 +45,7 @@ Assigned only if not already present.}
 }
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 Filters a tibble of iNaturalist occurrence records to retain only
 research-grade, non-captive observations with a valid date, then fetches
 establishment means information from iNaturalist for each unique taxon
@@ -71,21 +79,23 @@ may refer to the IUCN Red List. It may not always be up to date.
 }
 \examples{
 \dontrun{
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 
 occ_eLTER <- ReLTER::get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 5000
+  limit = 50
 )
 
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
-country <- site_boundary$country
 
 occ <- add_nativeness_to_occ(
   occ_eLTER = occ_eLTER$inat,
-  country = country
+  country = site_boundary$country
 )
 }
 
@@ -97,5 +107,9 @@ occ <- add_nativeness_to_occ(
 \code{\link{obs_SO_pie_chart}}
 }
 \author{
-Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}
+Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
+
+Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

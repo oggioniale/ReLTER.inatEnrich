@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{get_nativeness_degree}
 \alias{get_nativeness_degree}
-\title{Get nativeness degree for a taxon from iNaturalist}
+\title{Get nativeness degree for a taxon from iNaturalist and EASIN}
 \usage{
 get_nativeness_degree(taxon.id, country = NULL)
 }
@@ -18,44 +18,96 @@ is returned to avoid ambiguous cross-country data.}
 \value{
 A \code{\link[dplyr]{tibble}} with one row and one list-column:
 \describe{
-\item{establishmentMeans}{\code{list} of one-row tibbles, each containing:
+\item{establishmentMeans}{\code{list} of one-row tibbles, each
+containing:
 \describe{
-\item{nativeness}{\code{character}. The establishment means value
-(e.g., \code{"native"}, \code{"introduced"}), or \code{NA} if
-not available.}
-\item{authority}{\code{character}. The authority or checklist title
-associated with the establishment means (e.g.,
+\item{iNat_nativeness}{\code{character}. The establishment means
+value from iNaturalist (e.g., \code{"native"},
+\code{"introduced"}), or \code{NA} if not available.}
+\item{iNat_authority}{\code{character}. The checklist title
+associated with the establishment means in iNaturalist (e.g.,
 \code{"Italy Check List"}), or \code{NA} if not available.}
+\item{iNat_checkList_uri}{\code{character}. The URL of the
+iNaturalist checklist associated with the establishment means,
+or \code{NA} if not available.}
+\item{EASIN_url}{\code{character}. URL of the EASIN species
+factsheet, or \code{NA} if the taxon is not in EASIN.}
+\item{EASIN_id}{\code{character}. EASIN species identifier,
+or \code{NA} if not available.}
+\item{EASIN_LSID}{\code{character}. Life Science Identifier
+for the species in EASIN
+(e.g., \code{"urn:lsid:easin.jrc.ec.europa.eu:species:XXXX"}),
+or \code{NA} if not available.}
+\item{EASIN_firstIntroductionsInEU_year}{\code{character}. Year of
+first introduction in the EU as recorded in EASIN, or \code{NA}
+if not available.}
+\item{EASIN_firstIntroductions_Country}{\code{character}. Country
+of first introduction in the EU as recorded in EASIN, or
+\code{NA} if not available.}
+\item{EASIN_status}{\code{character}. Alien species status as
+recorded in EASIN, or \code{NA} if not available.}
+\item{EASIN_hasImpact}{\code{character}. Whether the species has
+a documented impact as recorded in EASIN (\code{"True"} or
+\code{"False"}), or \code{NA} if not available.}
+\item{EASIN_IsEUConcern}{\code{character}. Whether the species is
+listed as a species of EU concern under Regulation (EU)
+No 1143/2014 (\code{"True"} or \code{"False"}), or \code{NA}
+if not available.}
 }
 }
 }
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 Queries the iNaturalist API to retrieve the establishment means
 (nativeness status and authority) for a given taxon, optionally filtered
-by country, as provided by iNaturalist checklists.
-Returns a one-row tibble with a nested \code{establishmentMeans}
-list-column containing \code{nativeness} and \code{authority}.
+by country, as provided by iNaturalist checklists. Additionally queries
+the EASIN (European Alien Species Information Network) database to retrieve
+alien species information for the same taxon.
 
-Data are sourced from iNaturalist checklists:
-https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
+Data are sourced from:
+\enumerate{
+\item iNaturalist checklists —
+\url{https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712}
+\item EASIN — European Alien Species Information Network —
+\url{https://easin.jrc.ec.europa.eu/easin}
+}
 }
 \note{
-The establishment means information is sourced from iNaturalist and
-may refer to the IUCN Red List. It may not always be up to date.
+The establishment means information is sourced from iNaturalist and may
+refer to the IUCN Red List. It may not always be up to date.
+
+EASIN data are retrieved from the JRC API
+(\url{https://easin.jrc.ec.europa.eu/apixg/catxg/term/}) and reflect
+the information available in the EASIN catalogue. If the taxon is not
+present in EASIN, all \code{EASIN_*} fields are \code{NA}.
+
+\strong{Disclaimer}: EASIN reports alien (i.e., non-native) status at the
+country level and does not distinguish cases where a species is non-native
+only in specific sub-national areas (e.g., islands) but native in others
+within the same country. Therefore, EASIN information may overgeneralize
+the nativeness status when applied to heterogeneous territories such as
+Italy
 }
 \examples{
 \dontrun{
-# Get nativeness for a taxon in Italy
+# Get nativeness and EASIN info for a taxon in Italy
 get_nativeness_degree(taxon.id = 48484, country = "Italy")
+
+# Species of EU concern example
+get_nativeness_degree(taxon.id = 61976, country = "Italy")
 }
 
 }
 \seealso{
-\code{\link{add_nativeness_to_occ}} for applying this function
-across a full occurrence tibble.
+\code{\link{add_nativeness_to_occ}} for applying this function across
+a full occurrence tibble.
+\code{\link{.assign_EASIN_info}} for the underlying EASIN API call.
 }
 \author{
-Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}
+Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
+
+Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

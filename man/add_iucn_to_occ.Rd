@@ -36,7 +36,7 @@ Assigned only if not already present.}
 }
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 This function enriches all the eLTER site iNaturalist occurrences acquired
 by the \code{ReLTER::get_site_speciesOccurrences()} function with the IUCN
 Red List conservation status as recorded in iNaturalist.
@@ -91,7 +91,7 @@ occ_eLTER <- ReLTER::get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 5000
+  limit = 50
 )
 
 occ <- add_iucn_to_occ(
@@ -108,5 +108,9 @@ occ <- add_iucn_to_occ(
 \code{\link{obs_SO_pie_chart}}
 }
 \author{
-Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}
+Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
+
+Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

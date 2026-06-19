@@ -19,7 +19,7 @@ A tibble with the following columns:
 }
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 This function takes a \code{taxon.id} from iNaturalist, retrieves the corresponding
 scientific name from the iNaturalist API, searches the EUNIS database, and extracts
 the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC),
@@ -34,5 +34,5 @@ get_eunis_legal_info(taxon.id = 61749)
 
 }
 \author{
-Alessandro Oggioni, PhD (2023) \email{alessandro.oggioni@cnr.it}
+Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
 }

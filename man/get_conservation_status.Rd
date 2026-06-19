@@ -19,7 +19,7 @@ conservation status is available, the function returns a tibble with
 \code{NA} values in all fields.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 This function generates a request to the iNaturalist API of a given
 \code{taxon.id} to obtain, if updated, the IUCN conservation status, where
 the authority is the "IUCN Red List".
@@ -37,14 +37,20 @@ conservation staus is 'conservation_statuses[]'.
 \examples{
 \dontrun{
 ## Not run:
+# with 1 IUCN red list conservation status declared
+# Sclerophrys pantherina
 get_conservation_status(
   taxon.id = 517449
 )
 
+# without IUCN red list conservation status declared
+# Protoparmeliopsis muralis
 get_conservation_status(
   taxon.id = 632126
 )
 
+# with 3 IUCN red list conservation status declared
+# Falco tinnunculus
 get_conservation_status(
   taxon.id = 472766
 )
@@ -54,5 +60,9 @@ get_conservation_status(
 
 }
 \author{
-Alessandro Oggioni, phD (2023) \email{alessandro.oggioni@cnr.it}
+Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
+
+Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
+
+Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

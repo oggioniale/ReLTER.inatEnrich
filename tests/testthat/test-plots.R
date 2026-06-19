@@ -1,6 +1,6 @@
 # tests/testthat/test-plots.R
 
-df <- ReLTER.inatEnrich::occ_eLTER_legal
+df <- ReLTER.inatEnrich::occ_eLTER_EUNIS
 site_boundary <- ReLTER.inatEnrich::site_boundary
 
 
@@ -184,7 +184,7 @@ testthat::test_that("obs_pie_chart category proportions sum to 100", {
     dplyr::distinct(name, .keep_all = TRUE) |>
     dplyr::mutate(
       nativeness = purrr::map_chr(establishmentMeans, function(em) {
-        val <- tryCatch(em$nativeness[[1]], error = function(e) NA_character_)
+        val <- tryCatch(em$iNat_nativeness[[1]], error = function(e) NA_character_)
         if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
       }),
       category = dplyr::case_when(
@@ -207,7 +207,7 @@ testthat::test_that("obs_pie_chart alien category has priority over directives",
     dplyr::distinct(name, .keep_all = TRUE) |>
     dplyr::mutate(
       nativeness = purrr::map_chr(establishmentMeans, function(em) {
-        val <- tryCatch(em$nativeness[[1]], error = function(e) NA_character_)
+        val <- tryCatch(em$iNat_nativeness[[1]], error = function(e) NA_character_)
         if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
       }),
       category = dplyr::case_when(
@@ -220,6 +220,16 @@ testthat::test_that("obs_pie_chart alien category has priority over directives",
   # verifica che le specie introdotte siano in Alien (IAS)
   alien_species <- species_data |> dplyr::filter(category == "Alien (IAS)")
   testthat::expect_true(nrow(alien_species) >= 0)
+})
+
+test_that("obs_pie_chart() stops when establishmentMeans column is missing", {
+  occ_no_em <- df |> dplyr::select(-establishmentMeans)
+  expect_error(obs_pie_chart(occ_no_em), "required columns are missing")
+})
+
+test_that("obs_pie_chart() category labels contain species count", {
+  p <- obs_pie_chart(df)
+  expect_true(any(grepl("spp\\.", p$data$legend_label)))
 })
 
 # --- obs_SO_pie_chart -------------------------------------------------------
@@ -241,9 +251,25 @@ testthat::test_that("obs_SO_pie_chart stops when SOBIO columns are missing", {
 testthat::test_that("obs_SO_pie_chart data sums to total observations", {
   testthat::skip_if_not("SOBIO_014" %in% names(df))
   obs_flat <- df |> sf::st_drop_geometry()
-  n_014    <- sum(obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
-  n_018    <- sum(obs_flat$SOBIO_018 & !obs_flat$SOBIO_014, na.rm = TRUE)
-  n_both   <- sum(obs_flat$SOBIO_014 &  obs_flat$SOBIO_018, na.rm = TRUE)
+  n_014 <- sum(obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
+  n_018 <- sum(obs_flat$SOBIO_018 & !obs_flat$SOBIO_014, na.rm = TRUE)
+  n_both <- sum(obs_flat$SOBIO_014 & obs_flat$SOBIO_018, na.rm = TRUE)
   n_neither <- sum(!obs_flat$SOBIO_014 & !obs_flat$SOBIO_018, na.rm = TRUE)
   testthat::expect_equal(n_014 + n_018 + n_both + n_neither, nrow(obs_flat))
+})
+
+test_that("obs_SO_pie_chart() stops when SOBIO_017 is missing", {
+  df_no_017 <- df |> dplyr::select(-SOBIO_017)
+  expect_error(obs_SO_pie_chart(df_no_017), "SOBIO_014")
+})
+
+test_that("obs_SO_pie_chart() total observations match nrow of input", {
+  skip_if_not("SOBIO_014" %in% names(df))
+  obs_flat <- df |> sf::st_drop_geometry()
+  n_014 <- sum(obs_flat$SOBIO_014 & !obs_flat$SOBIO_018 & !obs_flat$SOBIO_017, na.rm = TRUE)
+  n_018 <- sum(obs_flat$SOBIO_018 & !obs_flat$SOBIO_014, na.rm = TRUE)
+  n_017 <- sum(obs_flat$SOBIO_017, na.rm = TRUE)
+  n_both <- sum(obs_flat$SOBIO_014 & obs_flat$SOBIO_018, na.rm = TRUE)
+  n_neither <- sum(!obs_flat$SOBIO_014 & !obs_flat$SOBIO_018 & !obs_flat$SOBIO_017, na.rm = TRUE)
+  expect_equal(n_014 + n_018 + n_017 + n_both + n_neither, nrow(obs_flat))
 })

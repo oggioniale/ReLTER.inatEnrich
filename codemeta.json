@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/oggioniale/ReLTER.inatEnrich",
   "issueTracker": "https://github.com/oggioniale/ReLTER.inatEnrich/issues",
   "license": "`use_mit_license()`, `use_gpl3_license()` or friends to pick a\n    license",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
