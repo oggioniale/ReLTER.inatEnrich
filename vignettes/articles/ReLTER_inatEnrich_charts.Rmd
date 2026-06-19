@@ -31,7 +31,7 @@ Standard Observations (SOs).
 ```{r setup-data}
 # Occurrence data from Gran Paradiso National Park eLTER site
 # DEIMS-ID: https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946
-df <- ReLTER.inatEnrich::occ_eLTER_legal
+df <- ReLTER.inatEnrich::occ_eLTER_EUNIS
 site_boundary <- ReLTER.inatEnrich::site_boundary
 ```
 
