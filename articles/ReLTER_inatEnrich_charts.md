@@ -109,7 +109,7 @@ species richness.
 ``` r
 
 species_richness_map(
-  df = occ_eLTER_legal,
+  df = df,
   site_boundary = site_boundary,
   cell_size = 0.01
 )
@@ -122,13 +122,7 @@ group, with a detailed popup per observation.
 ``` r
 
 create_leaflet_occ_map(
-  occ_enriched = occ_eLTER_legal,
+  occ_enriched = df,
   site_boundary = site_boundary
 )
-#> Warning: There were 33180 warnings in `stopifnot()`.
-#> The first warning was:
-#> ℹ In argument: `nativeness_lbl = vapply(...)`.
-#> Caused by warning:
-#> ! Unknown or uninitialised column: `iNat_nativeness`.
-#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 33179 remaining warnings.
 ```
