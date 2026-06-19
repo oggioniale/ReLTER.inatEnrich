@@ -1576,9 +1576,18 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       authority <- args[["authority"]]
       scope_of_assesment <- args[["scope_of_assesment"]]
       url <- args[["url"]]
-      scope <- if (is.na(scope_of_assesment) || scope_of_assesment == "") "-" else scope_of_assesment
-      label <- if (is.na(iucn_labels[status]) || iucn_labels[status] == "") "-" else iucn_labels[status]
-      # label <- if (is.na(label)) status else paste0(status, " \u2013 ", label)
+      scope <- if (is.null(scope_of_assesment) || length(scope_of_assesment) == 0 || 
+                   all(is.na(scope_of_assesment)) || identical(scope_of_assesment, "")) {
+        "-"
+      } else {
+        as.character(scope_of_assesment[[1]])
+      }
+      label <- if (is.null(iucn_labels[status]) || all(is.na(iucn_labels[status])) || 
+                   identical(iucn_labels[status], "")) {
+        "-"
+      } else {
+        as.character(iucn_labels[status][[1]])
+      }
       if (!is.na(url) && nzchar(url)) {
         paste0(
           "<div style='font-size:12px;'>",
