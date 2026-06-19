@@ -13,7 +13,7 @@ eLTER Standard Observations (SOs).
 ``` r
 
 # Occurrence data from Gran Paradiso National Park eLTER site
-# DEIMS-ID: https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946 <- 
+# DEIMS-ID: https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946
 df <- ReLTER.inatEnrich::occ_eLTER_legal
 site_boundary <- ReLTER.inatEnrich::site_boundary
 ```
@@ -81,6 +81,12 @@ order: Alien (IAS) \> Habitats Directive \> Birds Directive \> Other.
 ``` r
 
 obs_pie_chart(df)
+#> Warning: There were 917 warnings in `dplyr::mutate()`.
+#> The first warning was:
+#> ℹ In argument: `nativeness = purrr::map_chr(...)`.
+#> Caused by warning:
+#> ! Unknown or uninitialised column: `iNat_nativeness`.
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 916 remaining warnings.
 ```
 
 ![](ReLTER_inatEnrich_charts_files/figure-html/pie-chart-1.png)
@@ -125,4 +131,10 @@ create_leaflet_occ_map(
   occ_enriched = occ_eLTER_legal,
   site_boundary = site_boundary
 )
+#> Warning: There were 33180 warnings in `stopifnot()`.
+#> The first warning was:
+#> ℹ In argument: `nativeness_lbl = vapply(...)`.
+#> Caused by warning:
+#> ! Unknown or uninitialised column: `iNat_nativeness`.
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 33179 remaining warnings.
 ```

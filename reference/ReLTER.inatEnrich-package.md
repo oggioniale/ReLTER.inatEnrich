@@ -20,6 +20,9 @@ Useful links:
 
 Authors:
 
+- Alessandro Oggioni <alessandro.oggioni@cnr.it>
+  ([ORCID](https://orcid.org/0000-0002-7997-219X)) \[funder\]
+
 - Alice Lenzi <alice.lenzi@crea.gov.it>
   ([ORCID](https://orcid.org/0000-0002-3456-5726)) \[contributor\]
 

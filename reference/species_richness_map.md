@@ -62,13 +62,30 @@ Alice Lenzi, phD <alice.lenzi@crea.gov.it>
 
 ``` r
 if (FALSE) { # \dontrun{
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 
+iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+  deimsid = deimsid,
+  list_DS = "inat",
+  show_map = TRUE,
+  limit = 500
+)
+occ_eLTER_enrich <- add_iucn_to_occ(
+  occ_eLTER = iNat_occ_eLTER_site$inat
+) |>
+  add_nativeness_to_occ(
+    country = site_boundary$country
+  ) |>
+  add_eunis_legal_to_occ()
+
 species_richness_map(
-  df            = occ_eLTER_legal,
+  df = occ_eLTER_enrich,
   site_boundary = site_boundary,
-  cell_size     = 0.005
+  cell_size = 0.005
 )
 } # }
 ```

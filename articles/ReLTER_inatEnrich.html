@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Enriching iNaturalist Occurrences for eLTER-RI Sites • ReLTER.inatEnrich</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Enriching iNaturalist Occurrences for eLTER-RI Sites">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ReLTER.inatEnrich</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Enriching iNaturalist Occurrences for eLTER-RI Sites</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/oggioniale/ReLTER.inatEnrich/blob/v1.0.0/vignettes/ReLTER_inatEnrich.Rmd" class="external-link"><code>vignettes/ReLTER_inatEnrich.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/oggioniale/ReLTER.inatEnrich/blob/main/vignettes/ReLTER_inatEnrich.Rmd" class="external-link"><code>vignettes/ReLTER_inatEnrich.Rmd</code></a></small>
       <div class="d-none name"><code>ReLTER_inatEnrich.Rmd</code></div>
     </div>
 
@@ -170,25 +170,14 @@ the correct national checklist.</p>
 <span><span class="va">country</span>       <span class="op">&lt;-</span> <span class="va">site_boundary</span><span class="op">$</span><span class="va">country</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="step-4-clip-occurrences-to-the-site-boundary">Step 4 — Clip occurrences to the site boundary<a class="anchor" aria-label="anchor" href="#step-4-clip-occurrences-to-the-site-boundary"></a>
-</h3>
-<p>Use a spatial intersection to retain only the observations that fall
-within the site boundary polygon.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">occ_in_site</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">iNat_occ_eLTER_site</span><span class="op">$</span><span class="va">inat</span>,</span>
-<span>  y <span class="op">=</span> <span class="va">site_boundary</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="step-5-add-iucn-conservation-status">Step 5 — Add IUCN conservation status<a class="anchor" aria-label="anchor" href="#step-5-add-iucn-conservation-status"></a>
+<h3 id="step-4-add-iucn-conservation-status">Step 4 — Add IUCN conservation status<a class="anchor" aria-label="anchor" href="#step-4-add-iucn-conservation-status"></a>
 </h3>
 <p><code><a href="../reference/add_iucn_to_occ.html">add_iucn_to_occ()</a></code> queries <a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712" class="external-link">iNaturalist
 lists</a> for each unique taxon and appends a nested
 <code>status_IUCN</code> list-column. Each element is a tibble with one
 row per geographic scope (global, regional), containing the IUCN status
 code, authority, scope name, and a direct link to the <a href="https://www.iucnredlist.org" class="external-link">IUCN Red List assessment</a>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">occ_eLTER_IUCN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_iucn_to_occ.html">add_iucn_to_occ</a></span><span class="op">(</span>occ_eLTER <span class="op">=</span> <span class="va">occ_in_site</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># Example content of status_IUCN[[1]]:</span></span>
 <span><span class="co"># A tibble: 3 × 4</span></span>
@@ -207,7 +196,7 @@ Vocabulary (<a href="https://dwc.tdwg.org/em/" class="external-link uri">https:/
 by the site’s country. Results are stored in a nested
 <code>establishmentMeans</code> list-column containing
 <code>nativeness</code> and <code>authority</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">occ_eLTER_nativeness</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_nativeness_to_occ.html">add_nativeness_to_occ</a></span><span class="op">(</span></span>
 <span>  occ_eLTER <span class="op">=</span> <span class="va">occ_eLTER_IUCN</span>,</span>
 <span>  country   <span class="op">=</span> <span class="va">country</span></span>
@@ -225,7 +214,7 @@ by the site’s country. Results are stored in a nested
 <code>directive</code> and <code>Annex</code> columns indicating
 coverage under the EU Habitats Directive (92/43/EEC) or the EU Birds
 Directive (2009/147/EC).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">occ_eLTER_legal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></span><span class="op">(</span>occ_eLTER <span class="op">=</span> <span class="va">occ_eLTER_nativeness</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -234,7 +223,7 @@ Directive (2009/147/EC).</p>
 <p><code><a href="../reference/create_leaflet_occ_map.html">create_leaflet_occ_map()</a></code> produces an interactive Leaflet
 map with colour-coded markers by iconic taxon group, clustering, and
 rich popups showing all enriched attributes for each observation.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_leaflet_occ_map.html">create_leaflet_occ_map</a></span><span class="op">(</span>occ_enriched <span class="op">=</span> <span class="va">occ_eLTER_legal</span><span class="op">)</span></span>
 <span><span class="va">map</span></span></code></pre></div>
 <p>The popup for each observation includes:</p>
@@ -258,7 +247,7 @@ assessments</li>
 workflow above in your R session to obtain the fully interactive
 version.</p>
 </blockquote>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_leaflet_occ_map.html">create_leaflet_occ_map</a></span><span class="op">(</span></span>
 <span>  occ_enriched  <span class="op">=</span> <span class="va">occ_eLTER_legal</span>,</span>
 <span>  site_boundary <span class="op">=</span> <span class="va">site_boundary</span></span>

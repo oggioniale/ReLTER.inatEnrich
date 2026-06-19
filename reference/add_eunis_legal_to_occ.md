@@ -1,9 +1,9 @@
 # Enrich iNaturalist occurrences with EUNIS legal framework information
 
-**\[experimental\]** This function enriches iNaturalist occurrences with
-legal protection information extracted from the EUNIS database. It uses
-the scientific name retrieved from the iNaturalist `taxon.id` to query
-EUNIS and extract legal directives related to the EU Habitats Directive
+**\[stable\]** This function enriches iNaturalist occurrences with legal
+protection information extracted from the EUNIS database. It uses the
+scientific name retrieved from the iNaturalist `taxon.id` to query EUNIS
+and extract legal directives related to the EU Habitats Directive
 (92/43/EEC) and Birds Directive (2009/147/EC).
 
 Observations are not filtered by geoprivacy or research grade. If a
@@ -77,19 +77,25 @@ eLTER Standard Observation assignments are based on taxonomic ancestry
 
 ## Author
 
-Alessandro Oggioni, PhD (2023) <alessandro.oggioni@cnr.it>
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
+
+Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-# Example: enrich iNaturalist occurrences with legal info
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 occ_iNat <- ReLTER::get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 5000
+  limit = 50
 )
 
 occ_legal <- add_eunis_legal_to_occ(

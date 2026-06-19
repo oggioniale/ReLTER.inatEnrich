@@ -1,8 +1,8 @@
 # Function to obtain IUCN conservation status for a single taxon.id from iNaturalist API
 
-**\[experimental\]** This function generates a request to the
-iNaturalist API of a given `taxon.id` to obtain, if updated, the IUCN
-conservation status, where the authority is the "IUCN Red List".
+**\[stable\]** This function generates a request to the iNaturalist API
+of a given `taxon.id` to obtain, if updated, the IUCN conservation
+status, where the authority is the "IUCN Red List".
 
 Registered user can update iNaturalist IUCN conservation status. For
 more information about the procedure for updating the IUCN conservation
@@ -37,21 +37,31 @@ conservation status is available, the function returns a tibble with
 
 ## Author
 
-Alessandro Oggioni, phD (2023) <alessandro.oggioni@cnr.it>
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
+
+Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 ## Not run:
+# with 1 IUCN red list conservation status declared
+# Sclerophrys pantherina
 get_conservation_status(
   taxon.id = 517449
 )
 
+# without IUCN red list conservation status declared
+# Protoparmeliopsis muralis
 get_conservation_status(
   taxon.id = 632126
 )
 
+# with 3 IUCN red list conservation status declared
+# Falco tinnunculus
 get_conservation_status(
   taxon.id = 472766
 )

@@ -32,7 +32,7 @@ obs_pie_chart(df)
 
   establishmentMeans
 
-  :   list-column of tibbles with a `nativeness` field, produced by
+  :   list-column of tibbles with a `iNat_nativeness` field, produced by
       [`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md).
 
 ## Value
@@ -72,6 +72,26 @@ Alice Lenzi, phD <alice.lenzi@crea.gov.it>
 
 ``` r
 if (FALSE) { # \dontrun{
-obs_pie_chart(occ_eLTER_legal)
+#' # Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
+deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+
+iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+  deimsid = deimsid,
+  list_DS = "inat",
+  show_map = TRUE,
+  limit = 50
+)
+occ_eLTER_enrich <- add_iucn_to_occ(
+  occ_eLTER = iNat_occ_eLTER_site$inat
+) |>
+  add_nativeness_to_occ(
+    country = site_boundary$country
+  ) |>
+  add_eunis_legal_to_occ()
+  
+obs_pie_chart(occ_eLTER_enrich)
 } # }
 ```

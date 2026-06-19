@@ -3,31 +3,31 @@
 ## Enrichment functions
 
 - [`get_conservation_status()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_conservation_status.md)
-  **\[experimental\]** : Function to obtain IUCN conservation status for
-  a single taxon.id from iNaturalist API
+  **\[stable\]** : Function to obtain IUCN conservation status for a
+  single taxon.id from iNaturalist API
 - [`get_nativeness_degree()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_nativeness_degree.md)
-  **\[experimental\]** : Get nativeness degree for a taxon from
-  iNaturalist
+  **\[stable\]** : Get nativeness degree for a taxon from iNaturalist
+  and EASIN
 - [`get_eunis_legal_info()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_eunis_legal_info.md)
-  **\[experimental\]** : Get EUNIS Legal Information for a Species Using
+  **\[stable\]** : Get EUNIS Legal Information for a Species Using
   iNaturalist Taxon ID
 - [`add_iucn_to_obs()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_obs.md)
   **\[experimental\]** : Enrich iNaturalist specific project
   observations with IUCN conservation status
 - [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)
-  **\[experimental\]** : Enrich eLTER site iNaturalist occurrences with
-  IUCN conservation status
+  **\[stable\]** : Enrich eLTER site iNaturalist occurrences with IUCN
+  conservation status
 - [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)
-  **\[experimental\]** : Add nativeness information to iNaturalist
-  occurrence records
+  **\[stable\]** : Add nativeness information to iNaturalist occurrence
+  records
 - [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
-  **\[experimental\]** : Enrich iNaturalist occurrences with EUNIS legal
+  **\[stable\]** : Enrich iNaturalist occurrences with EUNIS legal
   framework information
 
 ## Visualization functions
 
 - [`create_leaflet_occ_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/create_leaflet_occ_map.md)
-  **\[experimental\]** : Create Leaflet map for enriched iNaturalist
+  **\[stable\]** : Create Leaflet map for enriched iNaturalist
   occurrences
 - [`iconic_taxa()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/iconic_taxa.md)
   **\[experimental\]** : Plot number of observations and species per

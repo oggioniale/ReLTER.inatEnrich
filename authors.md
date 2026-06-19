@@ -17,19 +17,19 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/oggioniale/ReLTER.inatEnrich/blob/v1.0.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/oggioniale/ReLTER.inatEnrich/blob/main/inst/CITATION)
 
 Oggioni A, Lenzi A, Campanaro A, Bergami C (2026). *ReLTER.inatEnrich:
 Enriching iNaturalist occurrences for eLTER-RI sites*.
 [doi:10.5281/zenodo.19954245](https://doi.org/10.5281/zenodo.19954245).
-R package version 1.0.0,
+R package version 1.1.0,
 <https://oggioniale.github.io/ReLTER.inatEnrich/>.
 
     @Manual{,
       title = {ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI sites},
       author = {Alessandro Oggioni and Alice Lenzi and Alessandro Campanaro and Caterina Bergami},
       year = {2026},
-      note = {R package version 1.0.0},
+      note = {R package version 1.1.0},
       url = {https://oggioniale.github.io/ReLTER.inatEnrich/},
       doi = {10.5281/zenodo.19954245},
     }

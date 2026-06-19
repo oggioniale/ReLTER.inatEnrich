@@ -54,7 +54,11 @@ of the `data.frame` returned is enriched with the following columns:
 
 ## Author
 
-Alessandro Oggioni, phD (2023) <alessandro.oggioni@cnr.it>
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
+
+Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
 
 ## Examples
 

@@ -283,10 +283,6 @@ saveRDS(occ_eLTER_legal,      "cache/occ_eLTER_legal.rds")
 occ_eLTER_legal <- readRDS("cache/occ_eLTER_legal.rds")
 ```
 
-- **Filter before enriching**: apply
-  [`sf::st_intersection()`](https://r-spatial.github.io/sf/reference/geos_binary_ops.html)
-  before running the enrichment functions so that only taxa actually
-  within the site boundary are queried.
 - **Rate limits**: the iNaturalist API does not require authentication
   for read-only taxon queries, but it does apply rate limiting. The
   built-in retry logic (`max_tries = 3`, `max_seconds = 120`) handles

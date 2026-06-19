@@ -1,9 +1,9 @@
 # Enrich eLTER site iNaturalist occurrences with IUCN conservation status
 
-**\[experimental\]** This function enriches all the eLTER site
-iNaturalist occurrences acquired by the
-`ReLTER::get_site_speciesOccurrences()` function with the IUCN Red List
-conservation status as recorded in iNaturalist.
+**\[stable\]** This function enriches all the eLTER site iNaturalist
+occurrences acquired by the `ReLTER::get_site_speciesOccurrences()`
+function with the IUCN Red List conservation status as recorded in
+iNaturalist.
 
 Observations are filtered to include only "Research Grade" data that
 meet the following criteria: have a valid date and exclude captive or
@@ -104,7 +104,11 @@ eLTER Standard Observation assignments are based on taxonomic ancestry
 
 ## Author
 
-Alessandro Oggioni, PhD (2023) <alessandro.oggioni@cnr.it>
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
+
+Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
 
 ## Examples
 
@@ -120,7 +124,7 @@ occ_eLTER <- ReLTER::get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 5000
+  limit = 50
 )
 
 occ <- add_iucn_to_occ(

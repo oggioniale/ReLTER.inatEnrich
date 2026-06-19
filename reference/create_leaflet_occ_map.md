@@ -1,10 +1,14 @@
 # Create Leaflet map for enriched iNaturalist occurrences
 
-**\[experimental\]**
+**\[stable\]**
 
 Takes a tibble of iNaturalist occurrences already enriched with species
-nativeness, IUCN conservation status, EUNIS legal information, and eLTER
-Standard Observation assignments. Verifies that all required columns are
+nativeness, IUCN conservation status
+([`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)),
+nativeness
+([`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)),
+and EUNIS legal information (`add_eunis_to_occ()`), and eLTER Standard
+Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
 interactive Leaflet map with colour-coded markers by iconic taxon group
@@ -25,14 +29,18 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
 
   establishmentMeans
 
-  :   list-column of 1 × 2 tibbles with `nativeness` and `authority`,
-      produced by
+  :   list-column of 1 × 11 tibbles fron iNaturalist `iNat_nativeness`,
+      `iNat_authority`, and `iNat_checkList_uri`, from EASIN
+      `EASIN_url`, `EASIN_id`, `EASIN_LSID`,
+      `EASIN_firstIntroductionsInEU_year`,
+      `EASIN_firstIntroductions_Country`, `EASIN_status`,
+      `EASIN_hasImpact`, `EASIN_IsEUConcern` produced by
       [`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md).
 
   status_IUCN
 
-  :   list-column of N × 4 tibbles with `status`, `authority`, `name`
-      (geographic scope), and `url`, produced by
+  :   list-column of N × 4 tibbles with `status`, `authority`,
+      `scope_of_assesment` (geographic scope), and `url`, produced by
       [`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md).
 
   directive
@@ -179,17 +187,37 @@ both SOs simultaneously. SOBIO_017 covers Plants.
 
 Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
 
-Alice Lenzi, phD <alice.lenzi@crea.gov.it>
+Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
+
+Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 
+iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
+ deimsid = deimsid,
+ list_DS = "inat",
+ show_map = TRUE,
+ limit = 50
+)
+
+occ_eLTER_enrich <- add_iucn_to_occ(
+  occ_eLTER = iNat_occ_eLTER_site$inat
+) |>
+  add_nativeness_to_occ(
+    country = site_boundary$country
+  ) |>
+  add_eunis_legal_to_occ()
+
 map <- create_leaflet_occ_map(
-  occ_enriched  = occ_eLTER_legal,
+  occ_enriched = occ_eLTER_enrich,
   site_boundary = site_boundary
 )
 map

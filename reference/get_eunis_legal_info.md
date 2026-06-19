@@ -1,6 +1,6 @@
 # Get EUNIS Legal Information for a Species Using iNaturalist Taxon ID
 
-**\[experimental\]** This function takes a `taxon.id` from iNaturalist,
+**\[stable\]** This function takes a `taxon.id` from iNaturalist,
 retrieves the corresponding scientific name from the iNaturalist API,
 searches the EUNIS database, and extracts the legal information related
 to the EU Habitats Directive (92/43/EEC) and Birds Directive
@@ -41,7 +41,7 @@ A tibble with the following columns:
 
 ## Author
 
-Alessandro Oggioni, PhD (2023) <alessandro.oggioni@cnr.it>
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
 
 ## Examples
 

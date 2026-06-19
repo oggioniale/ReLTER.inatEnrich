@@ -126,20 +126,7 @@ site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
 country       <- site_boundary$country
 ```
 
-### Step 4 — Clip occurrences to the site boundary
-
-Use a spatial intersection to retain only the observations that fall
-within the site boundary polygon.
-
-``` r
-
-occ_in_site <- sf::st_intersection(
-  x = iNat_occ_eLTER_site$inat,
-  y = site_boundary
-)
-```
-
-### Step 5 — Add IUCN conservation status
+### Step 4 — Add IUCN conservation status
 
 [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)
 queries [iNaturalist

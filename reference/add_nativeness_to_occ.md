@@ -1,9 +1,9 @@
 # Add nativeness information to iNaturalist occurrence records
 
-**\[experimental\]** Filters a tibble of iNaturalist occurrence records
-to retain only research-grade, non-captive observations with a valid
-date, then fetches establishment means information from iNaturalist for
-each unique taxon via
+**\[stable\]** Filters a tibble of iNaturalist occurrence records to
+retain only research-grade, non-captive observations with a valid date,
+then fetches establishment means information from iNaturalist for each
+unique taxon via
 [`get_nativeness_degree`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_nativeness_degree.md).
 The results are joined back to the filtered occurrence tibble as a
 nested `establishmentMeans` list-column.
@@ -45,11 +45,19 @@ A [`tibble`](https://tibble.tidyverse.org/reference/tibble.html) of
 filtered occurrence records (research-grade, non-captive, with valid
 date) with the following additional columns:
 
+- has_establishmentMeans:
+
+  `logical`. Whether at least one valid (non-`NA`) establishment means
+  value is available for the given `taxon.id`.
+
 - establishmentMeans:
 
-  list-column. Each element is a one-row tibble containing `nativeness`
-  and `authority`, or `NA` if not recorded in iNaturalist for the
-  specified country.
+  list-column. Each element is a one-row tibble containing
+  `iNat_nativeness`, `iNat_authority` (from iNaturalist), plus the EASIN
+  fields `EASIN_url`, `EASIN_id`, `EASIN_LSID`,
+  `EASIN_firstIntroductionsInEU_year`,
+  `EASIN_firstIntroductions_Country`, `EASIN_status`, `EASIN_hasImpact`,
+  `EASIN_IsEUConcern`. All fields are `NA` if not available.
 
 - SOBIO_014:
 
@@ -94,27 +102,33 @@ refer to the IUCN Red List. It may not always be up to date.
 
 ## Author
 
-Alessandro Oggioni, PhD (2023) <alessandro.oggioni@cnr.it>
+Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
+
+Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
+
+Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
+# Download taxa occurrences from iNaturalist using ReLTER's
+# get_site_speciesOccurrences() function
+# e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 
 occ_eLTER <- ReLTER::get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 5000
+  limit = 50
 )
 
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
-country <- site_boundary$country
 
 occ <- add_nativeness_to_occ(
   occ_eLTER = occ_eLTER$inat,
-  country = country
+  country = site_boundary$country
 )
 } # }
 ```
