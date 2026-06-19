@@ -72,7 +72,7 @@ contribution of observations to eLTER Standard Observations (SOs).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Occurrence data from Gran Paradiso National Park eLTER site</span></span>
 <span><span class="co"># DEIMS-ID: https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">ReLTER.inatEnrich</span><span class="fu">::</span><span class="va"><a href="../reference/occ_eLTER_legal.html">occ_eLTER_legal</a></span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">ReLTER.inatEnrich</span><span class="fu">::</span><span class="va">occ_eLTER_EUNIS</span></span>
 <span><span class="va">site_boundary</span> <span class="op">&lt;-</span> <span class="fu">ReLTER.inatEnrich</span><span class="fu">::</span><span class="va"><a href="../reference/site_boundary.html">site_boundary</a></span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -125,13 +125,7 @@ coloured by iconic taxon group.</p>
 category following a fixed priority order: Alien (IAS) &gt; Habitats
 Directive &gt; Birds Directive &gt; Other.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/obs_pie_chart.html">obs_pie_chart</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: There were 917 warnings in `dplyr::mutate()`.</span></span>
-<span><span class="co">#&gt; The first warning was:</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `nativeness = purrr::map_chr(...)`.</span></span>
-<span><span class="co">#&gt; Caused by warning:</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Unknown or uninitialised column: `iNat_nativeness`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 916 remaining warnings.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/obs_pie_chart.html">obs_pie_chart</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ReLTER_inatEnrich_charts_files/figure-html/pie-chart-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level2">
