@@ -17,7 +17,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/oggioniale/ReLTER.inatEnrich/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/oggioniale/ReLTER.inatEnrich/blob/v1.1.0/inst/CITATION)
 
 Oggioni A, Lenzi A, Campanaro A, Bergami C (2026). *ReLTER.inatEnrich:
 Enriching iNaturalist occurrences for eLTER-RI sites*.
