@@ -14,7 +14,7 @@
 [ReLTER](https://github.com/ropensci/ReLTER) package. It enriches
 iNaturalist biodiversity occurrence records — downloaded for a specific
 [eLTER-RI](https://elter-ri.eu) site — with conservation and legal
-attributes sourced from iNaturalist and the EUNIS species database.
+attributes sourced from iNaturalist EASIN and the EUNIS species database.
 
 ### What it adds to your occurrence data
 
@@ -28,7 +28,7 @@ attributes sourced from iNaturalist and the EUNIS species database.
 | Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
 
 ### Disclaimer
-_`ReLTER.inatEnrich` is designed to standardize iNaturalist data for consistent and comparable analysis. While methodological accuracy and interoperability of the results is ensured, the authors disclaim any responsibility for the quality or accuracy of the raw input data, as the functions rely entirely on variables and values provided by iNaturalist original source. Given this, users are strongly advised to perform their own data quality checks and validation, paying particular attention to the fields related to Establishment Means and IUCN status._
+_`ReLTER.inatEnrich` is designed to standardize iNaturalist data for consistent and comparable analysis. While methodological accuracy and interoperability of the results are ensured, the authors disclaim any responsibility for the quality or accuracy of the raw input data, as the functions rely entirely on variables and values provided by iNaturalist original source and other official international databases (i.e., EUNIS and EASIN). Given this, users are strongly advised to perform their own data quality checks and validation, paying particular attention to the fields related to Establishment Means and IUCN status.
 
 
 ## ReLTER ecosystem
