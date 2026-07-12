@@ -146,4 +146,4 @@ See the [LICENSE](LICENSE) file for details.
 This package was developed in the context of the [eLTER-RI](https://elter-ri.eu) research infrastructure.
 
 Biodiversity data are sourced from [iNaturalist](https://www.inaturalist.org) and legal/conservation data from the
-[EUNIS species database](https://eunis.eea.europa.eu) (European Environment Agency) and the [IUCN Red List](https://www.iucnredlist.org).
+[EUNIS species database](https://eunis.eea.europa.eu) (European Environment Agency), the [European Alien Species Information Network - EASIN](https://easin.jrc.ec.europa.eu/easin/About) (European Environment Agency) and the [IUCN Red List](https://www.iucnredlist.org).
