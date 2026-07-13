@@ -72,9 +72,7 @@ remotes::install_github("ropensci/ReLTER")
 
 All dependencies are installed automatically with the package.
 
-## Package workflow
-
-put here the picture of WF …
+## Package workflow descriptions
 
 [![Example map
 output](https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/man/figures/map_screenshot.png)](https://oggioniale.github.io/ReLTER.inatEnrich/figures/map_example.html)
