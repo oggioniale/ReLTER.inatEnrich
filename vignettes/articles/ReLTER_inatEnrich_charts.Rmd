@@ -90,7 +90,7 @@ Observations SOBIO_014 (Flying insects) and SOBIO_018 (Acoustic recording —
 birds, bats, amphibians and orthoptera). Orthoptera contribute to both SOs
 simultaneously.
 
-```{r pie-SOs}
+```{r pie-SOs, fig.width = 12, fig.height = 5, out.width = "100%"}
 obs_SO_pie_chart(df)
 ```
 

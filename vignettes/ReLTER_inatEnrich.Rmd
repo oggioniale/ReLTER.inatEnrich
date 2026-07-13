@@ -24,7 +24,10 @@ records — downloaded for a specific eLTER-RI site — with a set of
 conservation and legal attributes:
 
 - **Nativeness / establishment means** (native, introduced, etc.) sourced
-  from iNaturalist checklists, filtered by country
+  from iNaturalist checklists, filtered by country, and cross-referenced
+  with the [EASIN](https://easin.jrc.ec.europa.eu/easin) (European Alien
+  Species Information Network) database for additional alien species
+  information
 - **IUCN Red List conservation status** at global and regional level,
   directly as recorded on iNaturalist
 - **EU legal framework** coverage under the Habitats Directive
@@ -100,7 +103,7 @@ For more information see the
 
 ## Workflow
 
-The enrichment pipeline consists of eight steps, illustrated below.
+The enrichment pipeline consists of seven steps, illustrated below.
 
 ```{r workflow-diagram, echo = FALSE, eval = TRUE, out.width = "100%", fig.cap = "ReLTER.inatEnrich enrichment workflow."}
 # If you have a workflow diagram image, place it in vignettes/figures/ and
@@ -120,8 +123,8 @@ deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
 ### Step 2 — Download iNaturalist occurrences
 
 Download all iNaturalist observations associated with the eLTER-RI site
-using `ReLTER::get_site_speciesOccurrences()`. The `limit` argument caps
-the maximum number of records returned.
+using [`ReLTER::get_site_speciesOccurrences()`](https://docs.ropensci.org/ReLTER/reference/get_site_speciesOccurrences.html).
+The `limit` argument caps the maximum number of records returned.
 
 ```{r step2}
 iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
@@ -140,37 +143,70 @@ the correct national checklist.
 
 ```{r step3}
 site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
-country       <- site_boundary$country
+country <- site_boundary$country
 ```
 
 ### Step 4 — Add IUCN conservation status
 
-`add_iucn_to_occ()` queries [iNaturalist lists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) for each unique taxon and appends a nested `status_IUCN` list-column. Each element is a tibble with one row
-per geographic scope (global, regional), containing the IUCN status code,
-authority, scope name, and a direct link to the [IUCN Red List assessment](https://www.iucnredlist.org).
+`add_iucn_to_occ()` queries [iNaturalist](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712)
+for each unique taxon and appends a nested `status_IUCN` list-column. Each
+element is a tibble with one row per geographic scope (global, regional),
+containing the IUCN status code, authority, scope name, and a direct link
+to the [IUCN Red List assessment](https://www.iucnredlist.org).
 
 ```{r step4}
-occ_eLTER_IUCN <- add_iucn_to_occ(occ_eLTER = occ_in_site)
+occ_eLTER_IUCN <- add_iucn_to_occ(occ_eLTER = iNat_occ_eLTER_site$inat)
 ```
 
 ```
 # Example content of status_IUCN[[1]]:
 # A tibble: 3 × 4
-#   status authority      name          url
-#   <chr>  <chr>          <chr>         <chr>
-# 1 LC     IUCN Red List  NA            https://www.iucnredlist.org/...
-# 2 LC     IUCN Red List  Europe        https://www.iucnredlist.org/...
-# 3 LC     IUCN Red List  Mediterranean https://www.iucnredlist.org/...
+#   status authority      scope_of_assesment url
+#   <chr>  <chr>          <chr>              <chr>
+# 1 LC     IUCN Red List  Globally           https://www.iucnredlist.org/...
+# 2 LC     IUCN Red List  Europe             https://www.iucnredlist.org/...
+# 3 LC     IUCN Red List  Mediterranean      https://www.iucnredlist.org/...
 ```
 
-### Step 6 — Add nativeness / establishment means
+### Step 5 — Add nativeness / establishment means and EASIN data
 
-`add_nativeness_to_occ()` queries [iNaturalist for the establishment means](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist), following the definition Of Darwin Core Vocabulary (https://dwc.tdwg.org/em/)
-of each unique taxon, filtered by the site's country. Results are stored
-in a nested `establishmentMeans` list-column containing `nativeness` and
-`authority`.
+`add_nativeness_to_occ()` enriches each unique taxon with two complementary
+sources of alien species information:
 
-```{r step6}
+**From iNaturalist checklists** — the
+[establishment means](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist)
+of each taxon (following the
+[Darwin Core Vocabulary](https://dwc.tdwg.org/em/) definition) is
+retrieved and filtered by the site's country. This provides the
+`iNat_nativeness` (e.g. `native`, `introduced`) and `iNat_authority`
+fields.
+
+**From EASIN** — the
+[European Alien Species Information Network](https://easin.jrc.ec.europa.eu/easin)
+API is queried for each taxon by scientific name, returning additional
+alien species attributes when the taxon is present in the EASIN catalogue:
+
+| Field | Description |
+|---|---|
+| `EASIN_url` | Link to the EASIN species factsheet |
+| `EASIN_id` | EASIN species identifier |
+| `EASIN_LSID` | Life Science Identifier (`urn:lsid:easin.jrc.ec.europa.eu:species:...`) |
+| `EASIN_firstIntroductionsInEU_year` | Year of first recorded introduction in the EU |
+| `EASIN_firstIntroductions_Country` | Country of first recorded introduction in the EU |
+| `EASIN_status` | Alien status code (`A` = Alien, `Q` = Cryptogenic, `C` = Questionable) |
+| `EASIN_hasImpact` | Whether a documented ecological impact is recorded (`True`/`False`) |
+| `EASIN_IsEUConcern` | Whether listed as a species of EU concern under Regulation (EU) No 1143/2014 (`True`/`False`) |
+
+All EASIN fields are `NA` when the taxon is not present in the EASIN
+catalogue (i.e. it is not considered an alien species in Europe).
+
+> **Note:** EASIN reports alien status at the country level and does not
+> distinguish sub-national cases where a species may be non-native only in
+> specific areas (e.g. islands) but native elsewhere within the same country.
+> EASIN information may therefore overgeneralise nativeness for
+> heterogeneous territories such as Italy.
+
+```{r step5}
 occ_eLTER_nativeness <- add_nativeness_to_occ(
   occ_eLTER = occ_eLTER_IUCN,
   country   = country
@@ -178,31 +214,40 @@ occ_eLTER_nativeness <- add_nativeness_to_occ(
 ```
 
 ```
-# Example content of establishmentMeans[[1]]:
-# A tibble: 1 × 2
-#   nativeness authority
-#   <chr>      <chr>
-# 1 native     Italy Check List
+# Example content of establishmentMeans[[1]] for a native species:
+# A tibble: 1 × 11
+#   iNat_nativeness iNat_authority   iNat_checkList_uri EASIN_url EASIN_id ...
+#   <chr>           <chr>            <chr>              <chr>     <chr>
+# 1 native          Italy Check List https://www.in...  NA        NA        ...
+#
+# Example content of establishmentMeans[[1]] for an alien species:
+# A tibble: 1 × 11
+#   iNat_nativeness iNat_authority   iNat_checkList_uri EASIN_url            EASIN_id ...
+#   <chr>           <chr>            <chr>              <chr>                <chr>
+# 1 introduced      Italy Check List https://www.in...  https://easin.jrc... 1234      ...
 ```
 
-### Step 7 — Add EU legal framework (EUNIS)
+### Step 6 — Add EU legal framework (EUNIS)
 
 `add_eunis_legal_to_occ()` queries the [EUNIS species website](https://eunis.eea.europa.eu)
-and appends `directive` and `Annex` columns indicating coverage under the EU Habitats
+and appends `directive` and `annex` columns indicating coverage under the EU Habitats
 Directive (92/43/EEC) or the EU Birds Directive (2009/147/EC).
 
-```{r step7}
+```{r step6}
 occ_eLTER_legal <- add_eunis_legal_to_occ(occ_eLTER = occ_eLTER_nativeness)
 ```
 
-### Step 8 — Create the interactive map
+### Step 7 — Create the interactive map
 
 `create_leaflet_occ_map()` produces an interactive Leaflet map with
 colour-coded markers by iconic taxon group, clustering, and rich popups
 showing all enriched attributes for each observation.
 
-```{r step8}
-map <- create_leaflet_occ_map(occ_enriched = occ_eLTER_legal)
+```{r step7}
+map <- create_leaflet_occ_map(
+  occ_enriched  = occ_eLTER_legal,
+  site_boundary = site_boundary
+)
 map
 ```
 
@@ -211,22 +256,21 @@ The popup for each observation includes:
 - Taxon name (linked to iNaturalist) and common name
 - Observer and direct link to the observation record
 - Observation quality grade, geoprivacy, and positional accuracy
-- IUCN status per geographic scope, with links to Red List assessments
-- Nativeness and authority (from iNaturalist national checklist)
-- EU Directive coverage and relevant Annex, one row per directive
+- IUCN Red List status per geographic scope, with links to Red List assessments
+- Nativeness and authority from iNaturalist national checklist
+- EASIN alien species data (factsheet link, status, impact, EU concern, first introduction)
+- EU Directive coverage and relevant Annex, with links to EUR-Lex
 
 ---
 
 ## Output example
 
-> **Note:** The map below is a static screenshot. Run the workflow above
+> **Note:** The map below is an static screenshot. Run the workflow above
 > in your R session to obtain the fully interactive version.
 
-```{r occ-map, out.width = "100%"}
-create_leaflet_occ_map(
-  occ_enriched  = occ_eLTER_legal,
-  site_boundary = site_boundary
-)
-```
 
-For more information about possible other output please visit [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) article.
+<img src="https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/man/figures/map_screenshot.png" alt="Example map output" width="60%"/>
+
+For more information about possible other outputs please visit the
+[Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html)
+article.
