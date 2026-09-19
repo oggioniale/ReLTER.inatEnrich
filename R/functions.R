@@ -703,8 +703,6 @@ get_eunis_legal_info <- function(taxon.id) {
 #' status results for each `taxon.id`, as well as the number of taxa that
 #' encountered a JSON parsing error.
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
-#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
-#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
 #' @importFrom rinat get_inat_obs_project
 #' @importFrom dplyr mutate filter tibble select distinct left_join
 #' @importFrom purrr map_dfr walk2
