@@ -1,6 +1,6 @@
 Package: ReLTER.inatEnrich
 Title: ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI sites
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(
     person("Alessandro", "Oggioni", , "alessandro.oggioni@cnr.it", role = c("aut", "cre", "fnd"),
            comment = c(ORCID = "0000-0002-7997-219X")),
