@@ -74,9 +74,9 @@ information</li>
 regional level, directly as recorded on iNaturalist</li>
 <li>
 <strong>EU legal framework</strong> coverage under the Habitats
-Directive (92/43/EEC) and the Birds Directive (2009/147/EC), retrieved
-from the <a href="https://eunis.eea.europa.eu/" class="external-link">EUNIS</a> species
-database</li>
+Directive (92/43/EEC) and the Birds Directive (2009/147/EC), with Annex
+identifiers, retrieved live from the <a href="https://biodiversity.europa.eu" class="external-link">BISE</a> (Biodiversity Information
+System for Europe) REST API</li>
 </ul>
 <p>The final output is a fully enriched occurrence dataset and an
 interactive Leaflet map summarising all information in observation-level
@@ -98,8 +98,6 @@ popups.</p>
 <span>  <span class="st">"leaflet"</span>,</span>
 <span>  <span class="st">"ggplot2"</span>,</span>
 <span>  <span class="st">"grDevices"</span>,</span>
-<span>  <span class="st">"rinat"</span>,</span>
-<span>  <span class="st">"rvest"</span>,</span>
 <span>  <span class="st">"stats"</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -165,8 +163,8 @@ returned.</p>
 <h3 id="step-3-retrieve-site-boundary-and-country">Step 3 — Retrieve site boundary and country<a class="anchor" aria-label="anchor" href="#step-3-retrieve-site-boundary-and-country"></a>
 </h3>
 <p>Download the site boundary polygon and extract the country name. The
-country is used in the following step to filter establishment means to
-the correct national checklist.</p>
+country is used in subsequent steps to filter establishment means to the
+correct national context.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site_boundary</span> <span class="op">&lt;-</span> <span class="fu">ReLTER</span><span class="fu">::</span><span class="fu">get_site_info</span><span class="op">(</span>deimsid <span class="op">=</span> <span class="va">deimsid</span><span class="op">)</span></span>
 <span><span class="va">country</span> <span class="op">&lt;-</span> <span class="va">site_boundary</span><span class="op">$</span><span class="va">country</span></span></code></pre></div>
@@ -279,14 +277,38 @@ nativeness for heterogeneous territories such as Italy.</p>
 <span><span class="co"># 1 introduced      Italy Check List https://www.in...  https://easin.jrc... 1234      ...</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="step-6-add-eu-legal-framework-eunis">Step 6 — Add EU legal framework (EUNIS)<a class="anchor" aria-label="anchor" href="#step-6-add-eu-legal-framework-eunis"></a>
+<h3 id="step-6-add-eu-legal-framework-bise">Step 6 — Add EU legal framework (BISE)<a class="anchor" aria-label="anchor" href="#step-6-add-eu-legal-framework-bise"></a>
 </h3>
-<p><code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code> queries the <a href="https://eunis.eea.europa.eu" class="external-link">EUNIS species website</a> and appends
-<code>directive</code> and <code>annex</code> columns indicating
-coverage under the EU Habitats Directive (92/43/EEC) or the EU Birds
-Directive (2009/147/EC).</p>
+<p><code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code> queries the <a href="https://biodiversity.europa.eu" class="external-link">BISE</a> (Biodiversity Information
+System for Europe) REST API and appends <code>directive</code> and
+<code>annex</code> columns indicating coverage under the EU Habitats
+Directive (92/43/EEC) or the EU Birds Directive (2009/147/EC).</p>
+<p>The function performs two sequential POST requests per unique
+taxon:</p>
+<ol style="list-style-type: decimal">
+<li>A species search by scientific name to obtain the internal
+<code>id_eunis</code> identifier from the BISE all-species listing.</li>
+<li>A legal status lookup by <code>id_eunis</code> to retrieve the
+Protection table, which lists all international and EU legal instruments
+covering the species.</li>
+</ol>
+<p>Only rows where <code>legal_instrument</code> is
+<code>"EU Habitats Directive"</code> or
+<code>"EU Birds Directive"</code> are retained. The Annex value is
+parsed from the BISE full description
+(e.g. <code>"Annex IV: animal and plant species..."</code>) to a short
+code (e.g. <code>"IV"</code>).</p>
+<blockquote>
+<p><strong>Note:</strong> The BISE API returns EU-wide data only. Unlike
+the previous EEA-checklist-based approach, annex assignments are not
+filtered by country (BISE does not expose country-level annex
+filtering). All applicable annexes for the species across the EU are
+returned.</p>
+</blockquote>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">occ_eLTER_legal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></span><span class="op">(</span>occ_eLTER <span class="op">=</span> <span class="va">occ_eLTER_nativeness</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">occ_eLTER_legal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></span><span class="op">(</span></span>
+<span>  occ_eLTER <span class="op">=</span> <span class="va">occ_eLTER_nativeness</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-7-create-the-interactive-map">Step 7 — Create the interactive map<a class="anchor" aria-label="anchor" href="#step-7-create-the-interactive-map"></a>
@@ -310,7 +332,8 @@ assessments</li>
 <li>Nativeness and authority from iNaturalist national checklist</li>
 <li>EASIN alien species data (factsheet link, status, impact, EU
 concern, first introduction)</li>
-<li>EU Directive coverage and relevant Annex, with links to EUR-Lex</li>
+<li>EU Directive coverage and relevant Annex (e.g. Annex I for Birds;
+Annex II, IV, V for Habitats), with links to EUR-Lex</li>
 </ul>
 <hr>
 </div>
@@ -319,7 +342,7 @@ concern, first introduction)</li>
 <h2 id="output-example">Output example<a class="anchor" aria-label="anchor" href="#output-example"></a>
 </h2>
 <blockquote>
-<p><strong>Note:</strong> The map below is an static screenshot. Run the
+<p><strong>Note:</strong> The map below is a static screenshot. Run the
 workflow above in your R session to obtain the fully interactive
 version.</p>
 </blockquote>

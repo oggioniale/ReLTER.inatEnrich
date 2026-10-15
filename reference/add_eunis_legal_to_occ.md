@@ -1,23 +1,17 @@
-# Enrich iNaturalist occurrences with EUNIS legal framework information
+# Enrich eLTER site iNaturalist occurrences with EU directive legal information
 
-**\[stable\]** This function enriches iNaturalist occurrences with legal
-protection information extracted from the EUNIS database. It uses the
-scientific name retrieved from the iNaturalist `taxon.id` to query EUNIS
-and extract legal directives related to the EU Habitats Directive
-(92/43/EEC) and Birds Directive (2009/147/EC).
+**\[stable\]**
 
-Observations are not filtered by geoprivacy or research grade. If a
-taxon has no legal information in EUNIS, `NA` values are returned for
-`directive` and `annex`.
+Iterates over all unique `taxon.id` values in the occurrence tibble and
+enriches each row with EU directive information retrieved from the
+[BISE](https://biodiversity.europa.eu) (Biodiversity Information System
+for Europe) REST API via
+[`get_eunis_legal_info`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_eunis_legal_info.md).
 
-If not already present, the function automatically assigns eLTER
-Standard Observations to each record via `.assign_eLTER_SOs`, adding
-three logical columns: `SOBIO_014` (Flying insects — Insecta),
-`SOBIO_017` (Plants), and `SOBIO_018` (Acoustic recording — Aves, Anura,
-Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
-SOBIO_018 simultaneously. If the columns are already present (e.g.
-because a previous enrichment function was already run), the assignment
-step is skipped.
+For each taxon the function appends the directive name and the Annex
+identifier (II, IV, V for Habitats; I for Birds). When a species is
+listed under both directives the occurrence tibble will contain multiple
+rows for that taxon – one per directive/annex entry.
 
 ## Usage
 
@@ -29,77 +23,58 @@ add_eunis_legal_to_occ(occ_eLTER)
 
 - occ_eLTER:
 
-  A `tibble` containing iNaturalist occurrences. Must contain the
-  columns `taxon.id` and `taxon.ancestor_ids`.
+  An `sf` tibble of iNaturalist occurrences, typically output of
+  `ReLTER::get_site_speciesOccurrences()` after
+  [`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)
+  and
+  [`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md).
 
 ## Value
 
-A `tibble` containing all original columns of `occ_eLTER` plus:
+The input tibble enriched with:
 
 - directive:
 
-  `character`. Legal directive text from EUNIS (92/43/EEC or
-  2009/147/EC), or `NA` if not found.
+  EU directive name (`"Habitats Directive (92/43/EEC)"`,
+  `"Birds Directive (2009/147/EC)"`), or `NA`.
 
 - annex:
 
-  `character`. Annex information from EUNIS table, or `NA` if not found.
-
-- SOBIO_014:
-
-  `logical`. Whether the observation contributes to Flying insects
-  (SOBIO_014) eLTER Standard Observation. Assigned only if not already
-  present.
-
-- SOBIO_017:
-
-  `logical`. Whether the observation contributes to Vegetation
-  composition (SOBIO_017) eLTER Standard Observation. Assigned only if
-  not already present.
-
-- SOBIO_018:
-
-  `logical`. Whether the observation contributes to Acoustic recording
-  (SOBIO_018) eLTER Standard Observation. Assigned only if not already
-  present.
+  Short annex code (e.g. `"II"`, `"IV"`, `"I"`), or `NA`.
 
 ## Note
 
-eLTER Standard Observation assignments are based on taxonomic ancestry
-(`taxon.ancestor_ids`) retrieved from the iNaturalist API.
+EU directive data are retrieved live from the BISE REST API
+(<https://biodiversity.europa.eu>) using two POST requests per unique
+taxon. An internet connection is required. The function includes a short
+delay between taxa (`Sys.sleep(0.2)`) to avoid overloading the server.
 
 ## See also
 
 [`get_eunis_legal_info`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_eunis_legal_info.md),
-[`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md),
-[`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md),
-[`obs_SO_pie_chart`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
+[`obs_pie_chart`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_pie_chart.md)
 
 ## Author
 
 Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
 
-Alice Lenzi, PhD <alice.lenzi@crea.gov.it>
-
-Alessandro Campanaro, PhD <alessandro.campanaro@crea.gov.it>
-
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-# Download taxa occurrences from iNaturalist using ReLTER's
-# get_site_speciesOccurrences() function
-# e.g. Montagna di Torricchio eLTER site
-deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
-occ_iNat <- ReLTER::get_site_speciesOccurrences(
-  deimsid = deimsid,
-  list_DS = "inat",
-  show_map = FALSE,
-  limit = 50
+deimsid       <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+
+iNat_occ <- ReLTER::get_site_speciesOccurrences(
+  deimsid  = deimsid,
+  list_DS  = "inat",
+  show_map = TRUE,
+  limit    = 50
 )
 
-occ_legal <- add_eunis_legal_to_occ(
-  occ_eLTER = occ_iNat$inat
-)
+occ_legal <- iNat_occ$inat |>
+  add_iucn_to_occ() |>
+  add_nativeness_to_occ(country = site_boundary$country) |>
+  add_eunis_legal_to_occ()
 } # }
 ```

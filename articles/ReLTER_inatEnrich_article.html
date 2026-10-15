@@ -103,9 +103,9 @@ iNaturalist occurrences:</p>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code></td>
-<td>EUNIS species database</td>
+<td>BISE REST API (<code>biodiversity.europa.eu</code>)</td>
 <td>
-<code>directive</code>, <code>Annex</code> (flat columns)</td>
+<code>directive</code>, <code>annex</code> (flat columns)</td>
 </tr>
 <tr class="even">
 <td><code><a href="../reference/create_leaflet_occ_map.html">create_leaflet_occ_map()</a></code></td>
@@ -133,12 +133,22 @@ a single row of the occurrence tibble without information loss.</p>
 <code>establishmentMeans</code><a class="anchor" aria-label="anchor" href="#establishmentmeans"></a>
 </h3>
 <p>Produced by <code><a href="../reference/add_nativeness_to_occ.html">add_nativeness_to_occ()</a></code>. Each cell contains
-a <strong>1 × 2 tibble</strong> with the nativeness status and the
-authority that recorded it, filtered to the specified country.</p>
+a <strong>1 × 11 tibble</strong> with the nativeness status, the
+authority that recorded it (filtered to the specified country), and
+EASIN alien species fields.</p>
 <pre><code># str(occ$establishmentMeans[[1]])
-tibble [1 × 2] (S3: tbl_df/tbl/data.frame)
- $ nativeness: chr "native"
- $ authority : chr "Italy Check List"</code></pre>
+tibble [1 × 11] (S3: tbl_df/tbl/data.frame)
+ $ iNat_nativeness                    : chr "native"
+ $ iNat_authority                     : chr "Italy Check List"
+ $ iNat_checkList_uri                 : chr "https://www.inaturalist.org/lists/..."
+ $ EASIN_url                          : chr NA
+ $ EASIN_id                           : chr NA
+ $ EASIN_LSID                         : chr NA
+ $ EASIN_firstIntroductionsInEU_year  : chr NA
+ $ EASIN_firstIntroductions_Country   : chr NA
+ $ EASIN_status                       : chr NA
+ $ EASIN_hasImpact                    : chr NA
+ $ EASIN_IsEUConcern                  : chr NA</code></pre>
 <p><strong>Accessing the values:</strong></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -147,15 +157,17 @@ tibble [1 × 2] (S3: tbl_df/tbl/data.frame)
 <span><span class="co"># Extract nativeness for all rows as a flat character vector</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    nativeness <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">establishmentMeans</span>, <span class="op">~</span> <span class="va">.x</span><span class="op">$</span><span class="va">nativeness</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="cn">NA_character_</span><span class="op">)</span>,</span>
-<span>    em_authority <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">establishmentMeans</span>, <span class="op">~</span> <span class="va">.x</span><span class="op">$</span><span class="va">authority</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>  <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="cn">NA_character_</span><span class="op">)</span></span>
+<span>    nativeness   <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">establishmentMeans</span>,</span>
+<span>                           <span class="op">~</span> <span class="va">.x</span><span class="op">$</span><span class="va">iNat_nativeness</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="cn">NA_character_</span><span class="op">)</span>,</span>
+<span>    em_authority <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">establishmentMeans</span>,</span>
+<span>                           <span class="op">~</span> <span class="va">.x</span><span class="op">$</span><span class="va">iNat_authority</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>  <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="cn">NA_character_</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Unnest to a flat tibble (duplicates rows where needed)</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">establishmentMeans</span><span class="op">)</span></span></code></pre></div>
 <p><strong>When is it <code>NA</code>?</strong></p>
-<p><code>nativeness</code> and <code>authority</code> are both
+<p><code>iNat_nativeness</code> and <code>iNat_authority</code> are both
 <code>NA_character_</code> when:</p>
 <ul>
 <li>the taxon has no listed taxa records in iNaturalist, or</li>
@@ -163,6 +175,9 @@ tibble [1 × 2] (S3: tbl_df/tbl/data.frame)
 <code>country</code>, or</li>
 <li>the API call failed after the maximum number of retries.</li>
 </ul>
+<p>EASIN fields are <code>NA</code> when the taxon is not present in the
+EASIN catalogue (i.e. it is not considered an alien species in
+Europe).</p>
 <hr>
 </div>
 <div class="section level3">
@@ -174,28 +189,28 @@ tibble [1 × 2] (S3: tbl_df/tbl/data.frame)
 which an IUCN assessment exists. The number of rows varies by taxon.</p>
 <pre><code># str(occ$status_IUCN[[1]])
 tibble [3 × 4] (S3: tbl_df/tbl/data.frame)
- $ status   : chr [1:3] "LC" "LC" "LC"
- $ authority: chr [1:3] "IUCN Red List" "IUCN Red List" "IUCN Red List"
- $ name     : chr [1:3] NA "Europe" "Mediterranean"
- $ url      : chr [1:3] "https://www.iucnredlist.org/..."
-                        "https://www.iucnredlist.org/..."
-                        "https://www.iucnredlist.org/..."</code></pre>
-<p>The <code>name</code> field identifies the geographic scope of the
-assessment:</p>
+ $ status            : chr [1:3] "LC" "LC" "LC"
+ $ authority         : chr [1:3] "IUCN Red List" "IUCN Red List" "IUCN Red List"
+ $ scope_of_assesment: chr [1:3] "Globally" "Europe" "Mediterranean"
+ $ url               : chr [1:3] "https://www.iucnredlist.org/..."
+                                 "https://www.iucnredlist.org/..."
+                                 "https://www.iucnredlist.org/..."</code></pre>
+<p>The <code>scope_of_assesment</code> field identifies the geographic
+scope of the assessment:</p>
 <ul>
 <li>
-<code>NA</code> — global assessment</li>
+<code>"Globally"</code> — global assessment</li>
 <li>
 <code>"Europe"</code>, <code>"Mediterranean"</code>, etc. — regional
 assessments</li>
 </ul>
 <p><strong>Accessing the values:</strong></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Extract only the global status (name is NA)</span></span>
+<code class="sourceCode R"><span><span class="co"># Extract only the global status (scope_of_assesment is "Globally")</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    iucn_global <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">status_IUCN</span>, <span class="kw">function</span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="va">global</span> <span class="op">&lt;-</span> <span class="va">tbl</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="va">global</span> <span class="op">&lt;-</span> <span class="va">tbl</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">scope_of_assesment</span> <span class="op">==</span> <span class="st">"Globally"</span><span class="op">)</span></span>
 <span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">global</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="cn">NA_character_</span> <span class="kw">else</span> <span class="va">global</span><span class="op">$</span><span class="va">status</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="op">}</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -203,17 +218,11 @@ assessments</li>
 <span><span class="co"># Extract all scopes as a flat tibble (one row per taxon × scope)</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">taxon.id</span>, <span class="va">name</span>, <span class="va">status_IUCN</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">status_IUCN</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span></span>
-<span>    scientific_name <span class="op">=</span> <span class="va">name</span>,</span>
-<span>    iucn_scope      <span class="op">=</span> <span class="va">name1</span>,   <span class="co"># name column from the nested tibble</span></span>
-<span>    iucn_status     <span class="op">=</span> <span class="va">status</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">status_IUCN</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get all distinct statuses for a single taxon</span></span>
 <span><span class="va">occ</span><span class="op">$</span><span class="va">status_IUCN</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">name</span>, <span class="st">"Global"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">scope</span>, <span class="va">status</span>, <span class="va">url</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">scope_of_assesment</span>, <span class="va">status</span>, <span class="va">url</span><span class="op">)</span></span></code></pre></div>
 <p><strong>IUCN status codes reference:</strong></p>
 <table class="table">
 <thead><tr class="header">
@@ -263,23 +272,40 @@ assessments</li>
 </div>
 <div class="section level3">
 <h3 id="directive-and-annex-flat-columns">
-<code>directive</code> and <code>Annex</code> (flat columns)<a class="anchor" aria-label="anchor" href="#directive-and-annex-flat-columns"></a>
+<code>directive</code> and <code>annex</code> (flat columns)<a class="anchor" aria-label="anchor" href="#directive-and-annex-flat-columns"></a>
 </h3>
 <p>Produced by <code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code>. Unlike the IUCN
-and nativeness data, EUNIS legal information is stored as <strong>flat
+and nativeness data, EU legal information is stored as <strong>flat
 character columns</strong>. When a taxon is covered by more than one
-directive, the occurrence tibble contains <strong>multiple rows for the
-same observation</strong> — one per directive/annex combination.</p>
+directive or annex, the occurrence tibble contains <strong>multiple rows
+for the same observation</strong> — one per directive/annex
+combination.</p>
 <pre><code><span><span class="co"># Example: a taxon covered by both directives</span></span>
 <span><span class="co"># A tibble: 2 × (n + 2)</span></span>
-<span><span class="co">#   taxon.id  ...  directive                              Annex</span></span>
+<span><span class="co">#   taxon.id  ...  directive                              annex</span></span>
 <span><span class="co">#   &lt;int&gt;          &lt;chr&gt;                                  &lt;chr&gt;</span></span>
-<span><span class="co"># 1 48484          EU Birds Directive (2009/147/EC)       Annex I</span></span>
-<span><span class="co"># 2 48484          EU Habitats Directive (92/43/EEC)      Annex IV</span></span></code></pre>
-<p>This means that <strong>row count in <code>occ_eLTER_legal</code> may
-exceed row count in <code>occ_eLTER_nativeness</code></strong> for taxa
-with multiple directive entries. Keep this in mind when computing
-summaries:</p>
+<span><span class="co"># 1 48484          Birds Directive (2009/147/EC)          I</span></span>
+<span><span class="co"># 2 48484          Habitats Directive (92/43/EEC)         IV</span></span></code></pre>
+<p><strong>Annex values by directive:</strong></p>
+<p>For the <strong>Habitats Directive</strong>, annex values follow the
+standard format: <code>"II"</code>, <code>"II*"</code> (priority
+species), <code>"IV"</code>, <code>"V"</code>, or combinations.</p>
+<p>For the <strong>Birds Directive</strong>, annex values reflect the
+structure of the directive itself: <code>"I"</code> (special protection
+areas).</p>
+<p>These values are parsed from the BISE Protection table, which returns
+full English descriptions
+(e.g. <code>"Annex IV: animal and plant species of community interest in need of strict protection."</code>).
+The parser extracts the Roman numeral code (<code>"IV"</code>) using a
+regular expression.</p>
+<blockquote>
+<p><strong>Note:</strong> The BISE API returns EU-wide data only — annex
+assignments are not filtered by country. All annexes applicable to the
+species across the EU are returned. This means that <strong>row count in
+<code>occ_eLTER_legal</code> may exceed row count in
+<code>occ_eLTER_nativeness</code></strong> for taxa with multiple
+directive entries. Keep this in mind when computing summaries.</p>
+</blockquote>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Count unique observations (not rows) correctly</span></span>
 <span><span class="va">n_obs</span> <span class="op">&lt;-</span> <span class="va">occ_eLTER_legal</span> <span class="op">|&gt;</span></span>
@@ -288,13 +314,13 @@ summaries:</p>
 <span></span>
 <span><span class="co"># Summarise directives per taxon without duplicating observations</span></span>
 <span><span class="va">directives_per_taxon</span> <span class="op">&lt;-</span> <span class="va">occ_eLTER_legal</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">taxon.id</span>, <span class="va">directive</span>, <span class="va">Annex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">taxon.id</span>, <span class="va">directive</span>, <span class="va">annex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">taxon.id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
 <span>    n_directives <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">directive</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    directives   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">directive</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">"; "</span><span class="op">)</span>,</span>
-<span>    annexes      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">Annex</span><span class="op">)</span>,     collapse <span class="op">=</span> <span class="st">"; "</span><span class="op">)</span>,</span>
+<span>    annexes      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">annex</span><span class="op">)</span>,     collapse <span class="op">=</span> <span class="st">"; "</span><span class="op">)</span>,</span>
 <span>    .groups      <span class="op">=</span> <span class="st">"drop"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <hr>
@@ -322,14 +348,68 @@ name, list title</li>
 <p>Both functions iterate over <strong>unique taxon IDs only</strong>,
 so each taxon is queried exactly once regardless of how many
 observations exist for it in the dataset.</p>
+<p><strong>Rate limiting:</strong> the iNaturalist API applies rate
+limiting to unauthenticated requests (approximately 60 requests per
+minute). The functions include a short delay between requests
+(<code>Sys.sleep(0.1)</code>, approximately 6 req/sec) to stay well
+within this limit. The built-in retry logic (<code>max_tries = 3</code>,
+<code>max_seconds = 120</code>) handles any transient failures
+gracefully.</p>
 </div>
 <div class="section level3">
-<h3 id="eunis-species-database">EUNIS species database<a class="anchor" aria-label="anchor" href="#eunis-species-database"></a>
+<h3 id="bise-rest-api">BISE REST API<a class="anchor" aria-label="anchor" href="#bise-rest-api"></a>
 </h3>
-<p><code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code> queries the EUNIS API using the
-taxon’s scientific name to retrieve legal coverage under EU directives.
-Results are matched back to the occurrence tibble via
-<code>taxon.id</code>.</p>
+<p><code><a href="../reference/get_eunis_legal_info.html">get_eunis_legal_info()</a></code> (called by
+<code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code>) queries the BISE (Biodiversity
+Information System for Europe) REST API at
+<code>https://biodiversity.europa.eu</code> using two sequential POST
+requests:</p>
+<p><strong>Step 1 — Species name → <code>id_eunis</code>:</strong></p>
+<pre><code>POST https://biodiversity.europa.eu/++api++/data/all-species-search-listing/@connector-data
+Content-Type: application/json
+
+{
+  "data_query": [
+    {
+      "i": "scientific_name",
+      "o": "plone.app.querystring.operation.string.contains",
+      "v": "Canis lupus"
+    }
+  ],
+  "form": {"db_version": "latest"}
+}</code></pre>
+<p>The response contains parallel arrays under <code>data.results</code>
+(e.g. <code>id_eunis</code>, <code>scientific_name</code>). The
+exact-match row is selected by comparing <code>scientific_name</code>
+case-insensitively; the first result is used as a fallback.</p>
+<p><strong>Step 2 — <code>id_eunis</code> → legal status (Protection
+table):</strong></p>
+<pre><code>POST https://biodiversity.europa.eu/++api++/data/natura-2000-species-legal-status/@connector-data
+Content-Type: application/json
+
+{
+  "data_query": [
+    {
+      "i": "id_eunis",
+      "o": "plone.app.querystring.operation.selection.any",
+      "v": ["1367"]
+    }
+  ],
+  "form": {"db_version": "latest"}
+}</code></pre>
+<p>The response parallel arrays include <code>legal_instrument</code>,
+<code>annex</code>, <code>url_link</code>, and <code>id_eunis</code>.
+Only rows where <code>legal_instrument</code> is
+<code>"EU Habitats Directive"</code> or
+<code>"EU Birds Directive"</code> are retained.</p>
+<p>The <code>annex</code> field contains full descriptions such as:</p>
+<pre><code><span><span class="st">"Annex IV: animal and plant species of community interest in need of strict protection."</span></span></code></pre>
+<p>These are parsed to short codes (<code>"IV"</code>) using the regular
+expression
+<code>sub("^Annex\\s+(I{1,3}V?|VI?|IV|V?I{0,3}).*", "\\1", annex_str)</code>.</p>
+<p><strong>Throttling:</strong> <code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code>
+inserts a 200 ms pause between taxa (<code>Sys.sleep(0.2)</code>) to
+avoid overloading the BISE server.</p>
 <hr>
 </div>
 </div>
@@ -337,7 +417,7 @@ Results are matched back to the occurrence tibble via
 <h2 id="error-handling-and-na-semantics">Error handling and NA semantics<a class="anchor" aria-label="anchor" href="#error-handling-and-na-semantics"></a>
 </h2>
 <p>All three enrichment functions use the same defensive pattern:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Conceptual structure shared by all enrichment functions</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
 <span>  <span class="fu">query_external_api</span><span class="op">(</span><span class="va">taxon.id</span><span class="op">)</span>,</span>
@@ -354,20 +434,32 @@ enrichment columns</li>
 <li>A <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning()</a></code> is emitted for each failure, visible in the
 R console</li>
 </ol>
-<p>To inspect which taxa failed after running the pipeline:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p><strong><code>annex = NA</code> semantics:</strong> a taxon may have
+a valid <code>directive</code> entry but <code>annex = NA</code>. This
+means the taxon is present in the BISE Protection table as covered by
+that directive, but no annex code could be parsed from the BISE
+description string. This is rare but can occur for entries with
+non-standard formatting.</p>
+<p>To inspect which taxa failed or have missing data after running the
+pipeline:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Taxa with no IUCN data</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_lgl</a></span><span class="op">(</span><span class="va">status_IUCN</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">status</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Taxa with no nativeness data</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_lgl</a></span><span class="op">(</span><span class="va">establishmentMeans</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">nativeness</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_lgl</a></span><span class="op">(</span><span class="va">establishmentMeans</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">iNat_nativeness</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Taxa with no EUNIS legal data</span></span>
+<span><span class="co"># Taxa with no EU legal data</span></span>
 <span><span class="va">occ</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">directive</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">taxon.id</span>, <span class="va">name</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">taxon.id</span>, <span class="va">name</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Taxa with directive but no annex resolved</span></span>
+<span><span class="va">occ</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">directive</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">annex</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">taxon.id</span>, <span class="va">name</span>, <span class="va">directive</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -382,7 +474,7 @@ nature of the API calls and the retry logic. A few practical tips:</p>
 <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> / <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> to avoid re-querying on
 re-runs:</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Save after the slowest step</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">occ_eLTER_IUCN</span>,      <span class="st">"cache/occ_eLTER_IUCN.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">occ_eLTER_nativeness</span>, <span class="st">"cache/occ_eLTER_nativeness.rds"</span><span class="op">)</span></span>
@@ -394,9 +486,10 @@ re-runs:</li>
 <li>
 <strong>Rate limits</strong>: the iNaturalist API does not require
 authentication for read-only taxon queries, but it does apply rate
-limiting. The built-in retry logic (<code>max_tries = 3</code>,
-<code>max_seconds = 120</code>) handles transient failures
-gracefully.</li>
+limiting. The built-in per-request delay and retry logic handle this
+automatically; no manual throttling is needed in user code. For BISE,
+the 200 ms inter-taxon delay in <code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code> is
+sufficient for typical dataset sizes.</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

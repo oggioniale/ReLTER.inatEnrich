@@ -10,8 +10,8 @@ nested `establishmentMeans` list-column.
 
 If not already present, the function automatically assigns eLTER
 Standard Observations to each record via `.assign_eLTER_SOs`, adding
-three logical columns: `SOBIO_014` (Flying insects — Insecta),
-`SOBIO_017` (Plants), and `SOBIO_018` (Acoustic recording — Aves, Anura,
+three logical columns: `SOBIO_014` (Flying insects – Insecta),
+`SOBIO_017` (Plants), and `SOBIO_018` (Acoustic recording – Aves, Anura,
 Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
 SOBIO_018 simultaneously. If the columns are already present (e.g.
 because a previous enrichment function was already run), the assignment

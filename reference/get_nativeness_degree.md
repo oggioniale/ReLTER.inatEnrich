@@ -8,10 +8,10 @@ to retrieve alien species information for the same taxon.
 
 Data are sourced from:
 
-1.  iNaturalist checklists —
+1.  iNaturalist checklists –
     <https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712>
 
-2.  EASIN — European Alien Species Information Network —
+2.  EASIN – European Alien Species Information Network –
     <https://easin.jrc.ec.europa.eu/easin>
 
 ## Usage

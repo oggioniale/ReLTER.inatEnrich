@@ -4,15 +4,16 @@
 
 Takes a tibble of iNaturalist occurrences already enriched with species
 nativeness, IUCN conservation status
-([`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)),
+([`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)),
 nativeness
-([`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)),
-and EUNIS legal information (`add_eunis_to_occ()`), and eLTER Standard
-Observations (SOs) assignments. Verifies that all required columns are
-present, builds observation-level HTML popups with linked references to
-iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
-interactive Leaflet map with colour-coded markers by iconic taxon group
-and marker clustering.
+([`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)),
+and EUNIS legal information
+([`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)),
+and eLTER Standard Observations (SOs) assignments. Verifies that all
+required columns are present, builds observation-level HTML popups with
+linked references to iNaturalist, IUCN Red List, and EUR-Lex directive
+pages, and returns an interactive Leaflet map with colour-coded markers
+by iconic taxon group and marker clustering.
 
 ## Usage
 
@@ -29,7 +30,7 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
 
   establishmentMeans
 
-  :   list-column of 1 × 11 tibbles fron iNaturalist `iNat_nativeness`,
+  :   list-column of 1 x 11 tibbles fron iNaturalist `iNat_nativeness`,
       `iNat_authority`, and `iNat_checkList_uri`, from EASIN
       `EASIN_url`, `EASIN_id`, `EASIN_LSID`,
       `EASIN_firstIntroductionsInEU_year`,
@@ -39,7 +40,7 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
 
   status_IUCN
 
-  :   list-column of N × 4 tibbles with `status`, `authority`,
+  :   list-column of N x 4 tibbles with `status`, `authority`,
       `scope_of_assesment` (geographic scope), and `url`, produced by
       [`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md).
 

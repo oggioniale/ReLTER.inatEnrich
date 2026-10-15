@@ -4,7 +4,7 @@
 
 A dataset of iNaturalist occurrences from the Montagna di Torricchio
 eLTER site, enriched with IUCN conservation status, establishment means,
-and EUNIS legal information.
+and EU directive (Habitats / Birds) legal information.
 
 ## Usage
 
@@ -34,12 +34,16 @@ An `sf` tibble with the following key columns:
 
 - directive:
 
-  EU directive name
+  character. EU directive name: `"Habitats Directive (92/43/EEC)"`,
+  `"Birds Directive (2009/147/EC)"`, or `NA`.
 
 - annex:
 
-  EU directive annex
+  character. EU directive annex (e.g. `"II"`, `"I"`), or `NA` if not
+  listed or annex not available.
 
 ## Source
 
-iNaturalist via `ReLTER::get_site_speciesOccurrences()`
+iNaturalist via `ReLTER::get_site_speciesOccurrences()`, EU directive
+data from the BISE (Biodiversity Information System for Europe) REST API
+(<https://biodiversity.europa.eu>).

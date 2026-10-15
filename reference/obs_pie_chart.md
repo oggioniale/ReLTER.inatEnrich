@@ -29,6 +29,8 @@ obs_pie_chart(df)
 
   :   character. EU directive name, produced by
       [`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md).
+      Expected values: `"Habitats Directive (92/43/EEC)"`,
+      `"Birds Directive (2009/147/EC)"`, or `NA`.
 
   establishmentMeans
 
@@ -42,17 +44,27 @@ printed to the active device. The total number of species is displayed
 at the centre of the donut. Category counts and percentages are shown in
 the legend.
 
+## Details
+
+The `directive` column is populated by
+[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+using the bundled EEA Natura 2000 species dataset
+(`eu_directives_species`), which replaced the retired EUNIS web
+application in 2024. Directive values follow the format
+`"Habitats Directive (92/43/EEC)"` and
+`"Birds Directive (2009/147/EC)"`.
+
 ## Note
 
 Species are assigned to one category only, in order of priority:
 
-1.  Alien (IAS) — `nativeness == "introduced"`
+1.  Alien (IAS) – `nativeness == "introduced"`
 
-2.  Habitats Directive — `directive` contains `"Habitats"`
+2.  Habitats Directive – `directive` contains `"Habitats"`
 
-3.  Birds Directive — `directive` contains `"Birds"`
+3.  Birds Directive – `directive` contains `"Birds"`
 
-4.  Other — all remaining species
+4.  Other – all remaining species
 
 A species meeting multiple criteria will appear only in the
 highest-priority category.
@@ -72,7 +84,7 @@ Alice Lenzi, phD <alice.lenzi@crea.gov.it>
 
 ``` r
 if (FALSE) { # \dontrun{
-#' # Download taxa occurrences from iNaturalist using ReLTER's
+# Download taxa occurrences from iNaturalist using ReLTER's
 # get_site_speciesOccurrences() function
 # e.g. Montagna di Torricchio eLTER site
 deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
@@ -91,7 +103,7 @@ occ_eLTER_enrich <- add_iucn_to_occ(
     country = site_boundary$country
   ) |>
   add_eunis_legal_to_occ()
-  
+
 obs_pie_chart(occ_eLTER_enrich)
 } # }
 ```

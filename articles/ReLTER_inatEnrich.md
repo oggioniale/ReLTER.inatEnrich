@@ -16,8 +16,10 @@ set of conservation and legal attributes:
 - **IUCN Red List conservation status** at global and regional level,
   directly as recorded on iNaturalist
 - **EU legal framework** coverage under the Habitats Directive
-  (92/43/EEC) and the Birds Directive (2009/147/EC), retrieved from the
-  [EUNIS](https://eunis.eea.europa.eu/) species database
+  (92/43/EEC) and the Birds Directive (2009/147/EC), with Annex
+  identifiers, retrieved live from the
+  [BISE](https://biodiversity.europa.eu) (Biodiversity Information
+  System for Europe) REST API
 
 The final output is a fully enriched occurrence dataset and an
 interactive Leaflet map summarising all information in observation-level
@@ -41,8 +43,6 @@ install.packages(c(
   "leaflet",
   "ggplot2",
   "grDevices",
-  "rinat",
-  "rvest",
   "stats"
 ))
 
@@ -121,8 +121,8 @@ iNat_occ_eLTER_site <- ReLTER::get_site_speciesOccurrences(
 ### Step 3 — Retrieve site boundary and country
 
 Download the site boundary polygon and extract the country name. The
-country is used in the following step to filter establishment means to
-the correct national checklist.
+country is used in subsequent steps to filter establishment means to the
+correct national context.
 
 ``` r
 
@@ -212,16 +212,37 @@ occ_eLTER_nativeness <- add_nativeness_to_occ(
     #   <chr>           <chr>            <chr>              <chr>                <chr>
     # 1 introduced      Italy Check List https://www.in...  https://easin.jrc... 1234      ...
 
-### Step 6 — Add EU legal framework (EUNIS)
+### Step 6 — Add EU legal framework (BISE)
 
 [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
-queries the [EUNIS species website](https://eunis.eea.europa.eu) and
-appends `directive` and `annex` columns indicating coverage under the EU
-Habitats Directive (92/43/EEC) or the EU Birds Directive (2009/147/EC).
+queries the [BISE](https://biodiversity.europa.eu) (Biodiversity
+Information System for Europe) REST API and appends `directive` and
+`annex` columns indicating coverage under the EU Habitats Directive
+(92/43/EEC) or the EU Birds Directive (2009/147/EC).
+
+The function performs two sequential POST requests per unique taxon:
+
+1.  A species search by scientific name to obtain the internal
+    `id_eunis` identifier from the BISE all-species listing.
+2.  A legal status lookup by `id_eunis` to retrieve the Protection
+    table, which lists all international and EU legal instruments
+    covering the species.
+
+Only rows where `legal_instrument` is `"EU Habitats Directive"` or
+`"EU Birds Directive"` are retained. The Annex value is parsed from the
+BISE full description (e.g. `"Annex IV: animal and plant species..."`)
+to a short code (e.g. `"IV"`).
+
+> **Note:** The BISE API returns EU-wide data only. Unlike the previous
+> EEA-checklist-based approach, annex assignments are not filtered by
+> country (BISE does not expose country-level annex filtering). All
+> applicable annexes for the species across the EU are returned.
 
 ``` r
 
-occ_eLTER_legal <- add_eunis_legal_to_occ(occ_eLTER = occ_eLTER_nativeness)
+occ_eLTER_legal <- add_eunis_legal_to_occ(
+  occ_eLTER = occ_eLTER_nativeness
+)
 ```
 
 ### Step 7 — Create the interactive map
@@ -250,14 +271,15 @@ The popup for each observation includes:
 - Nativeness and authority from iNaturalist national checklist
 - EASIN alien species data (factsheet link, status, impact, EU concern,
   first introduction)
-- EU Directive coverage and relevant Annex, with links to EUR-Lex
+- EU Directive coverage and relevant Annex (e.g. Annex I for Birds;
+  Annex II, IV, V for Habitats), with links to EUR-Lex
 
 ------------------------------------------------------------------------
 
 ## Output example
 
-> **Note:** The map below is an static screenshot. Run the workflow
-> above in your R session to obtain the fully interactive version.
+> **Note:** The map below is a static screenshot. Run the workflow above
+> in your R session to obtain the fully interactive version.
 
 ![Example map
 output](https://raw.githubusercontent.com/oggioniale/ReLTER.inatEnrich/main/man/figures/map_screenshot.png)

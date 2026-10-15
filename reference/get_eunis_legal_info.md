@@ -1,11 +1,20 @@
-# Get EUNIS Legal Information for a Species Using iNaturalist Taxon ID
+# Get EU directive legal information for a species using the BISE API
 
-**\[stable\]** This function takes a `taxon.id` from iNaturalist,
-retrieves the corresponding scientific name from the iNaturalist API,
-searches the EUNIS database, and extracts the legal information related
-to the EU Habitats Directive (92/43/EEC) and Birds Directive
-(2009/147/EC), as delivered by data retrieved from the
-[EUNIS](https://eunis.eea.europa.eu/) species database.
+**\[stable\]**
+
+Takes an iNaturalist `taxon.id`, retrieves the species scientific name
+from the iNaturalist Taxa API, then queries the
+[BISE](https://biodiversity.europa.eu) (Biodiversity Information System
+for Europe) REST API in two steps:
+
+1.  Species search by scientific name to obtain the internal `id_eunis`
+    identifier.
+
+2.  Legal status lookup by `id_eunis` to obtain EU directive and annex
+    information from the Protection table.
+
+Only rows where `legal_instrument` is `"EU Habitats Directive"` or
+`"EU Birds Directive"` are retained.
 
 ## Usage
 
@@ -21,23 +30,26 @@ get_eunis_legal_info(taxon.id)
 
 ## Value
 
-A tibble with the following columns:
+A tibble with one row per EU directive entry for the species, or a
+single-row tibble with `NA` values if the species is not found. Columns:
 
 - taxon.id:
 
-  iNaturalist taxon ID provided as input
+  iNaturalist taxon ID.
 
 - scientific_name:
 
-  Scientific name of the species retrieved from iNaturalist
+  Scientific name from iNaturalist.
 
-- `Legal text`:
+- directive:
 
-  Legal directive text from EUNIS (92/43/EEC or 2009/147/EC)
+  `"Habitats Directive (92/43/EEC)"`, `"Birds Directive (2009/147/EC)"`,
+  or `NA`.
 
-- Annex:
+- annex:
 
-  Annex information from EUNIS table
+  Short annex code parsed from the BISE annex description, e.g. `"II"`,
+  `"IV"`, `"I"`, or `NA`.
 
 ## Author
 
@@ -47,8 +59,10 @@ Alessandro Oggioni, PhD <alessandro.oggioni@cnr.it>
 
 ``` r
 if (FALSE) { # \dontrun{
-## Not run:
-get_eunis_legal_info(taxon.id = 61749)
+# Canis lupus -- Habitats Directive, Annex II and IV
+get_eunis_legal_info(taxon.id = 42048)
+
+# Falco tinnunculus -- Birds Directive
+get_eunis_legal_info(taxon.id = 5221)
 } # }
-## End (Not run)
 ```

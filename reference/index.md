@@ -9,8 +9,8 @@
   **\[stable\]** : Get nativeness degree for a taxon from iNaturalist
   and EASIN
 - [`get_eunis_legal_info()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_eunis_legal_info.md)
-  **\[stable\]** : Get EUNIS Legal Information for a Species Using
-  iNaturalist Taxon ID
+  **\[stable\]** : Get EU directive legal information for a species
+  using the BISE API
 - [`add_iucn_to_obs()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_obs.md)
   **\[experimental\]** : Enrich iNaturalist specific project
   observations with IUCN conservation status
@@ -21,8 +21,8 @@
   **\[stable\]** : Add nativeness information to iNaturalist occurrence
   records
 - [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
-  **\[stable\]** : Enrich iNaturalist occurrences with EUNIS legal
-  framework information
+  **\[stable\]** : Enrich eLTER site iNaturalist occurrences with EU
+  directive legal information
 
 ## Visualization functions
 
@@ -56,4 +56,4 @@
   **\[experimental\]** : Example iNaturalist occurrences enriched with
   conservation information
 - [`site_boundary`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/site_boundary.md)
-  **\[experimental\]** : eLTER site boundary for Montagna di Torricchio
+  **\[experimental\]** : eLTER site boundary for Gran Paradiso
