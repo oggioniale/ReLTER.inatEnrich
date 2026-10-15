@@ -11,12 +11,17 @@ An \code{sf} tibble with the following key columns:
 \item{taxon.iconic_taxon_name}{iNaturalist iconic taxon group}
 \item{status_IUCN}{list-column of IUCN conservation status tibbles}
 \item{establishmentMeans}{list-column of establishment means tibbles}
-\item{directive}{EU directive name}
-\item{annex}{EU directive annex}
+\item{directive}{character. EU directive name:
+\code{"Habitats Directive (92/43/EEC)"},
+\code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+\item{annex}{character. EU directive annex (e.g. \code{"II"},
+\code{"I"}), or \code{NA} if not listed or annex not available.}
 }
 }
 \source{
-iNaturalist via \code{ReLTER::get_site_speciesOccurrences()}
+iNaturalist via \code{ReLTER::get_site_speciesOccurrences()},
+EU directive data from the BISE (Biodiversity Information System for Europe)
+REST API (\url{https://biodiversity.europa.eu}).
 }
 \usage{
 occ_eLTER_legal
@@ -26,6 +31,6 @@ occ_eLTER_legal
 
 A dataset of iNaturalist occurrences from the Montagna di Torricchio
 eLTER site, enriched with IUCN conservation status, establishment means,
-and EUNIS legal information.
+and EU directive (Habitats / Birds) legal information.
 }
 \keyword{datasets}

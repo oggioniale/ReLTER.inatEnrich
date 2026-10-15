@@ -14,7 +14,7 @@ library(testthat)
 # HELPERS — shared fixtures from package data
 # ==============================================================================
 
-occ <- ReLTER.inatEnrich::occ_eLTER_EUNIS
+occ <- ReLTER.inatEnrich::occ_eLTER_legal
 sb <- ReLTER.inatEnrich::site_boundary
 
 # Mock site boundary for map tests
@@ -131,7 +131,8 @@ test_that(".assign_eLTER_SOs() assigns SOBIO_014 FALSE and SOBIO_018 TRUE for Av
 # ==============================================================================
 
 test_that("get_nativeness_degree() EASIN fields are NA for species not in EASIN", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   # Falco tinnunculus è nativo, non in EASIN come alieno
   result <- get_nativeness_degree(taxon.id = 472766, country = "Italy")
   nested <- result$establishmentMeans[[1]]
@@ -148,7 +149,8 @@ test_that("get_nativeness_degree() EASIN fields are NA for species not in EASIN"
 })
 
 test_that("get_nativeness_degree() EASIN fields are populated for known alien species", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   # Vespa velutina — specie aliena nota in EASIN
   result <- get_nativeness_degree(taxon.id = 119019, country = "Italy")
   nested <- result$establishmentMeans[[1]]
@@ -159,7 +161,8 @@ test_that("get_nativeness_degree() EASIN fields are populated for known alien sp
 })
 
 test_that("get_nativeness_degree() EASIN_IsEUConcern is 'TRUE' or 'FALSE' or NA", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_nativeness_degree(taxon.id = 119019, country = "Italy")
   nested <- result$establishmentMeans[[1]]
   expect_true(nested$EASIN_IsEUConcern %in% c("TRUE", "FALSE", NA))
@@ -195,14 +198,16 @@ test_that(".country_to_flag() accepts 2-letter ISO codes", {
 # ==============================================================================
 
 test_that("get_conservation_status() returns tibble with expected columns", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_conservation_status(taxon.id = occ$taxon.id[1])
   expect_s3_class(result, "tbl_df")
   expect_named(result, c("status", "authority", "scope_of_assesment", "url"))
 })
 
 test_that("get_conservation_status() returns correct column types", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_conservation_status(taxon.id = occ$taxon.id[1])
   expect_type(result$status,    "character")
   expect_type(result$authority, "character")
@@ -227,7 +232,8 @@ test_that("get_conservation_status() status_IUCN in occ_eLTER_legal is well-form
 })
 
 test_that("get_conservation_status() returns multiple rows for taxon with multiple IUCN statuses", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   # Falco tinnunculus ha 3 stati IUCN
   result <- get_conservation_status(taxon.id = 472766)
   expect_s3_class(result, "tbl_df")
@@ -236,13 +242,15 @@ test_that("get_conservation_status() returns multiple rows for taxon with multip
 })
 
 test_that("get_conservation_status() scope_of_assesment is 'Globally' when place is NULL", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_conservation_status(taxon.id = 517449)
   expect_true(any(result$scope_of_assesment == "Globally"))
 })
 
 test_that("get_conservation_status() url column contains valid URLs or NA", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_conservation_status(taxon.id = 472766)
   non_na_urls <- result$url[!is.na(result$url)]
   if (length(non_na_urls) > 0) {
@@ -277,7 +285,8 @@ test_that("add_eunis_legal_to_occ() annex is NA when directive is NA", {
 # ==============================================================================
 
 test_that("get_nativeness_degree() returns tibble with establishmentMeans", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_nativeness_degree(
     taxon.id = occ$taxon.id[1],
     country  = sb$country
@@ -288,7 +297,8 @@ test_that("get_nativeness_degree() returns tibble with establishmentMeans", {
 })
 
 test_that("get_nativeness_degree() nested tibble has nativeness and authority", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_nativeness_degree(
     taxon.id = occ$taxon.id[1],
     country  = sb$country
@@ -319,7 +329,8 @@ test_that("get_nativeness_degree() returns NA when country is NULL", {
 })
 
 test_that("get_nativeness_degree() returns NA for non-existent country", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_nativeness_degree(
     taxon.id = occ$taxon.id[1],
     country  = "NonExistentCountry"
@@ -342,21 +353,23 @@ test_that("establishmentMeans in occ_eLTER_legal is well-formed", {
 # ==============================================================================
 
 test_that("get_eunis_legal_info() returns tibble with expected columns", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   taxon_with_directive <- occ |>
     sf::st_drop_geometry() |>
     dplyr::filter(!is.na(directive)) |>
     dplyr::slice(1)
   result <- get_eunis_legal_info(taxon.id = taxon_with_directive$taxon.id)
   expect_s3_class(result, "tbl_df")
-  expect_true(all(c("taxon.id", "scientific_name", "Legal text", "Annex") %in% names(result)))
+  expect_true(all(c("taxon.id", "scientific_name", "directive", "annex") %in% names(result)))
 })
 
 test_that("get_eunis_legal_info() returns NA fallback for unknown taxon", {
-  skip_on_ci()
+  skip_on_cran()
+  skip_if_offline()
   result <- get_eunis_legal_info(taxon.id = 0)
   expect_s3_class(result, "tbl_df")
-  expect_true(is.na(result$`Legal text`[1]))
+  expect_true(is.na(result$directive[1]))
 })
 
 test_that("directive and annex in occ_eLTER_legal are character columns", {

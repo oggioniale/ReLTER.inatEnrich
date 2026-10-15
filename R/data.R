@@ -4,7 +4,7 @@
 #'
 #' A dataset of iNaturalist occurrences from the Montagna di Torricchio
 #' eLTER site, enriched with IUCN conservation status, establishment means,
-#' and EUNIS legal information.
+#' and EU directive (Habitats / Birds) legal information.
 #'
 #' @format An \code{sf} tibble with the following key columns:
 #' \describe{
@@ -12,20 +12,24 @@
 #'   \item{taxon.iconic_taxon_name}{iNaturalist iconic taxon group}
 #'   \item{status_IUCN}{list-column of IUCN conservation status tibbles}
 #'   \item{establishmentMeans}{list-column of establishment means tibbles}
-#'   \item{directive}{EU directive name}
-#'   \item{annex}{EU directive annex}
+#'   \item{directive}{character. EU directive name:
+#'     \code{"Habitats Directive (92/43/EEC)"},
+#'     \code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+#'   \item{annex}{character. EU directive annex (e.g. \code{"II"},
+#'     \code{"I"}), or \code{NA} if not listed or annex not available.}
 #' }
-#' @source iNaturalist via \code{ReLTER::get_site_speciesOccurrences()}
+#' @source iNaturalist via \code{ReLTER::get_site_speciesOccurrences()},
+#'   EU directive data from the BISE (Biodiversity Information System for Europe)
+#'   REST API (\url{https://biodiversity.europa.eu}).
 "occ_eLTER_legal"
 
-
-#' eLTER site boundary for Montagna di Torricchio
+#' eLTER site boundary for Gran Paradiso
 #'
 #' @description `r lifecycle::badge("experimental")`
 #'
-#' An \code{sf} object representing the boundary of the Montagna di
-#' Torricchio eLTER site retrieved via \code{ReLTER::get_site_info()}.
+#' An \code{sf} object representing the boundary of the Gran Paradiso
+#' eLTER facility retrieved via \code{ReLTER::get_site_info()}.
 #'
 #' @format An \code{sf} object with site metadata and boundary polygon.
-#' @source \url{https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8}
+#' @source \url{https://deims.org/15c3e841-8494-42d2-a44e-c49a0ff25946}
 "site_boundary"

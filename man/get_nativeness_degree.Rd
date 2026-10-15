@@ -67,9 +67,9 @@ alien species information for the same taxon.
 
 Data are sourced from:
 \enumerate{
-\item iNaturalist checklists —
+\item iNaturalist checklists --
 \url{https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712}
-\item EASIN — European Alien Species Information Network —
+\item EASIN -- European Alien Species Information Network --
 \url{https://easin.jrc.ec.europa.eu/easin}
 }
 }
@@ -102,7 +102,7 @@ get_nativeness_degree(taxon.id = 61976, country = "Italy")
 \seealso{
 \code{\link{add_nativeness_to_occ}} for applying this function across
 a full occurrence tibble.
-\code{\link{.assign_EASIN_info}} for the underlying EASIN API call.
+\code{.assign_EASIN_info} for the underlying EASIN API call.
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}

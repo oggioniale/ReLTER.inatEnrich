@@ -19,7 +19,7 @@ A \code{\link[ggplot2]{ggplot}} object printed to the active device.
 
 Takes a tibble of iNaturalist occurrences and produces a stacked bar chart
 of mean observations per calendar month across years, coloured by iconic
-taxon group. Error bars show ± 1 standard error of the mean across years.
+taxon group. Error bars show +/- 1 standard error of the mean across years.
 All twelve months are always shown, including those with zero observations.
 }
 \examples{

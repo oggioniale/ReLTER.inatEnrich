@@ -14,7 +14,6 @@
 ^pkgdown$
 ^docs$
 # Vignettes build artifacts
-^inst/doc$
 # renv
 ^renv$
 ^renv\.lock$
@@ -27,3 +26,11 @@
 ^codecov\.yml$
 ^dev$
 ^data-raw$
+.codecov.yml
+man/figures/.bkp
+^inst/figures/map_example_files$
+^man/figures/\.\$.*\.bkp$
+^vignettes/articles$
+^codemeta\.json$
+^other_files$
+^rosm\.cache$

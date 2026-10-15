@@ -2,87 +2,67 @@
 % Please edit documentation in R/functions.R
 \name{add_eunis_legal_to_occ}
 \alias{add_eunis_legal_to_occ}
-\title{Enrich iNaturalist occurrences with EUNIS legal framework information}
+\title{Enrich eLTER site iNaturalist occurrences with EU directive legal information}
 \usage{
 add_eunis_legal_to_occ(occ_eLTER)
 }
 \arguments{
-\item{occ_eLTER}{A \code{tibble} containing iNaturalist occurrences. Must
-contain the columns \code{taxon.id} and \code{taxon.ancestor_ids}.}
+\item{occ_eLTER}{An \code{sf} tibble of iNaturalist occurrences, typically
+output of \code{ReLTER::get_site_speciesOccurrences()} after
+\code{\link{add_iucn_to_occ}} and \code{\link{add_nativeness_to_occ}}.}
 }
 \value{
-A \code{tibble} containing all original columns of \code{occ_eLTER}
-plus:
+The input tibble enriched with:
 \describe{
-\item{directive}{\code{character}. Legal directive text from EUNIS
-(92/43/EEC or 2009/147/EC), or \code{NA} if not found.}
-\item{annex}{\code{character}. Annex information from EUNIS table,
-or \code{NA} if not found.}
-\item{SOBIO_014}{\code{logical}. Whether the observation contributes to
-Flying insects (SOBIO_014) eLTER Standard Observation.
-Assigned only if not already present.}
-\item{SOBIO_017}{\code{logical}. Whether the observation contributes to
-Vegetation composition (SOBIO_017) eLTER Standard Observation.
-Assigned only if not already present.}
-\item{SOBIO_018}{\code{logical}. Whether the observation contributes to
-Acoustic recording (SOBIO_018) eLTER Standard Observation.
-Assigned only if not already present.}
+\item{directive}{EU directive name
+(\code{"Habitats Directive (92/43/EEC)"},
+\code{"Birds Directive (2009/147/EC)"}), or \code{NA}.}
+\item{annex}{Short annex code (e.g. \code{"II"}, \code{"IV"},
+\code{"I"}), or \code{NA}.}
 }
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
-This function enriches iNaturalist occurrences with legal protection
-information extracted from the EUNIS database. It uses the scientific name
-retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
-legal directives related to the EU Habitats Directive (92/43/EEC) and
-Birds Directive (2009/147/EC).
 
-Observations are not filtered by geoprivacy or research grade. If a taxon
-has no legal information in EUNIS, \code{NA} values are returned for
-\code{directive} and \code{annex}.
+Iterates over all unique \code{taxon.id} values in the occurrence tibble
+and enriches each row with EU directive information retrieved from the
+\href{https://biodiversity.europa.eu}{BISE} (Biodiversity Information System
+for Europe) REST API via \code{\link{get_eunis_legal_info}}.
 
-If not already present, the function automatically assigns eLTER Standard
-Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
-\code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves,
-Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
-SOBIO_018 simultaneously.
-If the columns are already present (e.g. because a previous enrichment function
-was already run), the assignment step is skipped.
+For each taxon the function appends the directive name and the Annex
+identifier (II, IV, V for Habitats; I for Birds). When a species is listed
+under both directives the occurrence tibble will contain multiple rows for
+that taxon -- one per directive/annex entry.
 }
 \note{
-eLTER Standard Observation assignments are based on taxonomic ancestry
-(\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
+EU directive data are retrieved live from the BISE REST API
+(\url{https://biodiversity.europa.eu}) using two POST requests per unique
+taxon. An internet connection is required. The function includes a short
+delay between taxa (\code{Sys.sleep(0.2)}) to avoid overloading the
+server.
 }
 \examples{
 \dontrun{
-# Download taxa occurrences from iNaturalist using ReLTER's
-# get_site_speciesOccurrences() function
-# e.g. Montagna di Torricchio eLTER site
-deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
-occ_iNat <- ReLTER::get_site_speciesOccurrences(
-  deimsid = deimsid,
-  list_DS = "inat",
-  show_map = FALSE,
-  limit = 50
+deimsid       <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+
+iNat_occ <- ReLTER::get_site_speciesOccurrences(
+  deimsid  = deimsid,
+  list_DS  = "inat",
+  show_map = TRUE,
+  limit    = 50
 )
 
-occ_legal <- add_eunis_legal_to_occ(
-  occ_eLTER = occ_iNat$inat
-)
+occ_legal <- iNat_occ$inat |>
+  add_iucn_to_occ() |>
+  add_nativeness_to_occ(country = site_boundary$country) |>
+  add_eunis_legal_to_occ()
 }
 
 }
 \seealso{
-\code{\link{get_eunis_legal_info}},
-\code{\link{add_iucn_to_occ}},
-\code{\link{add_nativeness_to_occ}},
-\code{\link{obs_SO_pie_chart}}
+\code{\link{get_eunis_legal_info}}, \code{\link{obs_pie_chart}}
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
-
-Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
-
-Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

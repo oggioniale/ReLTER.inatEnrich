@@ -18,14 +18,14 @@
   occ |>
     dplyr::mutate(
       .is_aves = vapply(taxon.ancestor_ids,
-                           function(x) has_ancestor(x, AVES_ID),
-                           FUN.VALUE = logical(1)),
+                        function(x) has_ancestor(x, AVES_ID),
+                        FUN.VALUE = logical(1)),
       .is_insecta = vapply(taxon.ancestor_ids,
-               function(x) has_ancestor(x, INSECTA_ID),
-               FUN.VALUE = logical(1)),
+                           function(x) has_ancestor(x, INSECTA_ID),
+                           FUN.VALUE = logical(1)),
       .is_anura = vapply(taxon.ancestor_ids,
-                              function(x) has_ancestor(x, ANURA_ID),
-                              FUN.VALUE = logical(1)),
+                         function(x) has_ancestor(x, ANURA_ID),
+                         FUN.VALUE = logical(1)),
       .is_chiroptera = vapply(taxon.ancestor_ids,
                               function(x) has_ancestor(x, CHIROPTERA_ID),
                               FUN.VALUE = logical(1)),
@@ -33,8 +33,8 @@
                               function(x) has_ancestor(x, ORTHOPTERA_ID),
                               FUN.VALUE = logical(1)),
       .is_plants = vapply(taxon.ancestor_ids,
-                              function(x) has_ancestor(x, PLANTS_ID),
-                              FUN.VALUE = logical(1)),
+                          function(x) has_ancestor(x, PLANTS_ID),
+                          FUN.VALUE = logical(1)),
       SOBIO_018 = .is_aves | .is_anura | .is_chiroptera | .is_orthoptera,
       SOBIO_014 = .is_insecta,
       SOBIO_017 = .is_plants
@@ -51,11 +51,11 @@
 #' ## Not run:
 #' # https://easin.jrc.ec.europa.eu/apixg/catxg/term/Falco%20tinnunculus
 #' .assign_EASIN_info(specie_name = "Falco tinnunculus")
-#' 
+#'
 #' # https://easin.jrc.ec.europa.eu/apixg/catxg/term/Vespa%20velutina%20nigrithorax
 #' .assign_EASIN_info(specie_name = "Vespa velutina")
 #' }
-#' 
+#'
 .assign_EASIN_info <- function(specie_name) {
   easin_empty_tbl <- dplyr::tibble(
     EASIN_url = NA_character_,
@@ -74,10 +74,10 @@
   )
   
   easin_response <- tryCatch({
-    httr2::request(easin_api_url) |> 
-      httr2::req_method("GET") |> 
-      httr2::req_headers(Accept = "application/json") |> 
-      httr2::req_retry(max_tries = 3, max_seconds = 120) |> 
+    httr2::request(easin_api_url) |>
+      httr2::req_method("GET") |>
+      httr2::req_headers(Accept = "application/json") |>
+      httr2::req_retry(max_tries = 3, max_seconds = 120) |>
       httr2::req_perform()
   }, error = function(e) {
     return(NULL)
@@ -103,7 +103,7 @@
     if (is.null(intro) || length(intro) == 0) return(NA_character_)
     if (!is.list(intro)) return(NA_character_)
     first <- intro[[1]]
-    if (!is.list(first)) return(NA_character_)   # <-- blocca se intro[[1]] è atomico
+    if (!is.list(first)) return(NA_character_)   # <-- blocca se intro[[1]] e atomico
     val <- first[[field]]
     if (is.null(val) || length(val) == 0) return(NA_character_)
     as.character(val)
@@ -132,7 +132,6 @@
 }
 
 #' @keywords internal
-#' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @noRd
 #' @examples
 #' \dontrun{
@@ -192,12 +191,12 @@
 #' This function generates a request to the iNaturalist API of a given
 #' `taxon.id` to obtain, if updated, the IUCN conservation status, where
 #' the authority is the "IUCN Red List".
-#' 
+#'
 #' Registered user can update iNaturalist IUCN conservation status.
 #' For more information about the procedure for updating the IUCN conservation
 #' status in iNaturalist community, please refer to the following link:
 #' https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
-#' 
+#'
 #' For more information about iNaturalist API of Taxa, please refer to the
 #' following link: https://api.inaturalist.org/v1/docs/#!/Taxa/get_taxa_id
 #' using as "id" value 517449. The JSON key that contains info about IUCN
@@ -223,13 +222,13 @@
 #' get_conservation_status(
 #'   taxon.id = 517449
 #' )
-#' 
+#'
 #' # without IUCN red list conservation status declared
 #' # Protoparmeliopsis muralis
 #' get_conservation_status(
 #'   taxon.id = 632126
 #' )
-#' 
+#'
 #' # with 3 IUCN red list conservation status declared
 #' # Falco tinnunculus
 #' get_conservation_status(
@@ -243,18 +242,18 @@
 get_conservation_status <- function(taxon.id) {
   # helper: empty tibble with consistent structure
   empty_tbl <- dplyr::tibble(
-      status = NA_character_,
-      authority = NA_character_,
-      scope_of_assesment = NA_character_,
-      url = NA_character_
-    )
+    status = NA_character_,
+    authority = NA_character_,
+    scope_of_assesment = NA_character_,
+    url = NA_character_
+  )
   iNat_api_url <- paste0("https://api.inaturalist.org/v1/taxa/", taxon.id)
   
   response <- tryCatch({
-    httr2::request(iNat_api_url) |> 
-      httr2::req_method("GET") |> 
-      httr2::req_headers(Accept = "application/json") |> 
-      httr2::req_retry(max_tries = 3, max_seconds = 120) |> 
+    httr2::request(iNat_api_url) |>
+      httr2::req_method("GET") |>
+      httr2::req_headers(Accept = "application/json") |>
+      httr2::req_retry(max_tries = 3, max_seconds = 120) |>
       httr2::req_perform()
   }, error = function(e) {
     return(NULL)
@@ -282,7 +281,7 @@ get_conservation_status <- function(taxon.id) {
   if (is.null(cons_status) ||
       length(cons_status) == 0 ||
       (is.data.frame(cons_status) && nrow(cons_status) == 0)
-    ) {
+  ) {
     return(empty_tbl)
   }
   
@@ -334,9 +333,9 @@ get_conservation_status <- function(taxon.id) {
 #'
 #' Data are sourced from:
 #' \enumerate{
-#'   \item iNaturalist checklists —
+#'   \item iNaturalist checklists --
 #'     \url{https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712}
-#'   \item EASIN — European Alien Species Information Network —
+#'   \item EASIN -- European Alien Species Information Network --
 #'     \url{https://easin.jrc.ec.europa.eu/easin}
 #' }
 #'
@@ -396,7 +395,7 @@ get_conservation_status <- function(taxon.id) {
 #' (\url{https://easin.jrc.ec.europa.eu/apixg/catxg/term/}) and reflect
 #' the information available in the EASIN catalogue. If the taxon is not
 #' present in EASIN, all \code{EASIN_*} fields are \code{NA}.
-#' 
+#'
 #' \strong{Disclaimer}: EASIN reports alien (i.e., non-native) status at the
 #' country level and does not distinguish cases where a species is non-native
 #' only in specific sub-national areas (e.g., islands) but native in others
@@ -407,7 +406,7 @@ get_conservation_status <- function(taxon.id) {
 #' @seealso
 #' \code{\link{add_nativeness_to_occ}} for applying this function across
 #' a full occurrence tibble.
-#' \code{\link{.assign_EASIN_info}} for the underlying EASIN API call.
+#' \code{.assign_EASIN_info} for the underlying EASIN API call.
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
@@ -523,54 +522,80 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
   )
 }
 
-#' Get EUNIS Legal Information for a Species Using iNaturalist Taxon ID
+#' Get EU directive legal information for a species using the BISE API
+#'
 #' @description `r lifecycle::badge("stable")`
-#' This function takes a \code{taxon.id} from iNaturalist, retrieves the corresponding
-#' scientific name from the iNaturalist API, searches the EUNIS database, and extracts
-#' the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC),
-#' as delivered by data retrieved from the [EUNIS](https://eunis.eea.europa.eu/) species database.
-#' 
+#'
+#' Takes an iNaturalist \code{taxon.id}, retrieves the species scientific name
+#' from the iNaturalist Taxa API, then queries the
+#' \href{https://biodiversity.europa.eu}{BISE} (Biodiversity Information System
+#' for Europe) REST API in two steps:
+#' \enumerate{
+#'   \item Species search by scientific name to obtain the internal
+#'         \code{id_eunis} identifier.
+#'   \item Legal status lookup by \code{id_eunis} to obtain EU directive and
+#'         annex information from the Protection table.
+#' }
+#' Only rows where \code{legal_instrument} is \code{"EU Habitats Directive"}
+#' or \code{"EU Birds Directive"} are retained.
+#'
 #' @param taxon.id Integer. The taxon ID of the species in iNaturalist.
 #'
-#' @return A tibble with the following columns:
+#' @return A tibble with one row per EU directive entry for the species, or a
+#'   single-row tibble with \code{NA} values if the species is not found.
+#'   Columns:
 #'   \describe{
-#'     \item{taxon.id}{iNaturalist taxon ID provided as input}
-#'     \item{scientific_name}{Scientific name of the species retrieved from iNaturalist}
-#'     \item{`Legal text`}{Legal directive text from EUNIS (92/43/EEC or 2009/147/EC)}
-#'     \item{Annex}{Annex information from EUNIS table}
+#'     \item{taxon.id}{iNaturalist taxon ID.}
+#'     \item{scientific_name}{Scientific name from iNaturalist.}
+#'     \item{directive}{\code{"Habitats Directive (92/43/EEC)"},
+#'       \code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+#'     \item{annex}{Short annex code parsed from the BISE annex description,
+#'       e.g. \code{"II"}, \code{"IV"}, \code{"I"}, or \code{NA}.}
 #'   }
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #'
-#' @importFrom httr2 request req_method req_headers req_retry req_perform
-#' @importFrom httr2 resp_status resp_body_json
-#' @importFrom rvest read_html html_elements html_attr html_table
-#' @importFrom dplyr tibble filter select mutate
-#' @importFrom purrr keep
+#' @importFrom httr2 request req_method req_headers req_body_json req_retry
+#' @importFrom httr2 req_perform resp_status resp_body_json
+#' @importFrom dplyr tibble filter mutate
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' ## Not run:
-#' get_eunis_legal_info(taxon.id = 61749)
+#' # Canis lupus -- Habitats Directive, Annex II and IV
+#' get_eunis_legal_info(taxon.id = 42048)
+#'
+#' # Falco tinnunculus -- Birds Directive
+#' get_eunis_legal_info(taxon.id = 5221)
 #' }
-#' ## End (Not run)
 #'
 ### get_eunis_legal_info
 get_eunis_legal_info <- function(taxon.id) {
-  safe_return <- function(taxon.id, scientific_name = NA) {
+  
+  safe_return <- function(taxon.id, scientific_name = NA_character_) {
     dplyr::tibble(
       taxon.id        = taxon.id,
       scientific_name = scientific_name,
-      `Legal text`    = NA,
-      Annex           = NA
+      directive       = NA_character_,
+      annex           = NA_character_
     )
   }
   
-  # --- 1. Extract scientific name from iNaturalist ---
+  # --- Helper: parse short annex code from BISE long-form description ---
+  .parse_annex_code <- function(annex_str) {
+    if (is.na(annex_str) || !nzchar(trimws(annex_str))) return(NA_character_)
+    # Match "Annex <Roman>" at the start of the string
+    m <- regmatches(annex_str,
+                    regexpr("Annex\\s+(I{1,3}V?|VI?|IV|V?I{0,3})", annex_str))
+    if (length(m) == 0 || !nzchar(m)) return(NA_character_)
+    # Extract just the numeral part
+    sub("^Annex\\s+", "", m)
+  }
+  
+  # --- 1. Get scientific name from iNaturalist ---
   url_inat <- paste0("https://api.inaturalist.org/v1/taxa/", taxon.id)
   
-  res <- tryCatch({
+  res_inat <- tryCatch({
     httr2::request(url_inat) |>
       httr2::req_method("GET") |>
       httr2::req_headers(Accept = "application/json") |>
@@ -578,93 +603,168 @@ get_eunis_legal_info <- function(taxon.id) {
       httr2::req_perform()
   }, error = function(e) NULL)
   
-  if (is.null(res) || httr2::resp_status(res) != 200) {
-    warning("Error in iNaturalist API request")
+  if (is.null(res_inat) || httr2::resp_status(res_inat) != 200) {
+    warning("Error in iNaturalist API request for taxon.id: ", taxon.id)
     return(safe_return(taxon.id))
   }
   
-  data <- tryCatch({
-    httr2::resp_body_json(res, simplifyVector = TRUE)
-  }, error = function(e) NULL)
+  data_inat <- tryCatch(
+    httr2::resp_body_json(res_inat, simplifyVector = TRUE),
+    error = function(e) NULL
+  )
   
-  if (is.null(data) || length(data$results) == 0) {
+  if (is.null(data_inat) || length(data_inat$results) == 0) {
     return(safe_return(taxon.id))
   }
   
-  scientific_name <- data$results$name[1]
+  scientific_name <- trimws(data_inat$results$name[1])
   
-  # --- 2. Search species on EUNIS ---
-  url_specie <- paste0(
-    "https://eunis.eea.europa.eu/species-names-result.jsp?typeForm=0&showScientificName=true&searchVernacular=false&sort=1&ascendency=1&showGroup=false&showOrder=false&showFamily=false&showValidName=false&relationOp=2&scientificName=",
-    URLencode(scientific_name)
+  # --- 2. BISE step 1: species name -> id_eunis ---
+  bise_search_url <- paste0(
+    "https://biodiversity.europa.eu/++api++/data/",
+    "all-species-search-listing/@connector-data"
   )
   
-  link <- tryCatch({
-    url_specie |>
-      rvest::read_html() |>
-      rvest::html_elements("a") |>
-      rvest::html_attr("href") |>
-      na.omit() |>
-      as.vector() |>
-      (\(x) x[grepl("^species/\\d+$", x)])()  # bug fix: pattern primo, x secondo
-  }, error = function(e) character(0))
+  search_body <- list(
+    data_query = list(
+      list(
+        i = "scientific_name",
+        o = "plone.app.querystring.operation.string.contains",
+        v = scientific_name
+      )
+    ),
+    form = list(db_version = "latest")
+  )
   
-  if (length(link) == 0) {
-    return(safe_return(taxon.id, scientific_name))
-  }
-  
-  m <- regexpr("\\d+", link[1])
-  species_id <- if (m != -1) regmatches(link[1], m) else NA_character_
-  
-  if (is.na(species_id)) {
-    return(safe_return(taxon.id, scientific_name))
-  }
-  
-  url_eunis <- paste0("https://eunis.eea.europa.eu/species/", species_id)
-  
-  # --- 3. Read EUNIS page and extract table ---
-  page <- tryCatch({
-    rvest::read_html(url_eunis) |>
-      rvest::html_elements("table") |>
-      rvest::html_table(fill = TRUE)
+  res_search <- tryCatch({
+    httr2::request(bise_search_url) |>
+      httr2::req_method("POST") |>
+      httr2::req_headers(
+        Accept         = "application/json",
+        `Content-Type` = "application/json"
+      ) |>
+      httr2::req_body_json(search_body) |>
+      httr2::req_retry(max_tries = 3, max_seconds = 60) |>
+      httr2::req_perform()
   }, error = function(e) NULL)
   
-  if (is.null(page) || length(page) == 0) {
+  if (is.null(res_search) || httr2::resp_status(res_search) != 200) {
     return(safe_return(taxon.id, scientific_name))
   }
   
-  # trova tabella con "Legal"
-  df_legal_list <- purrr::keep(
-    page,
-    ~ any(grepl("Legal", names(.x)))  # bug fix: pattern primo, names(.x) secondo
+  data_search <- tryCatch(
+    httr2::resp_body_json(res_search, simplifyVector = TRUE),
+    error = function(e) NULL
   )
   
-  if (length(df_legal_list) == 0) {
+  # Extract id_eunis -- response uses parallel arrays under data$results
+  id_eunis_vec <- tryCatch(
+    data_search$data$results$id_eunis,
+    error = function(e) NULL
+  )
+  sci_names_vec <- tryCatch(
+    data_search$data$results$scientific_name,
+    error = function(e) NULL
+  )
+  
+  if (is.null(id_eunis_vec) || length(id_eunis_vec) == 0) {
     return(safe_return(taxon.id, scientific_name))
   }
   
-  df_legal <- df_legal_list[[1]]
+  # Pick the row where scientific_name matches exactly (case-insensitive)
+  exact_idx <- which(tolower(trimws(sci_names_vec)) == tolower(scientific_name))
+  id_eunis <- if (length(exact_idx) > 0) {
+    id_eunis_vec[[exact_idx[1]]]
+  } else {
+    id_eunis_vec[[1]]   # fallback: first result
+  }
   
-  # verifica colonne attese
-  if (!all(c("Legal text", "Annex") %in% names(df_legal))) {
+  if (is.null(id_eunis) || is.na(id_eunis) || !nzchar(as.character(id_eunis))) {
     return(safe_return(taxon.id, scientific_name))
   }
   
-  # filtra direttive EU
-  df_legal <- df_legal |>
-    dplyr::filter(grepl("92/43/EEC|2009/147/EC", `Legal text`)) |>  # bug fix: pattern primo
-    dplyr::select(`Legal text`, Annex) |>
+  # --- 3. BISE step 2: id_eunis -> legal status (Protection table) ---
+  bise_legal_url <- paste0(
+    "https://biodiversity.europa.eu/++api++/data/",
+    "natura-2000-species-legal-status/@connector-data"
+  )
+  
+  legal_body <- list(
+    data_query = list(
+      list(
+        i = "id_eunis",
+        o = "plone.app.querystring.operation.selection.any",
+        v = list(as.character(id_eunis))
+      )
+    ),
+    form = list(db_version = "latest")
+  )
+  
+  res_legal <- tryCatch({
+    httr2::request(bise_legal_url) |>
+      httr2::req_method("POST") |>
+      httr2::req_headers(
+        Accept         = "application/json",
+        `Content-Type` = "application/json"
+      ) |>
+      httr2::req_body_json(legal_body) |>
+      httr2::req_retry(max_tries = 3, max_seconds = 60) |>
+      httr2::req_perform()
+  }, error = function(e) NULL)
+  
+  if (is.null(res_legal) || httr2::resp_status(res_legal) != 200) {
+    return(safe_return(taxon.id, scientific_name))
+  }
+  
+  data_legal <- tryCatch(
+    httr2::resp_body_json(res_legal, simplifyVector = TRUE),
+    error = function(e) NULL
+  )
+  
+  legal_results <- tryCatch(data_legal$data$results, error = function(e) NULL)
+  
+  if (is.null(legal_results) ||
+      is.null(legal_results$legal_instrument) ||
+      length(legal_results$legal_instrument) == 0) {
+    return(safe_return(taxon.id, scientific_name))
+  }
+  
+  # Build a data frame from the parallel arrays
+  n <- length(legal_results$legal_instrument)
+  df <- dplyr::tibble(
+    legal_instrument = as.character(legal_results$legal_instrument),
+    annex_raw        = if (!is.null(legal_results$annex))
+      as.character(legal_results$annex)
+    else rep(NA_character_, n)
+  )
+  
+  # Keep only EU Habitats Directive and EU Birds Directive rows
+  df_eu <- df[df$legal_instrument %in%
+                c("EU Habitats Directive", "EU Birds Directive"), ]
+  
+  if (nrow(df_eu) == 0) {
+    return(safe_return(taxon.id, scientific_name))
+  }
+  
+  # Map instrument names to standard directive labels
+  df_eu <- df_eu |>
     dplyr::mutate(
-      taxon.id        = taxon.id,
-      scientific_name = scientific_name
-    ) |>
-    dplyr::select(taxon.id, scientific_name, `Legal text`, Annex)
+      directive = dplyr::case_when(
+        legal_instrument == "EU Habitats Directive" ~
+          "Habitats Directive (92/43/EEC)",
+        legal_instrument == "EU Birds Directive"    ~
+          "Birds Directive (2009/147/EC)",
+        TRUE ~ NA_character_
+      ),
+      annex = vapply(annex_raw, .parse_annex_code, FUN.VALUE = character(1))
+    )
   
-  if (nrow(df_legal) == 0) {
-    return(safe_return(taxon.id, scientific_name))
-  }
-  
-  return(df_legal)
+  dplyr::tibble(
+    taxon.id        = taxon.id,
+    scientific_name = scientific_name,
+    directive       = df_eu$directive,
+    annex           = df_eu$annex
+  )
 }
 
 #' Enrich iNaturalist specific project observations with IUCN conservation status
@@ -765,15 +865,15 @@ add_iucn_to_obs <- function(project_name) {
     status <- get_conservation_status(taxon.id)
     
     # Print progress
-    message("✅ Progressive: ", record_counter, " | iNat taxon id: ", taxon.id, " | Status: ", status)
+    message("\u2705 Progressive: ", record_counter, " | iNat taxon id: ", taxon.id, " | Status: ", status)
     
     dplyr::tibble(taxon.id = taxon.id, status = status)
   })
   
   # Filter taxon.id with JSON parsing errors
-  taxon_errors <- status_results |> 
+  taxon_errors <- status_results |>
     dplyr::filter(is.na(status)) |>  # Errors are stored as NA
-    dplyr::inner_join(obs_iNat_project_research_valid, by = "taxon.id") |> 
+    dplyr::inner_join(obs_iNat_project_research_valid, by = "taxon.id") |>
     dplyr::select(taxon.id, taxon.name, taxon.common_name.name) |>
     dplyr::distinct()
   
@@ -783,16 +883,16 @@ add_iucn_to_obs <- function(project_name) {
     
     # Print each taxon.id with scientific and common name
     purrr::walk2(
-      taxon_errors$taxon.id, 
+      taxon_errors$taxon.id,
       taxon_errors$taxon.name,
-      ~ message("❌ Error for Taxon ID: ", .x, " | Scientific name: ", .y)
+      ~ message("\u274c Error for Taxon ID: ", .x, " | Scientific name: ", .y)
     )
   } else {
-    message("✅ No JSON parsing errors found for taxa.")
+    message("\u2705 No JSON parsing errors found for taxa.")
   }
   
   # Merge the obtained results with the original dataframe
-  obs_iNat_project_research_valid <- obs_iNat_project_research_valid |> 
+  obs_iNat_project_research_valid <- obs_iNat_project_research_valid |>
     dplyr::left_join(status_results, by = "taxon.id")
   
   return(obs_iNat_project_research_valid)
@@ -821,10 +921,10 @@ add_iucn_to_obs <- function(project_name) {
 #' list-column.
 #'
 #' If not already present, the function automatically assigns eLTER Standard
-#' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-#' three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
-#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves, 
-#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and 
+#' Observations to each record via \code{.assign_eLTER_SOs}, adding
+#' three logical columns: \code{SOBIO_014} (Flying insects -- Insecta),
+#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording -- Aves,
+#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
 #' SOBIO_018 simultaneously.
 #' If the columns are already present (e.g. because a previous enrichment function
 #' was already run), the assignment step is skipped.
@@ -869,7 +969,7 @@ add_iucn_to_obs <- function(project_name) {
 #' \code{\link{add_nativeness_to_occ}},
 #' \code{\link{add_eunis_legal_to_occ}},
 #' \code{\link{obs_SO_pie_chart}}
-#' 
+#'
 #' @details
 #' The IUCN conservation status is retrieved from the iNaturalist Taxa API and
 #' reflects the information available within iNaturalist. This information may
@@ -887,28 +987,28 @@ add_iucn_to_obs <- function(project_name) {
 #' # get_site_speciesOccurrences() function
 #' # e.g. Montagna di Torricchio eLTER site
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
-#' 
+#'
 #' occ_eLTER <- ReLTER::get_site_speciesOccurrences(
 #'   deimsid = deimsid,
 #'   list_DS = "inat",
 #'   show_map = FALSE,
 #'   limit = 50
 #' )
-#' 
+#'
 #' occ <- add_iucn_to_occ(
 #'   occ_eLTER = occ_eLTER$inat
 #' )
 #' }
 #' ## End (Not run)
-#' 
+#'
 ### add_iucn_to_occ
 add_iucn_to_occ <- function(occ_eLTER) {
   # assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
-    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
+    message("\u2139\ufe0f Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
     occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
   } else {
-    message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
+    message("\u2139\ufe0f eLTER Standard Observations already assigned -- skipping.\n----\n")
   }
   
   occ_in_site_research_valid <- occ_eLTER |>
@@ -936,27 +1036,15 @@ add_iucn_to_occ <- function(occ_eLTER) {
       get_conservation_status(taxon.id),
       error = function(e) NULL
     )
-    # Normalize output
-    # if (is.na(status)) {
-    #   status_tbl <- empty_status_tbl
-    # } else if (inherits(status, "data.frame")) {
-    #   if (nrow(status) == 0) {
-    #     status_tbl <- empty_status_tbl
-    #   } else {
-    #     status_tbl <- status
-    #   }
-    # } else {
-    #   status_tbl <- empty_status_tbl
-    # }
     # Check validity
     valid <- has_valid_status(status_tbl)
     # Logging
     if (!valid) {
-      message("⚠️ Progressive taxon record: ", record_counter,
+      message("\u26a0\ufe0f Progressive taxon record: ", record_counter,
               " | iNat taxon id: ", taxon.id,
               " | No IUCN status recorded in iNaturalist")
     } else {
-      message("✅ Progressive taxon record:  ", record_counter,
+      message("\u2705 Progressive taxon record:  ", record_counter,
               " | iNat taxon id: ", taxon.id,
               " | Records found: ", sum(!is.na(status_tbl$status)),
               " | Authority: IUCN Red List")
@@ -982,18 +1070,18 @@ add_iucn_to_occ <- function(occ_eLTER) {
   # Summary log
   message(
     "\n----\nThe conservation status here, if present, is the one reported in iNaturalist, referring to the IUCN Red List. It may not be up to date.\n----\n",
-    "⚠️ ", nrow(taxon_errors),
+    "\u26a0\ufe0f ", nrow(taxon_errors),
     " taxa encountered no IUCN Red List status information in iNaturalist.\n"
   )
   purrr::walk2(
     taxon_errors$taxon.id,
     taxon_errors$name,
-    ~ message("⚠️ The Taxon ID: ", .x,
+    ~ message("\u26a0\ufe0f The Taxon ID: ", .x,
               " | Scientific name: ", .y,
               " | it does not have an IUCN status recorded in iNaturalist.")
   )
   message(
-    "\n✅ ", nrow(taxon_no_errors),
+    "\n\u2705 ", nrow(taxon_no_errors),
     " taxa successfully parsed and ready for use. Please, remember that this information may not be up to date.\n"
   )
   purrr::walk(
@@ -1001,7 +1089,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
     function(i) {
       n_records <- sum(!is.na(taxon_no_errors$status_IUCN[[i]]$status))
       message(
-        "✅ The Taxon ID: ", taxon_no_errors$taxon.id[i],
+        "\u2705 The Taxon ID: ", taxon_no_errors$taxon.id[i],
         " | Scientific name: ", taxon_no_errors$name[i],
         " | it does have an IUCN status recorded in iNaturalist (",
         n_records, " records)."
@@ -1028,10 +1116,10 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #' list-column.
 #'
 #' If not already present, the function automatically assigns eLTER Standard
-#' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-#' three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
-#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves, 
-#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and 
+#' Observations to each record via \code{.assign_eLTER_SOs}, adding
+#' three logical columns: \code{SOBIO_014} (Flying insects -- Insecta),
+#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording -- Aves,
+#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
 #' SOBIO_018 simultaneously.
 #' If the columns are already present (e.g. because a previous enrichment function
 #' was already run), the assignment step is skipped.
@@ -1083,7 +1171,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #' \code{\link{add_iucn_to_occ}},
 #' \code{\link{add_eunis_legal_to_occ}},
 #' \code{\link{obs_SO_pie_chart}}
-#' 
+#'
 #' @note Progress messages are printed to the console for each taxon
 #'   processed, including the iNaturalist taxon ID, nativeness status,
 #'   and authority. A summary of taxa with and without establishment means
@@ -1091,7 +1179,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #'
 #'   The establishment means information is sourced from iNaturalist and
 #'   may refer to the IUCN Red List. It may not always be up to date.
-#'   
+#'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
 #' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
@@ -1128,10 +1216,10 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
   
   # assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
-    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
+    message("\u2139\ufe0f Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
     occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
   } else {
-    message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
+    message("\u2139\ufe0f eLTER Standard Observations already assigned -- skipping.\n----\n")
   }
   
   # Keep only research-grade, non-captive observations with a valid date
@@ -1160,11 +1248,11 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
     
     # Log result to console
     if (is.na(nativeness_val)) {
-      message("⚠️ Progressive: ", record_counter,
+      message("\u26a0\ufe0f Progressive: ", record_counter,
               " | iNat taxon id: ", taxon.id,
               " | No Establishment Means recorded in iNaturalist for country: ", country)
     } else {
-      message("✅ Progressive: ", record_counter,
+      message("\u2705 Progressive: ", record_counter,
               " | iNat taxon id: ", taxon.id,
               " | Status: ", nativeness_val,
               " | Authority: ", authority_val,
@@ -1206,23 +1294,23 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
   message(
     "\n----\nThe Establishment Means here, if present, is the one reported in iNaturalist ",
     "for country: ", country, ", referring to the IUCN Red List. It may not be up to date.\n----\n",
-    "⚠️ ", nrow(taxon_errors), " taxa encountered no Establishment Means information.\n"
+    "\u26a0\ufe0f ", nrow(taxon_errors), " taxa encountered no Establishment Means information.\n"
   )
   
   # Log each taxon without establishment means
   purrr::walk2(
     taxon_errors$taxon.id, taxon_errors$name,
-    ~ message("⚠️ Taxon ID: ", .x, " | Scientific name: ", .y,
+    ~ message("\u26a0\ufe0f Taxon ID: ", .x, " | Scientific name: ", .y,
               " | No Establishment Means in iNaturalist for country: ", country)
   )
   
-  message("\n✅ ", nrow(taxon_no_errors),
+  message("\n\u2705 ", nrow(taxon_no_errors),
           " taxa successfully parsed. Remember: this info may not be up to date.\n")
   
   # Log each taxon with establishment means
   purrr::walk2(
     taxon_no_errors$taxon.id, taxon_no_errors$name,
-    ~ message("✅ Taxon ID: ", .x, " | Scientific name: ", .y,
+    ~ message("\u2705 Taxon ID: ", .x, " | Scientific name: ", .y,
               " | Establishment Means available for country: ", country)
   )
   
@@ -1240,145 +1328,126 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
     )
 }
 
-#' Enrich iNaturalist occurrences with EUNIS legal framework information
+#' Enrich eLTER site iNaturalist occurrences with EU directive legal information
+#'
 #' @description `r lifecycle::badge("stable")`
-#' This function enriches iNaturalist occurrences with legal protection
-#' information extracted from the EUNIS database. It uses the scientific name
-#' retrieved from the iNaturalist \code{taxon.id} to query EUNIS and extract
-#' legal directives related to the EU Habitats Directive (92/43/EEC) and
-#' Birds Directive (2009/147/EC).
 #'
-#' Observations are not filtered by geoprivacy or research grade. If a taxon
-#' has no legal information in EUNIS, \code{NA} values are returned for
-#' \code{directive} and \code{annex}.
+#' Iterates over all unique \code{taxon.id} values in the occurrence tibble
+#' and enriches each row with EU directive information retrieved from the
+#' \href{https://biodiversity.europa.eu}{BISE} (Biodiversity Information System
+#' for Europe) REST API via \code{\link{get_eunis_legal_info}}.
 #'
-#' If not already present, the function automatically assigns eLTER Standard
-#' Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-#' three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
-#' \code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves, 
-#' Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and 
-#' SOBIO_018 simultaneously.
-#' If the columns are already present (e.g. because a previous enrichment function
-#' was already run), the assignment step is skipped.
+#' For each taxon the function appends the directive name and the Annex
+#' identifier (II, IV, V for Habitats; I for Birds). When a species is listed
+#' under both directives the occurrence tibble will contain multiple rows for
+#' that taxon -- one per directive/annex entry.
 #'
-#' @param occ_eLTER A \code{tibble} containing iNaturalist occurrences. Must
-#'   contain the columns \code{taxon.id} and \code{taxon.ancestor_ids}.
+#' @param occ_eLTER An \code{sf} tibble of iNaturalist occurrences, typically
+#'   output of \code{ReLTER::get_site_speciesOccurrences()} after
+#'   \code{\link{add_iucn_to_occ}} and \code{\link{add_nativeness_to_occ}}.
 #'
-#' @return A \code{tibble} containing all original columns of \code{occ_eLTER}
-#'   plus:
+#' @return The input tibble enriched with:
 #'   \describe{
-#'     \item{directive}{\code{character}. Legal directive text from EUNIS
-#'       (92/43/EEC or 2009/147/EC), or \code{NA} if not found.}
-#'     \item{annex}{\code{character}. Annex information from EUNIS table,
-#'       or \code{NA} if not found.}
-#'     \item{SOBIO_014}{\code{logical}. Whether the observation contributes to
-#'       Flying insects (SOBIO_014) eLTER Standard Observation.
-#'       Assigned only if not already present.}
-#'     \item{SOBIO_017}{\code{logical}. Whether the observation contributes to
-#'       Vegetation composition (SOBIO_017) eLTER Standard Observation.
-#'       Assigned only if not already present.}
-#'     \item{SOBIO_018}{\code{logical}. Whether the observation contributes to
-#'       Acoustic recording (SOBIO_018) eLTER Standard Observation.
-#'       Assigned only if not already present.}
+#'     \item{directive}{EU directive name
+#'       (\code{"Habitats Directive (92/43/EEC)"},
+#'       \code{"Birds Directive (2009/147/EC)"}), or \code{NA}.}
+#'     \item{annex}{Short annex code (e.g. \code{"II"}, \code{"IV"},
+#'       \code{"I"}), or \code{NA}.}
 #'   }
 #'
 #' @note
-#' eLTER Standard Observation assignments are based on taxonomic ancestry
-#' (\code{taxon.ancestor_ids}) retrieved from the iNaturalist API.
+#' EU directive data are retrieved live from the BISE REST API
+#' (\url{https://biodiversity.europa.eu}) using two POST requests per unique
+#' taxon. An internet connection is required. The function includes a short
+#' delay between taxa (\code{Sys.sleep(0.2)}) to avoid overloading the
+#' server.
 #'
-#' @seealso
-#' \code{\link{get_eunis_legal_info}},
-#' \code{\link{add_iucn_to_occ}},
-#' \code{\link{add_nativeness_to_occ}},
-#' \code{\link{obs_SO_pie_chart}}
-#' 
+#' @seealso \code{\link{get_eunis_legal_info}}, \code{\link{obs_pie_chart}}
+#'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
-#' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
-#' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
-#' @importFrom dplyr tibble mutate left_join rename
+#' @importFrom dplyr select left_join tibble
 #' @importFrom purrr map_dfr
 #' @export
+#'
 #' @examples
 #' \dontrun{
-#' # Download taxa occurrences from iNaturalist using ReLTER's
-#' # get_site_speciesOccurrences() function
-#' # e.g. Montagna di Torricchio eLTER site
-#' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
-#' occ_iNat <- ReLTER::get_site_speciesOccurrences(
-#'   deimsid = deimsid,
-#'   list_DS = "inat",
-#'   show_map = FALSE,
-#'   limit = 50
+#' deimsid       <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
+#' site_boundary <- ReLTER::get_site_info(deimsid = deimsid)
+#'
+#' iNat_occ <- ReLTER::get_site_speciesOccurrences(
+#'   deimsid  = deimsid,
+#'   list_DS  = "inat",
+#'   show_map = TRUE,
+#'   limit    = 50
 #' )
 #'
-#' occ_legal <- add_eunis_legal_to_occ(
-#'   occ_eLTER = occ_iNat$inat
-#' )
+#' occ_legal <- iNat_occ$inat |>
+#'   add_iucn_to_occ() |>
+#'   add_nativeness_to_occ(country = site_boundary$country) |>
+#'   add_eunis_legal_to_occ()
 #' }
 #'
 ### add_eunis_legal_to_occ
 add_eunis_legal_to_occ <- function(occ_eLTER) {
   
-  # Check that taxon.id column exists
-  if(!"taxon.id" %in% names(occ_eLTER)) {
+  if (!"taxon.id" %in% names(occ_eLTER)) {
     stop("The input tibble must contain a column named 'taxon.id'")
   }
   
-  # assign eLTER SOs if not already present
+  # Assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
-    message("ℹ️ Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
+    message("\u2139\ufe0f Assigning eLTER Standard Observations ...\n----\n")
     occ_eLTER <- .assign_eLTER_SOs(occ_eLTER)
   } else {
-    message("ℹ️ eLTER Standard Observations already assigned — skipping.\n----\n")
+    message("\u2139\ufe0f eLTER Standard Observations already assigned -- skipping.\n----\n")
   }
   
-  # Extract unique taxon.ids
+  message("\u2139\ufe0f Querying BISE (biodiversity.europa.eu) for EU directive information...\n----\n")
+  
   unique_taxon.ids <- unique(occ_eLTER$taxon.id)
+  record_counter   <- 0L
   
-  record_counter <- 0
-  
-  # Map over unique taxon.ids to get legal info from EUNIS
-  legal_results <- purrr::map_dfr(unique_taxon.ids, function(taxon.id) {
+  legal_results <- purrr::map_dfr(unique_taxon.ids, function(tid) {
+    record_counter <<- record_counter + 1L
     
-    record_counter <<- record_counter + 1
+    # Throttle: iNaturalist + BISE each see ~3 requests/taxon, keep it gentle
+    Sys.sleep(0.2)
     
-    # Retrieve legal info for this taxon.id
     legal <- tryCatch(
-      get_eunis_legal_info(taxon.id),
+      get_eunis_legal_info(tid),
       error = function(e) {
-        warning("Error retrieving legal info for taxon.id: ", taxon.id)
-        return(dplyr::tibble(
-          taxon.id = taxon.id,
-          scientific_name = NA,
-          `Legal text` = NA,
-          Annex = NA
-        ))
+        warning("Error for taxon.id: ", tid, " -- ", conditionMessage(e))
+        dplyr::tibble(
+          taxon.id        = tid,
+          scientific_name = NA_character_,
+          directive       = NA_character_,
+          annex           = NA_character_
+        )
       }
     )
     
-    # Print progress
-    if(all(is.na(legal$`Legal text`))) {
-      message("⚠️ Progressive ", record_counter, 
-              " | iNat taxon.id: ", taxon.id,
-              " | No legal info in EUNIS")
+    if (all(is.na(legal$directive))) {
+      message("\u26a0\ufe0f  [", record_counter, "] taxon.id ", tid,
+              " | Not listed in EU directives (BISE)")
     } else {
-      message("✅ Progressive ", record_counter,
-              " | iNat taxon.id: ", taxon.id,
-              " | Legal info retrieved from EUNIS")
+      for (i in seq_len(nrow(legal))) {
+        annex_str <- if (is.na(legal$annex[i])) "--" else legal$annex[i]
+        message("\u2705  [", record_counter, "] taxon.id ", tid,
+                " | ", legal$directive[i],
+                " | Annex: ", annex_str)
+      }
     }
     
     return(legal)
   })
   
-  # Merge legal info with original occurrences
-  occ_enriched <- occ_eLTER |>
+  # Join back to occurrences -- one row per occurrence x directive entry
+  occ_eLTER |>
     dplyr::left_join(
-      legal_results |> dplyr::select(taxon.id, `Legal text`, Annex),
-      by = "taxon.id"
-    ) |>
-    dplyr::rename(directive = `Legal text`, annex = Annex)
-  
-  return(occ_enriched)
+      legal_results |> dplyr::select(taxon.id, directive, annex),
+      by = "taxon.id",
+      relationship = "many-to-many"
+    )
 }
 
 #' Create Leaflet map for enriched iNaturalist occurrences
@@ -1386,9 +1455,9 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' @description `r lifecycle::badge("stable")`
 #'
 #' Takes a tibble of iNaturalist occurrences already enriched with species
-#' nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ()}}),
-#' nativeness (\code{\link{add_nativeness_to_occ()}}), and EUNIS legal 
-#' information (\code{\link{add_eunis_to_occ()}}), and eLTER Standard
+#' nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ}}),
+#' nativeness (\code{\link{add_nativeness_to_occ}}), and EUNIS legal
+#' information (\code{\link{add_eunis_legal_to_occ}}), and eLTER Standard
 #' Observations (SOs) assignments. Verifies that all required columns are
 #' present, builds observation-level HTML popups with linked references to
 #' iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
@@ -1398,13 +1467,13 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' @param occ_enriched An \code{sf} tibble of iNaturalist occurrences enriched
 #'   with the following columns:
 #'   \describe{
-#'     \item{establishmentMeans}{list-column of 1 × 11 tibbles fron iNaturalist
+#'     \item{establishmentMeans}{list-column of 1 x 11 tibbles fron iNaturalist
 #'       \code{iNat_nativeness}, \code{iNat_authority}, and \code{iNat_checkList_uri},
 #'       from EASIN \code{EASIN_url}, \code{EASIN_id}, \code{EASIN_LSID},
 #'       \code{EASIN_firstIntroductionsInEU_year}, \code{EASIN_firstIntroductions_Country},
 #'       \code{EASIN_status}, \code{EASIN_hasImpact}, \code{EASIN_IsEUConcern}
 #'       produced by \code{\link{add_nativeness_to_occ}}.}
-#'     \item{status_IUCN}{list-column of N × 4 tibbles with \code{status},
+#'     \item{status_IUCN}{list-column of N x 4 tibbles with \code{status},
 #'       \code{authority}, \code{scope_of_assesment} (geographic scope), and \code{url},
 #'       produced by \code{\link{add_iucn_to_occ}}.}
 #'     \item{directive}{character. EU directive name, produced by
@@ -1413,13 +1482,13 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'       \code{\link{add_eunis_legal_to_occ}}.}
 #'     \item{SOBIO_014}{logical. Whether the observation contributes to the
 #'       eLTER Standard Observation Flying insects (SOBIO_014), assigned by
-#'       the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+#'       the enrichment pipeline via \code{.assign_eLTER_SOs}.}
 #'     \item{SOBIO_017}{logical. Whether the observation contributes to the
 #'       eLTER Standard Observation Vegetation composition (SOBIO_017),
-#'       assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+#'       assigned by the enrichment pipeline via \code{.assign_eLTER_SOs}.}
 #'     \item{SOBIO_018}{logical. Whether the observation contributes to the
 #'       eLTER Standard Observation Acoustic recording (SOBIO_018),
-#'       assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+#'       assigned by the enrichment pipeline via \code{.assign_eLTER_SOs}.}
 #'     \item{taxon.id}{integer. iNaturalist taxon ID.}
 #'     \item{name}{character. Scientific name.}
 #'     \item{taxon.preferred_common_name}{character. Common name.}
@@ -1574,13 +1643,13 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       authority <- args[["authority"]]
       scope_of_assesment <- args[["scope_of_assesment"]]
       url <- args[["url"]]
-      scope <- if (is.null(scope_of_assesment) || length(scope_of_assesment) == 0 || 
+      scope <- if (is.null(scope_of_assesment) || length(scope_of_assesment) == 0 ||
                    all(is.na(scope_of_assesment)) || identical(scope_of_assesment, "")) {
         "-"
       } else {
         as.character(scope_of_assesment[[1]])
       }
-      label <- if (is.null(iucn_labels[status]) || all(is.na(iucn_labels[status])) || 
+      label <- if (is.null(iucn_labels[status]) || all(is.na(iucn_labels[status])) ||
                    identical(iucn_labels[status], "")) {
         "-"
       } else {
@@ -1671,8 +1740,8 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       }, FUN.VALUE = character(1)),
       EASIN_intro_country_lbl = purrr::map_chr(
         vapply(establishmentMeans, function(em) {
-        val <- tryCatch(em$EASIN_firstIntroductions_Country[[1]], error = function(e) NA_character_)
-        if (is.null(val) || is.na(val)) "-" else as.character(val)
+          val <- tryCatch(em$EASIN_firstIntroductions_Country[[1]], error = function(e) NA_character_)
+          if (is.null(val) || is.na(val)) "-" else as.character(val)
         }, FUN.VALUE = character(1)),
         .country_to_flag
       )
@@ -1690,8 +1759,18 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         annexes <- annex
         parts <- purrr::map2_chr(dirs, annexes, function(d, a) {
           if (is.na(d)) return("")
-          annex_str <- if (!is.na(a) && nzchar(a)) paste0("<br/><b>Annex</b> - ", a) else ""
-          paste0("<div style='font-size:12px;'>", d, annex_str, ".</div>")
+          # Prefisso "EU " necessario per il gsub EUR-Lex nel popup
+          d_eu <- dplyr::case_when(
+            grepl("Habitats", d) ~ "EU Habitats Directive (92/43/EEC)",
+            grepl("Birds",    d) ~ "EU Birds Directive (2009/147/EC)",
+            TRUE                 ~ d
+          )
+          annex_str <- if (!is.na(a) && nzchar(a)) {
+            paste0(" &mdash; <b>Annex ", a, "</b>")
+          } else {
+            ""
+          }
+          paste0("<div style='font-size:12px;'>", d_eu, annex_str, ".</div>")
         })
         paste(parts[nzchar(parts)], collapse = "")
       },
@@ -1738,15 +1817,14 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       
       # Build directive HTML block with links to EUR-Lex
       directive_block <- if (nzchar(directive_html)) {
-        # Inject EUR-Lex hyperlink based on directive type
         linked_html <- gsub(
-          "EU Birds Directive[^<]*",
-          '<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32009L0147" target="_blank">EU Birds Directive (2009/147/EC)</a>.',
+          "EU Birds Directive \\(2009/147/EC\\)",
+          '<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32009L0147" target="_blank">EU Birds Directive (2009/147/EC)</a>',
           directive_html
         )
         linked_html <- gsub(
-          "EU Habitats Directive[^<]*",
-          '<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:31992L0043" target="_blank">EU Habitats Directive (92/43/EEC)</a>.',
+          "EU Habitats Directive \\(92/43/EEC\\)",
+          '<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:31992L0043" target="_blank">EU Habitats Directive (92/43/EEC)</a>',
           linked_html
         )
         paste0("<b>EU Directives</b>: ", linked_html)
@@ -1787,10 +1865,10 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         '<div style="margin-top:4px;">',
         "<b>Obs quality:</b> ", obs_quality,
         sprintf(' <a href="https://help.inaturalist.org/en/support/solutions/articles/151000169936"
-              target="_blank" style="font-size:11px;">ℹ️</a><br/>'),
+              target="_blank" style="font-size:11px;">\u2139\ufe0f</a><br/>'),
         sprintf('<b>Geoprivacy:</b> %s
            <a href="https://www.inaturalist.org/pages/geoprivacy"
-              target="_blank" style="font-size:11px;">ℹ️</a><br/>', geopriv),
+              target="_blank" style="font-size:11px;">\u2139\ufe0f</a><br/>', geopriv),
         "<b>Positional accuracy (m):</b> ", posacc,
         '</div>',
         '</div>',
@@ -1805,7 +1883,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           style="height:18px;width:auto;vertical-align:middle;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">IUCN Red List
       <a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712"
-         target="_blank" style="font-size:11px;">ℹ️</a>
+         target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
       <span style="font-weight:300;font-style:italic;">(via iNaturalist, provided by IUCN)</span>
     </span>',
             '</div>',
@@ -1821,7 +1899,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           style="height:18px;width:auto;vertical-align:middle;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">IUCN Red List
       <a href="https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712"
-         target="_blank" style="font-size:11px;">ℹ️</a>
+         target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
       <span style="font-weight:300;font-style:italic;">(via iNaturalist, provided by IUCN)</span>
     </span>',
             '</div>',
@@ -1840,9 +1918,9 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           style="height:18px;width:auto;vertical-align:middle;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">EASIN
       <span style="font-weight:300;font-style:italic;">
-        — European Alien Species Information Network
+        -- European Alien Species Information Network
       </span><a href="https://easin.jrc.ec.europa.eu/easin"
-       target="_blank" style="font-size:11px;">ℹ️</a>
+       target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
     </span>',
             '</div>',
             'This taxon is not present in EASIN database',
@@ -1857,9 +1935,9 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           style="height:18px;width:auto;vertical-align:middle;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">EASIN
       <span style="font-weight:300;font-style:italic;">
-        — European Alien Species Information Network
+        -- European Alien Species Information Network
       </span><a href="https://easin.jrc.ec.europa.eu/easin"
-       target="_blank" style="font-size:11px;">ℹ️</a>
+       target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
     </span>',
             '</div>',
             dplyr::case_when(
@@ -1877,7 +1955,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
                 EASIN_status == "C" ~ '<b>Status:</b> Questionable - species with unresolved taxonomic status or not verified by experts ',
                 EASIN_id == "-" ~ '<b>Status:</b> - '
               ),
-              '<a href="https://easin.jrc.ec.europa.eu/easin/Catalogue/Protocol" target="_blank" style="font-size:11px;">ℹ️</a><br/>'
+              '<a href="https://easin.jrc.ec.europa.eu/easin/Catalogue/Protocol" target="_blank" style="font-size:11px;">\u2139\ufe0f</a><br/>'
             ),
             dplyr::case_when(
               EASIN_impact == "FALSE" ~ '<b>Has documented impact:</b> No <br/>',
@@ -1896,7 +1974,6 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         },
         
         # --- Section: Establishment means (iNaturalist) ---
-        # --- Section: Establishment means (iNaturalist) ---
         if (nativeness == "-" && em_authority == "-") {
           paste0(
             '<div style="background:#f0f7f0;border-left:3px solid #74ac00;
@@ -1906,7 +1983,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           style="height:18px;width:auto;vertical-align:middle;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">Establishment means
       <a href="https://help.inaturalist.org/en/support/solutions/articles/151000176171"
-         target="_blank" style="font-size:11px;">ℹ️</a>
+         target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
       <span style="font-weight:300;font-style:italic;">(via iNaturalist)</span>
     </span>',
             '</div>',
@@ -1922,7 +1999,7 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           style="height:18px;width:auto;vertical-align:middle;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">Establishment means
       <a href="https://help.inaturalist.org/en/support/solutions/articles/151000176171"
-         target="_blank" style="font-size:11px;">ℹ️</a>
+         target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
       <span style="font-weight:300;font-style:italic;">(via iNaturalist)</span>
     </span>',
             '</div>',
@@ -1938,16 +2015,19 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
           )
         },
         
-        # --- Section: EU Directives (EUNIS) ---
+        # --- Section: EU Directives (BISE) ---
         if (nzchar(directive_block)) {
           paste0(
             '<div style="background:#f0f4ff;border-left:3px solid #004b87;
                    padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
             '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
-            '<img src="https://www.eea.europa.eu/static/media/eea-logo.55fb94a4.svg"
-            style="height:18px;width:auto;vertical-align:middle;">',
+            '<img src="https://biodiversity.europa.eu/static/media/bise-logo-white.0ad0757f.svg"
+            style="height:18px;width:auto;vertical-align:middle;background:#004b87;
+                   padding:2px 4px;border-radius:3px;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">EU Legal framework
-        <span style="font-weight:300;font-style:italic;">(via EUNIS)</span>
+        <span style="font-weight:300;font-style:italic;">(via BISE)</span>
+        <a href="https://biodiversity.europa.eu" target="_blank"
+           style="font-size:11px;text-decoration:none;">\u2139\ufe0f</a>
       </span>',
             '</div>',
             directive_block,
@@ -1958,10 +2038,13 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
             '<div style="background:#f0f4ff;border-left:3px solid #004b87;
                    padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
             '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
-            '<img src="https://www.eea.europa.eu/static/media/eea-logo.55fb94a4.svg"
-            style="height:18px;width:auto;vertical-align:middle;">',
+            '<img src="https://biodiversity.europa.eu/static/media/bise-logo-white.0ad0757f.svg"
+            style="height:18px;width:auto;vertical-align:middle;background:#004b87;
+                   padding:2px 4px;border-radius:3px;">',
             '<span style="font-size:11px;color:#555;font-weight:500;">EU Legal framework
-        <span style="font-weight:300;font-style:italic;">(via EUNIS)</span>
+        <span style="font-weight:300;font-style:italic;">(via BISE)</span>
+        <a href="https://biodiversity.europa.eu" target="_blank"
+           style="font-size:11px;text-decoration:none;">\u2139\ufe0f</a>
       </span>',
             '</div>',
             'This taxon is not included in any Directives',
@@ -1973,33 +2056,33 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         if (so_lbl == "-") {
           paste0('<div style="background:#f5f0ff;border-left:3px solid #000F22;
                padding:6px 8px;margin-bottom:2px;border-radius:0 4px 4px 0;">',
-          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
-          '<img src="https://elter-ri.eu/media-center/logo?&download=131&file_name=eLTER_Logo"
+                 '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+                 '<img src="https://elter-ri.eu/media-center/logo?&download=131&file_name=eLTER_Logo"
         style="height:18px;width:auto;vertical-align:middle;background:white;
                padding:2px 4px;border-radius:3px;">',
-          '<span style="font-size:11px;color:#555;font-weight:500;">eLTER Standard Observations (SOs)
+                 '<span style="font-size:11px;color:#555;font-weight:500;">eLTER Standard Observations (SOs)
     <a href="https://elter-ri.eu/standard-observations-spheres/biosphere"
-       target="_blank" style="font-size:11px;">ℹ️</a>
+       target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
   </span>',
-          '</div>',
-          "<div style='font-size:12px;'>This observation can't contribute to any eLTER SOs ", 
-          "</div>",
-          '</div>')
+                 '</div>',
+                 "<div style='font-size:12px;'>This observation can't contribute to any eLTER SOs ",
+                 "</div>",
+                 '</div>')
         } else {
           paste0('<div style="background:#f5f0ff;border-left:3px solid #000F22;
                padding:6px 8px;margin-bottom:2px;border-radius:0 4px 4px 0;">',
-          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
-          '<img src="https://elter-ri.eu/media-center/logo?&download=131&file_name=eLTER_Logo"
+                 '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
+                 '<img src="https://elter-ri.eu/media-center/logo?&download=131&file_name=eLTER_Logo"
         style="height:18px;width:auto;vertical-align:middle;background:white;
                padding:2px 4px;border-radius:3px;">',
-          '<span style="font-size:11px;color:#555;font-weight:500;">eLTER Standard Observations (SOs)
+                 '<span style="font-size:11px;color:#555;font-weight:500;">eLTER Standard Observations (SOs)
     <a href="https://elter-ri.eu/standard-observations-spheres/biosphere"
-       target="_blank" style="font-size:11px;">ℹ️</a>
+       target="_blank" style="font-size:11px;">\u2139\ufe0f</a>
   </span>',
-          '</div>',
-          "<div style='font-size:12px;'>This observation can contribute to: ", 
-          so_lbl, "</div>",
-          '</div>')
+                 '</div>',
+                 "<div style='font-size:12px;'>This observation can contribute to: ",
+                 so_lbl, "</div>",
+                 '</div>')
         }
       )
     }

@@ -54,9 +54,9 @@ the filtered occurrence tibble as a nested \code{establishmentMeans}
 list-column.
 
 If not already present, the function automatically assigns eLTER Standard
-Observations to each record via \code{\link{.assign_eLTER_SOs}}, adding
-three logical columns: \code{SOBIO_014} (Flying insects — Insecta),
-\code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording — Aves,
+Observations to each record via \code{.assign_eLTER_SOs}, adding
+three logical columns: \code{SOBIO_014} (Flying insects -- Insecta),
+\code{SOBIO_017} (Plants), and \code{SOBIO_018} (Acoustic recording -- Aves,
 Anura, Chiroptera, Orthoptera). Orthoptera contribute to SOBIO_014 and
 SOBIO_018 simultaneously.
 If the columns are already present (e.g. because a previous enrichment function

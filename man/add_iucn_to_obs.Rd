@@ -58,8 +58,4 @@ add_iucn_to_obs(project_name = "LTER site Montagna di Torricchio")
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}
-
-Alice Lenzi, PhD \email{alice.lenzi@crea.gov.it}
-
-Alessandro Campanaro, PhD \email{alessandro.campanaro@crea.gov.it}
 }

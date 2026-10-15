@@ -10,13 +10,13 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
 \item{occ_enriched}{An \code{sf} tibble of iNaturalist occurrences enriched
 with the following columns:
 \describe{
-\item{establishmentMeans}{list-column of 1 × 11 tibbles fron iNaturalist
+\item{establishmentMeans}{list-column of 1 x 11 tibbles fron iNaturalist
 \code{iNat_nativeness}, \code{iNat_authority}, and \code{iNat_checkList_uri},
 from EASIN \code{EASIN_url}, \code{EASIN_id}, \code{EASIN_LSID},
 \code{EASIN_firstIntroductionsInEU_year}, \code{EASIN_firstIntroductions_Country},
 \code{EASIN_status}, \code{EASIN_hasImpact}, \code{EASIN_IsEUConcern}
 produced by \code{\link{add_nativeness_to_occ}}.}
-\item{status_IUCN}{list-column of N × 4 tibbles with \code{status},
+\item{status_IUCN}{list-column of N x 4 tibbles with \code{status},
 \code{authority}, \code{scope_of_assesment} (geographic scope), and \code{url},
 produced by \code{\link{add_iucn_to_occ}}.}
 \item{directive}{character. EU directive name, produced by
@@ -25,13 +25,13 @@ produced by \code{\link{add_iucn_to_occ}}.}
 \code{\link{add_eunis_legal_to_occ}}.}
 \item{SOBIO_014}{logical. Whether the observation contributes to the
 eLTER Standard Observation Flying insects (SOBIO_014), assigned by
-the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+the enrichment pipeline via \code{.assign_eLTER_SOs}.}
 \item{SOBIO_017}{logical. Whether the observation contributes to the
 eLTER Standard Observation Vegetation composition (SOBIO_017),
-assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+assigned by the enrichment pipeline via \code{.assign_eLTER_SOs}.}
 \item{SOBIO_018}{logical. Whether the observation contributes to the
 eLTER Standard Observation Acoustic recording (SOBIO_018),
-assigned by the enrichment pipeline via \code{\link{.assign_eLTER_SOs}}.}
+assigned by the enrichment pipeline via \code{.assign_eLTER_SOs}.}
 \item{taxon.id}{integer. iNaturalist taxon ID.}
 \item{name}{character. Scientific name.}
 \item{taxon.preferred_common_name}{character. Common name.}
@@ -88,9 +88,9 @@ Vegetation composition and/or \code{SOBIO_018} Acoustic recording).
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 
 Takes a tibble of iNaturalist occurrences already enriched with species
-nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ()}}),
-nativeness (\code{\link{add_nativeness_to_occ()}}), and EUNIS legal
-information (\code{\link{add_eunis_to_occ()}}), and eLTER Standard
+nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ}}),
+nativeness (\code{\link{add_nativeness_to_occ}}), and EUNIS legal
+information (\code{\link{add_eunis_legal_to_occ}}), and eLTER Standard
 Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an

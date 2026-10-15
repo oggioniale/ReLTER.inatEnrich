@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{get_eunis_legal_info}
 \alias{get_eunis_legal_info}
-\title{Get EUNIS Legal Information for a Species Using iNaturalist Taxon ID}
+\title{Get EU directive legal information for a species using the BISE API}
 \usage{
 get_eunis_legal_info(taxon.id)
 }
@@ -10,27 +10,42 @@ get_eunis_legal_info(taxon.id)
 \item{taxon.id}{Integer. The taxon ID of the species in iNaturalist.}
 }
 \value{
-A tibble with the following columns:
+A tibble with one row per EU directive entry for the species, or a
+single-row tibble with \code{NA} values if the species is not found.
+Columns:
 \describe{
-\item{taxon.id}{iNaturalist taxon ID provided as input}
-\item{scientific_name}{Scientific name of the species retrieved from iNaturalist}
-\item{\verb{Legal text}}{Legal directive text from EUNIS (92/43/EEC or 2009/147/EC)}
-\item{Annex}{Annex information from EUNIS table}
+\item{taxon.id}{iNaturalist taxon ID.}
+\item{scientific_name}{Scientific name from iNaturalist.}
+\item{directive}{\code{"Habitats Directive (92/43/EEC)"},
+\code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+\item{annex}{Short annex code parsed from the BISE annex description,
+e.g. \code{"II"}, \code{"IV"}, \code{"I"}, or \code{NA}.}
 }
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
-This function takes a \code{taxon.id} from iNaturalist, retrieves the corresponding
-scientific name from the iNaturalist API, searches the EUNIS database, and extracts
-the legal information related to the EU Habitats Directive (92/43/EEC) and Birds Directive (2009/147/EC),
-as delivered by data retrieved from the \href{https://eunis.eea.europa.eu/}{EUNIS} species database.
+
+Takes an iNaturalist \code{taxon.id}, retrieves the species scientific name
+from the iNaturalist Taxa API, then queries the
+\href{https://biodiversity.europa.eu}{BISE} (Biodiversity Information System
+for Europe) REST API in two steps:
+\enumerate{
+\item Species search by scientific name to obtain the internal
+\code{id_eunis} identifier.
+\item Legal status lookup by \code{id_eunis} to obtain EU directive and
+annex information from the Protection table.
+}
+Only rows where \code{legal_instrument} is \code{"EU Habitats Directive"}
+or \code{"EU Birds Directive"} are retained.
 }
 \examples{
 \dontrun{
-## Not run:
-get_eunis_legal_info(taxon.id = 61749)
+# Canis lupus -- Habitats Directive, Annex II and IV
+get_eunis_legal_info(taxon.id = 42048)
+
+# Falco tinnunculus -- Birds Directive
+get_eunis_legal_info(taxon.id = 5221)
 }
-## End (Not run)
 
 }
 \author{

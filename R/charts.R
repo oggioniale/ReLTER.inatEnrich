@@ -338,7 +338,7 @@ obs_per_year <- function(df) {
 #'
 #' Takes a tibble of iNaturalist occurrences and produces a stacked bar chart
 #' of mean observations per calendar month across years, coloured by iconic
-#' taxon group. Error bars show ± 1 standard error of the mean across years.
+#' taxon group. Error bars show +/- 1 standard error of the mean across years.
 #' All twelve months are always shown, including those with zero observations.
 #'
 #' @param df An \code{sf} tibble of iNaturalist occurrences containing at least
@@ -457,7 +457,7 @@ obs_per_month <- function(df) {
       expand = ggplot2::expansion(mult = c(0, 0.15))
     ) +
     ggplot2::labs(title   = "Mean observations per month",
-                  caption = "Bars: mean across years | Error bars: ± SE",
+                  caption = "Bars: mean across years | Error bars: +/- SE",
                   x       = NULL,
                   y       = "Mean observations") +
     ggplot2::theme_minimal(base_size = 13) +
@@ -477,7 +477,7 @@ obs_per_month <- function(df) {
 #'
 #' Takes a tibble of iNaturalist occurrences and produces a stacked bar chart
 #' of mean observations per hour of the day across years, coloured by iconic
-#' taxon group. Error bars show ± 1 standard error of the mean across years.
+#' taxon group. Error bars show +/- 1 standard error of the mean across years.
 #' All 24 hours are always shown, including those with zero observations.
 #'
 #' @param df An \code{sf} tibble of iNaturalist occurrences containing at least
@@ -595,7 +595,7 @@ obs_per_hour <- function(df) {
       expand = ggplot2::expansion(mult = c(0, 0.15))
     ) +
     ggplot2::labs(title   = "Mean observations per hour of the day",
-                  caption = "Bars: mean across years | Error bars: ± SE",
+                  caption = "Bars: mean across years | Error bars: +/- SE",
                   x       = NULL,
                   y       = "Mean observations") +
     ggplot2::theme_minimal(base_size = 13) +
@@ -769,9 +769,12 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'   \describe{
 #'     \item{name}{character. Scientific name.}
 #'     \item{directive}{character. EU directive name, produced by
-#'       \code{\link{add_eunis_legal_to_occ}}.}
-#'     \item{establishmentMeans}{list-column of tibbles with a \code{iNat_nativeness}
-#'       field, produced by \code{\link{add_nativeness_to_occ}}.}
+#'       \code{\link{add_eunis_legal_to_occ}}. Expected values:
+#'       \code{"Habitats Directive (92/43/EEC)"},
+#'       \code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+#'     \item{establishmentMeans}{list-column of tibbles with a
+#'       \code{iNat_nativeness} field, produced by
+#'       \code{\link{add_nativeness_to_occ}}.}
 #'   }
 #'
 #' @return A \code{\link[ggplot2]{ggplot}} object printed to the active device.
@@ -781,17 +784,25 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #' @note
 #' Species are assigned to one category only, in order of priority:
 #' \enumerate{
-#'   \item Alien (IAS) — \code{nativeness == "introduced"}
-#'   \item Habitats Directive — \code{directive} contains \code{"Habitats"}
-#'   \item Birds Directive — \code{directive} contains \code{"Birds"}
-#'   \item Other — all remaining species
+#'   \item Alien (IAS) -- \code{nativeness == "introduced"}
+#'   \item Habitats Directive -- \code{directive} contains \code{"Habitats"}
+#'   \item Birds Directive -- \code{directive} contains \code{"Birds"}
+#'   \item Other -- all remaining species
 #' }
 #' A species meeting multiple criteria will appear only in the
 #' highest-priority category.
 #'
+#' @details
+#' The \code{directive} column is populated by \code{\link{add_eunis_legal_to_occ}}
+#' using the bundled EEA Natura 2000 species dataset
+#' (\code{eu_directives_species}), which replaced the retired EUNIS web
+#' application in 2024. Directive values follow the format
+#' \code{"Habitats Directive (92/43/EEC)"} and
+#' \code{"Birds Directive (2009/147/EC)"}.
+#'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @author Alice Lenzi, phD \email{alice.lenzi@@crea.gov.it}
-#' 
+#'
 #' @seealso
 #' \code{\link{add_nativeness_to_occ}}, \code{\link{add_eunis_legal_to_occ}}
 #'
@@ -806,7 +817,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'
 #' @examples
 #' \dontrun{
-#' #' # Download taxa occurrences from iNaturalist using ReLTER's
+#' # Download taxa occurrences from iNaturalist using ReLTER's
 #' # get_site_speciesOccurrences() function
 #' # e.g. Montagna di Torricchio eLTER site
 #' deimsid <- "https://deims.org/6b62feb2-61bf-47e1-b97f-0e909c408db8"
@@ -825,23 +836,22 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'     country = site_boundary$country
 #'   ) |>
 #'   add_eunis_legal_to_occ()
-#'   
+#'
 #' obs_pie_chart(occ_eLTER_enrich)
 #' }
 #'
 ### obs_pie_chart
 obs_pie_chart <- function(df) {
   
-  required_cols <- c(
-    "status_IUCN",
-    "establishmentMeans",
-    "directive", "annex"
-  )
-  
-  missing_cols <- setdiff(required_cols, names(df))
+  required_cols <- c("status_IUCN", "establishmentMeans", "directive")
+  missing_cols  <- setdiff(required_cols, names(df))
   if (length(missing_cols) > 0) {
-    stop("The following required columns are missing: ", paste(missing_cols, collapse = ", "),
-         "\nRun the enrichment pipeline first.")
+    stop(
+      "The following required columns are missing: ",
+      paste(missing_cols, collapse = ", "),
+      "\nRun the enrichment pipeline first ",
+      "(add_iucn_to_occ, add_nativeness_to_occ, add_eunis_legal_to_occ)."
+    )
   }
   
   species_data <- df |>
@@ -854,10 +864,10 @@ obs_pie_chart <- function(df) {
         if (is.null(val) || length(val) == 0) NA_character_ else as.character(val)
       }),
       category = dplyr::case_when(
-        !is.na(nativeness) & nativeness == "introduced" ~ "Alien (IAS)",
-        !is.na(directive) & grepl("Habitats", directive) ~ "Habitats Directive",
-        !is.na(directive) & grepl("Birds", directive)    ~ "Birds Directive",
-        TRUE                                             ~ "Other"
+        !is.na(nativeness) & nativeness == "introduced"   ~ "Alien (IAS)",
+        !is.na(directive)  & grepl("Habitats", directive) ~ "Habitats Directive",
+        !is.na(directive)  & grepl("Birds",    directive) ~ "Birds Directive",
+        TRUE                                              ~ "Other"
       )
     ) |>
     dplyr::group_by(category) |>
@@ -873,6 +883,10 @@ obs_pie_chart <- function(df) {
     "Birds Directive"    = "#378ADD",
     "Other"              = "#888780"
   )
+  
+  # Ensure all expected categories appear in the colour scale
+  present_categories <- species_data$category
+  category_colors    <- category_colors[names(category_colors) %in% present_categories]
   
   total_species <- sum(species_data$n)
   
@@ -898,7 +912,9 @@ obs_pie_chart <- function(df) {
       title    = "Species composition by conservation category",
       subtitle = paste0(
         "Each species is assigned to one category only, in order of priority:\n",
-        "Alien (IAS) > Habitats Directive > Birds Directive > Other"
+        "Alien (IAS) > Habitats Directive (92/43/EEC) > ",
+        "Birds Directive (2009/147/EC) > Other\n",
+        "Source: EEA Natura 2000 species lists (eu_directives_species)"
       ),
       x = NULL,
       y = NULL
@@ -917,6 +933,7 @@ obs_pie_chart <- function(df) {
   print(p)
   invisible(p)
 }
+
 
 #' Plot a donut chart of observations contributing to eLTER Standard Observations
 #'

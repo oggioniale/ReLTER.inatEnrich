@@ -28,5 +28,9 @@ inst/doc/
 renv/library/
 renv/staging/
 
-flow.R
+# other
+other_files/
 
+# data files
+data-raw/Article17_2020_species_check_list.csv
+data-raw/Article12_2020_bird_check_list.csv

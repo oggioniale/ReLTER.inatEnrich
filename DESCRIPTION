@@ -12,12 +12,11 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-5284-1317"))
   )
 Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: GPL-3 + file LICENSE
 URL: https://github.com/oggioniale/ReLTER.inatEnrich,
     https://oggioniale.github.io/ReLTER.inatEnrich/
 BugReports: https://github.com/oggioniale/ReLTER.inatEnrich/issues
-Imports: 
+Imports:
     dplyr,
     ggplot2,
     grDevices,
@@ -26,24 +25,26 @@ Imports:
     lifecycle,
     purrr,
     rinat,
-    rvest,
     sf,
     stats
-Suggests: 
+Suggests:
     htmltools,
     httptest2,
     knitr,
     remotes,
     rmarkdown,
     testthat (>= 3.0.0),
-    rinat,
     tibble,
     tidyr,
     withr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Depends: 
-    R (>= 3.5)
+Depends:
+    R (>= 4.1.0)
 LazyData: true
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
+VignetteBuilder: knitr
+BuildVignettes: true
+StagedInstall: no
+LazyDataCompression: xz
