@@ -49,10 +49,10 @@ install.packages(c(
 # ReLTER — the parent package providing site info and occurrence download
 # https://doi.org/10.5281/zenodo.16927384
 # install.packages("remotes")
-remotes::install_github("eLTER-RI/ReLTER")
+remotes::install_github("ropensci/ReLTER")
 
 # ReLTER.inatEnrich — this package
-remotes::install_github("eLTER-RI/ReLTER.inatEnrich")
+remotes::install_github("oggioniale/ReLTER.inatEnrich")
 ```
 
 Then load the packages:
@@ -214,7 +214,7 @@ occ_eLTER_nativeness <- add_nativeness_to_occ(
 
 ### Step 6 — Add EU legal framework (BISE)
 
-[`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+[`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
 queries the [BISE](https://biodiversity.europa.eu) (Biodiversity
 Information System for Europe) REST API and appends `directive` and
 `annex` columns indicating coverage under the EU Habitats Directive
@@ -240,7 +240,7 @@ to a short code (e.g. `"IV"`).
 
 ``` r
 
-occ_eLTER_legal <- add_eunis_legal_to_occ(
+occ_eLTER_legal <- add_legal_to_occ(
   occ_eLTER = occ_eLTER_nativeness
 )
 ```

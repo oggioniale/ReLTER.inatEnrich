@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ReLTER.inatEnrich</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,10 +104,10 @@ popups.</p>
 <span><span class="co"># ReLTER — the parent package providing site info and occurrence download</span></span>
 <span><span class="co"># https://doi.org/10.5281/zenodo.16927384</span></span>
 <span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"eLTER-RI/ReLTER"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ropensci/ReLTER"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># ReLTER.inatEnrich — this package</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"eLTER-RI/ReLTER.inatEnrich"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"oggioniale/ReLTER.inatEnrich"</span><span class="op">)</span></span></code></pre></div>
 <p>Then load the packages:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ReLTER</span><span class="op">)</span></span>
@@ -279,7 +279,7 @@ nativeness for heterogeneous territories such as Italy.</p>
 <div class="section level3">
 <h3 id="step-6-add-eu-legal-framework-bise">Step 6 — Add EU legal framework (BISE)<a class="anchor" aria-label="anchor" href="#step-6-add-eu-legal-framework-bise"></a>
 </h3>
-<p><code><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ()</a></code> queries the <a href="https://biodiversity.europa.eu" class="external-link">BISE</a> (Biodiversity Information
+<p><code><a href="../reference/add_legal_to_occ.html">add_legal_to_occ()</a></code> queries the <a href="https://biodiversity.europa.eu" class="external-link">BISE</a> (Biodiversity Information
 System for Europe) REST API and appends <code>directive</code> and
 <code>annex</code> columns indicating coverage under the EU Habitats
 Directive (92/43/EEC) or the EU Birds Directive (2009/147/EC).</p>
@@ -306,7 +306,7 @@ filtering). All applicable annexes for the species across the EU are
 returned.</p>
 </blockquote>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">occ_eLTER_legal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">occ_eLTER_legal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_legal_to_occ.html">add_legal_to_occ</a></span><span class="op">(</span></span>
 <span>  occ_eLTER <span class="op">=</span> <span class="va">occ_eLTER_nativeness</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>

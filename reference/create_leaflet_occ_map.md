@@ -8,7 +8,7 @@ nativeness, IUCN conservation status
 nativeness
 ([`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)),
 and EUNIS legal information
-([`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)),
+([`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)),
 and eLTER Standard Observations (SOs) assignments. Verifies that all
 required columns are present, builds observation-level HTML popups with
 linked references to iNaturalist, IUCN Red List, and EUR-Lex directive
@@ -47,12 +47,12 @@ create_leaflet_occ_map(occ_enriched, site_boundary = NULL)
   directive
 
   :   character. EU directive name, produced by
-      [`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md).
+      [`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md).
 
   annex
 
   :   character. EU directive annex, produced by
-      [`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md).
+      [`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md).
 
   SOBIO_014
 
@@ -181,7 +181,7 @@ both SOs simultaneously. SOBIO_017 covers Plants.
 
 [`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md),
 [`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md),
-[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md),
+[`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md),
 [`obs_SO_pie_chart`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
 
 ## Author
@@ -215,7 +215,7 @@ occ_eLTER_enrich <- add_iucn_to_occ(
   add_nativeness_to_occ(
     country = site_boundary$country
   ) |>
-  add_eunis_legal_to_occ()
+  add_legal_to_occ()
 
 map <- create_leaflet_occ_map(
   occ_enriched = occ_eLTER_enrich,

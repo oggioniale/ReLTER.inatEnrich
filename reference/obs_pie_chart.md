@@ -28,7 +28,7 @@ obs_pie_chart(df)
   directive
 
   :   character. EU directive name, produced by
-      [`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md).
+      [`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md).
       Expected values: `"Habitats Directive (92/43/EEC)"`,
       `"Birds Directive (2009/147/EC)"`, or `NA`.
 
@@ -47,7 +47,7 @@ the legend.
 ## Details
 
 The `directive` column is populated by
-[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+[`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
 using the bundled EEA Natura 2000 species dataset
 (`eu_directives_species`), which replaced the retired EUNIS web
 application in 2024. Directive values follow the format
@@ -72,7 +72,7 @@ highest-priority category.
 ## See also
 
 [`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md),
-[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+[`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
 
 ## Author
 
@@ -102,7 +102,7 @@ occ_eLTER_enrich <- add_iucn_to_occ(
   add_nativeness_to_occ(
     country = site_boundary$country
   ) |>
-  add_eunis_legal_to_occ()
+  add_legal_to_occ()
 
 obs_pie_chart(occ_eLTER_enrich)
 } # }

@@ -62,7 +62,7 @@ occ_eLTER_enrich <- add_iucn_to_occ(
   add_nativeness_to_occ(
     country = site_boundary$country
   ) |>
-  add_eunis_legal_to_occ()
+  add_legal_to_occ()
   
 top_n_species(occ_eLTER_enrich)
 top_n_species(occ_eLTER_enrich, n = 20)

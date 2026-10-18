@@ -3,7 +3,7 @@
 Takes a tibble of iNaturalist occurrences already enriched with species
 nativeness, IUCN conservation status (add_iucn_to_occ),
 nativeness (add_nativeness_to_occ), and EUNIS legal
-information (add_eunis_legal_to_occ), and eLTER Standard
+information (add_legal_to_occ), and eLTER Standard
 Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
@@ -12,7 +12,7 @@ and marker clustering."><meta property="og:description" content="
 Takes a tibble of iNaturalist occurrences already enriched with species
 nativeness, IUCN conservation status (add_iucn_to_occ),
 nativeness (add_nativeness_to_occ), and EUNIS legal
-information (add_eunis_legal_to_occ), and eLTER Standard
+information (add_legal_to_occ), and eLTER Standard
 Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
@@ -25,7 +25,7 @@ and marker clustering."><meta property="og:image" content="https://oggioniale.gi
 
     <a class="navbar-brand me-2" href="../index.html">ReLTER.inatEnrich</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@ and marker clustering."><meta property="og:image" content="https://oggioniale.gi
 <p>Takes a tibble of iNaturalist occurrences already enriched with species
 nativeness, IUCN conservation status (<code><a href="add_iucn_to_occ.html">add_iucn_to_occ</a></code>),
 nativeness (<code><a href="add_nativeness_to_occ.html">add_nativeness_to_occ</a></code>), and EUNIS legal
-information (<code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>), and eLTER Standard
+information (<code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>), and eLTER Standard
 Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
@@ -87,11 +87,11 @@ produced by <code><a href="add_iucn_to_occ.html">add_iucn_to_occ</a></code>.</p>
 
 <dt>directive</dt>
 <dd><p>character. EU directive name, produced by
-<code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>.</p></dd>
+<code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>.</p></dd>
 
 <dt>annex</dt>
 <dd><p>character. EU directive annex, produced by
-<code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>.</p></dd>
+<code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>.</p></dd>
 
 <dt>SOBIO_014</dt>
 <dd><p>logical. Whether the observation contributes to the
@@ -197,7 +197,7 @@ contribute to both SOs simultaneously. SOBIO_017 covers Plants.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="add_iucn_to_occ.html">add_iucn_to_occ</a></code>,
 <code><a href="add_nativeness_to_occ.html">add_nativeness_to_occ</a></code>,
-<code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>,
+<code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>,
 <code><a href="obs_SO_pie_chart.html">obs_SO_pie_chart</a></code></p></div>
     </div>
     <div class="section level2">
@@ -229,7 +229,7 @@ contribute to both SOs simultaneously. SOBIO_017 covers Plants.</p>
 <span class="r-in"><span>  <span class="fu"><a href="add_nativeness_to_occ.html">add_nativeness_to_occ</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    country <span class="op">=</span> <span class="va">site_boundary</span><span class="op">$</span><span class="va">country</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="add_legal_to_occ.html">add_legal_to_occ</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu">create_leaflet_occ_map</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  occ_enriched <span class="op">=</span> <span class="va">occ_eLTER_enrich</span>,</span></span>

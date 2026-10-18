@@ -97,7 +97,7 @@ refer to the IUCN Red List. It may not always be up to date.
 
 [`get_nativeness_degree`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_nativeness_degree.md),
 [`add_iucn_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md),
-[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md),
+[`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md),
 [`obs_SO_pie_chart`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
 
 ## Author

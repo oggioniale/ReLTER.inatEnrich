@@ -99,7 +99,7 @@ eLTER Standard Observation assignments are based on taxonomic ancestry
 
 [`get_conservation_status`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_conservation_status.md),
 [`add_nativeness_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md),
-[`add_eunis_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md),
+[`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md),
 [`obs_SO_pie_chart`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/obs_SO_pie_chart.md)
 
 ## Author

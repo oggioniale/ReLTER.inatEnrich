@@ -19,7 +19,7 @@ operate sequentially on an `sf` tibble of iNaturalist occurrences:
 |----|----|----|
 | [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md) | iNaturalist API `/v1/taxa/{id}` | `status_IUCN` (list-column) |
 | [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md) | iNaturalist API `/v1/taxa/{id}` | `establishmentMeans` (list-column) |
-| [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md) | BISE REST API (`biodiversity.europa.eu`) | `directive`, `annex` (flat columns) |
+| [`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md) | BISE REST API (`biodiversity.europa.eu`) | `directive`, `annex` (flat columns) |
 | [`create_leaflet_occ_map()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/create_leaflet_occ_map.md) | — | Leaflet map object |
 
 All API calls use `httr2` with retry logic (`max_tries = 3`,
@@ -157,7 +157,7 @@ occ$status_IUCN[[1]] |>
 ### `directive` and `annex` (flat columns)
 
 Produced by
-[`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md).
+[`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md).
 Unlike the IUCN and nativeness data, EU legal information is stored as
 **flat character columns**. When a taxon is covered by more than one
 directive or annex, the occurrence tibble contains **multiple rows for
@@ -246,7 +246,7 @@ failures gracefully.
 
 [`get_eunis_legal_info()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_eunis_legal_info.md)
 (called by
-[`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md))
+[`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md))
 queries the BISE (Biodiversity Information System for Europe) REST API
 at `https://biodiversity.europa.eu` using two sequential POST requests:
 
@@ -299,7 +299,7 @@ These are parsed to short codes (`"IV"`) using the regular expression
 `sub("^Annex\\s+(I{1,3}V?|VI?|IV|V?I{0,3}).*", "\\1", annex_str)`.
 
 **Throttling:**
-[`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+[`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
 inserts a 200 ms pause between taxa (`Sys.sleep(0.2)`) to avoid
 overloading the BISE server.
 
@@ -388,5 +388,5 @@ occ_eLTER_legal <- readRDS("cache/occ_eLTER_legal.rds")
   built-in per-request delay and retry logic handle this automatically;
   no manual throttling is needed in user code. For BISE, the 200 ms
   inter-taxon delay in
-  [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+  [`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
   is sufficient for typical dataset sizes.

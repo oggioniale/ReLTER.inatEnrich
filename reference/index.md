@@ -20,7 +20,7 @@
 - [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)
   **\[stable\]** : Add nativeness information to iNaturalist occurrence
   records
-- [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+- [`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
   **\[stable\]** : Enrich eLTER site iNaturalist occurrences with EU
   directive legal information
 

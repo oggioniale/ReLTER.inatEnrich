@@ -17,7 +17,7 @@ for Europe) REST API.
 | [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md) | iNaturalist API | IUCN Red List status per geographic scope, with links to assessments, sourced from [iNaturalist checklists](https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712) |
 | [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md) | iNaturalist API | Nativeness / [establishment means](https://dwc.tdwg.org/em/), filtered by country, directly as recorded on [iNaturalist](https://help.inaturalist.org/en/support/solutions/articles/151000176171-how-to-add-or-edit-establishment-means-in-inaturalist) |
 | [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md) | EASIN API | IAS information from EASIN - European Alien Species Information Network |
-| [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md) | [BISE REST API](https://biodiversity.europa.eu) | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage with Annex identifiers, retrieved live from the Biodiversity Information System for Europe |
+| [`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md) | [BISE REST API](https://biodiversity.europa.eu) | EU Habitats (92/43/EEC) and Birds (2009/147/EC) Directive coverage with Annex identifiers, retrieved live from the Biodiversity Information System for Europe |
 | all three functions above | iNaturalist API (taxonomic ancestry) | Automatic assignment of [eLTER Standard Observations](https://elter-ri.eu/standard-observations-spheres) ([`SOBIO_014` Flying insects](https://elter-ri.eu/standard-observations-spheres/biosphere), [`SOBIO_017` Vegetation composition](https://elter-ri.eu/standard-observations-spheres/biosphere), [`SOBIO_018` Acoustic recording](https://elter-ri.eu/standard-observations-spheres/biosphere)) based on taxonomic ancestry — performed once at the first enrichment step and skipped thereafter |
 | Visualization functions | — | Charts and interactive maps for enriched occurrence data — see [Visualization functions](https://oggioniale.github.io/ReLTER.inatEnrich/articles/ReLTER_inatEnrich_charts.html) |
 
@@ -124,7 +124,7 @@ If you use `ReLTER.inatEnrich` in your research, please cite it as:
 
 > Oggioni A., Lenzi A., Campanaro A., Bergami C. (2026).
 > *ReLTER.inatEnrich: Enriching iNaturalist occurrences for eLTER-RI
-> sites*. R package version 1.1.1. doi:
+> sites*. R package version 1.1.2. doi:
 > [10.5281/zenodo.19954245](https://doi.org/10.5281/zenodo.19954245)
 
 You can also retrieve the citation from within R:
@@ -176,7 +176,7 @@ Red List](https://www.iucnredlist.org).
 - [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)
   **\[stable\]** : Add nativeness information to iNaturalist occurrence
   records
-- [`add_eunis_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_eunis_legal_to_occ.md)
+- [`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
   **\[stable\]** : Enrich eLTER site iNaturalist occurrences with EU
   directive legal information
 

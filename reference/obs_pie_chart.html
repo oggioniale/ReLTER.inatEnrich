@@ -17,7 +17,7 @@ Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Other.
 
     <a class="navbar-brand me-2" href="../index.html">ReLTER.inatEnrich</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@ the columns:</p><dl><dt>name</dt>
 
 <dt>directive</dt>
 <dd><p>character. EU directive name, produced by
-<code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>. Expected values:
+<code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>. Expected values:
 <code>"Habitats Directive (92/43/EEC)"</code>,
 <code>"Birds Directive (2009/147/EC)"</code>, or <code>NA</code>.</p></dd>
 
@@ -86,7 +86,7 @@ Category counts and percentages are shown in the legend.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The <code>directive</code> column is populated by <code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code>
+    <p>The <code>directive</code> column is populated by <code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>
 using the bundled EEA Natura 2000 species dataset
 (<code>eu_directives_species</code>), which replaced the retired EUNIS web
 application in 2024. Directive values follow the format
@@ -104,7 +104,7 @@ highest-priority category.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="add_nativeness_to_occ.html">add_nativeness_to_occ</a></code>, <code><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></code></p></div>
+    <div class="dont-index"><p><code><a href="add_nativeness_to_occ.html">add_nativeness_to_occ</a></code>, <code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -133,7 +133,7 @@ highest-priority category.</p>
 <span class="r-in"><span>  <span class="fu"><a href="add_nativeness_to_occ.html">add_nativeness_to_occ</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    country <span class="op">=</span> <span class="va">site_boundary</span><span class="op">$</span><span class="va">country</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="add_eunis_legal_to_occ.html">add_eunis_legal_to_occ</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="add_legal_to_occ.html">add_legal_to_occ</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">obs_pie_chart</span><span class="op">(</span><span class="va">occ_eLTER_enrich</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
