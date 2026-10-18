@@ -20,9 +20,9 @@ produced by \code{\link{add_nativeness_to_occ}}.}
 \code{authority}, \code{scope_of_assesment} (geographic scope), and \code{url},
 produced by \code{\link{add_iucn_to_occ}}.}
 \item{directive}{character. EU directive name, produced by
-\code{\link{add_eunis_legal_to_occ}}.}
+\code{\link{add_legal_to_occ}}.}
 \item{annex}{character. EU directive annex, produced by
-\code{\link{add_eunis_legal_to_occ}}.}
+\code{\link{add_legal_to_occ}}.}
 \item{SOBIO_014}{logical. Whether the observation contributes to the
 eLTER Standard Observation Flying insects (SOBIO_014), assigned by
 the enrichment pipeline via \code{.assign_eLTER_SOs}.}
@@ -90,7 +90,7 @@ Vegetation composition and/or \code{SOBIO_018} Acoustic recording).
 Takes a tibble of iNaturalist occurrences already enriched with species
 nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ}}),
 nativeness (\code{\link{add_nativeness_to_occ}}), and EUNIS legal
-information (\code{\link{add_eunis_legal_to_occ}}), and eLTER Standard
+information (\code{\link{add_legal_to_occ}}), and eLTER Standard
 Observations (SOs) assignments. Verifies that all required columns are
 present, builds observation-level HTML popups with linked references to
 iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
@@ -130,7 +130,7 @@ occ_eLTER_enrich <- add_iucn_to_occ(
   add_nativeness_to_occ(
     country = site_boundary$country
   ) |>
-  add_eunis_legal_to_occ()
+  add_legal_to_occ()
 
 map <- create_leaflet_occ_map(
   occ_enriched = occ_eLTER_enrich,
@@ -143,7 +143,7 @@ map
 \seealso{
 \code{\link{add_iucn_to_occ}},
 \code{\link{add_nativeness_to_occ}},
-\code{\link{add_eunis_legal_to_occ}},
+\code{\link{add_legal_to_occ}},
 \code{\link{obs_SO_pie_chart}}
 }
 \author{

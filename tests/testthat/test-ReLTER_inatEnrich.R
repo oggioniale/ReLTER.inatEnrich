@@ -259,10 +259,10 @@ test_that("get_conservation_status() url column contains valid URLs or NA", {
 })
 
 # ==============================================================================
-# add_eunis_legal_to_occ() — casi edge aggiuntivi
+# add_legal_to_occ() — casi edge aggiuntivi
 # ==============================================================================
 
-test_that("add_eunis_legal_to_occ() directive values match expected pattern when not NA", {
+test_that("add_legal_to_occ() directive values match expected pattern when not NA", {
   non_na <- occ |>
     sf::st_drop_geometry() |>
     dplyr::filter(!is.na(directive))
@@ -273,7 +273,7 @@ test_that("add_eunis_legal_to_occ() directive values match expected pattern when
   }
 })
 
-test_that("add_eunis_legal_to_occ() annex is NA when directive is NA", {
+test_that("add_legal_to_occ() annex is NA when directive is NA", {
   both_na <- occ |>
     sf::st_drop_geometry() |>
     dplyr::filter(is.na(directive))
@@ -494,23 +494,23 @@ test_that("add_nativeness_to_occ() iNat_checkList_uri is a valid URL or NA", {
 })
 
 # ==============================================================================
-# add_eunis_legal_to_occ()
+# add_legal_to_occ()
 # ==============================================================================
 
-test_that("add_eunis_legal_to_occ() output has directive and annex columns", {
+test_that("add_legal_to_occ() output has directive and annex columns", {
   expect_true("directive" %in% names(occ))
   expect_true("annex"     %in% names(occ))
 })
 
-test_that("add_eunis_legal_to_occ() directive and annex are character", {
+test_that("add_legal_to_occ() directive and annex are character", {
   expect_type(occ$directive, "character")
   expect_type(occ$annex,     "character")
 })
 
-test_that("add_eunis_legal_to_occ() stops when taxon.id column is missing", {
+test_that("add_legal_to_occ() stops when taxon.id column is missing", {
   occ_no_id <- occ |> dplyr::select(-taxon.id)
   expect_error(
-    add_eunis_legal_to_occ(occ_eLTER = occ_no_id),
+    add_legal_to_occ(occ_eLTER = occ_no_id),
     "column named 'taxon.id'"
   )
 })

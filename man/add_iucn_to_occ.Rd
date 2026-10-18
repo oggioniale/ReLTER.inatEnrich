@@ -104,7 +104,7 @@ occ <- add_iucn_to_occ(
 \seealso{
 \code{\link{get_conservation_status}},
 \code{\link{add_nativeness_to_occ}},
-\code{\link{add_eunis_legal_to_occ}},
+\code{\link{add_legal_to_occ}},
 \code{\link{obs_SO_pie_chart}}
 }
 \author{

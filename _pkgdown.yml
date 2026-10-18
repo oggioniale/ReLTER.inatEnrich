@@ -21,7 +21,7 @@ reference:
       - add_iucn_to_obs
       - add_iucn_to_occ
       - add_nativeness_to_occ
-      - add_eunis_legal_to_occ
+      - add_legal_to_occ
 
   - title: Visualization functions
     contents:

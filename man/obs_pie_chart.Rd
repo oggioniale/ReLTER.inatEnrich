@@ -12,7 +12,7 @@ the columns:
 \describe{
 \item{name}{character. Scientific name.}
 \item{directive}{character. EU directive name, produced by
-\code{\link{add_eunis_legal_to_occ}}. Expected values:
+\code{\link{add_legal_to_occ}}. Expected values:
 \code{"Habitats Directive (92/43/EEC)"},
 \code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
 \item{establishmentMeans}{list-column of tibbles with a
@@ -35,7 +35,7 @@ is assigned to exactly one category following a fixed priority order:
 Alien (IAS) > Habitats Directive > Birds Directive > Other.
 }
 \details{
-The \code{directive} column is populated by \code{\link{add_eunis_legal_to_occ}}
+The \code{directive} column is populated by \code{\link{add_legal_to_occ}}
 using the bundled EEA Natura 2000 species dataset
 (\code{eu_directives_species}), which replaced the retired EUNIS web
 application in 2024. Directive values follow the format
@@ -73,14 +73,14 @@ occ_eLTER_enrich <- add_iucn_to_occ(
   add_nativeness_to_occ(
     country = site_boundary$country
   ) |>
-  add_eunis_legal_to_occ()
+  add_legal_to_occ()
 
 obs_pie_chart(occ_eLTER_enrich)
 }
 
 }
 \seealso{
-\code{\link{add_nativeness_to_occ}}, \code{\link{add_eunis_legal_to_occ}}
+\code{\link{add_nativeness_to_occ}}, \code{\link{add_legal_to_occ}}
 }
 \author{
 Alessandro Oggioni, PhD \email{alessandro.oggioni@cnr.it}

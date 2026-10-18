@@ -29,7 +29,7 @@ occ_eLTER_nativeness <- add_nativeness_to_occ(
 )
 
 # Enrich with EUNIS legal information (via BISE API)
-occ_eLTER_legal <- add_eunis_legal_to_occ(
+occ_eLTER_legal <- add_legal_to_occ(
   occ_eLTER_nativeness
 )
 

@@ -42,7 +42,7 @@ occ_eLTER_enrich <- add_iucn_to_occ(
   add_nativeness_to_occ(
     country = site_boundary$country
   ) |>
-  add_eunis_legal_to_occ()
+  add_legal_to_occ()
   
 obs_per_hour(occ_eLTER_enrich)
 }

@@ -967,7 +967,7 @@ add_iucn_to_obs <- function(project_name) {
 #' @seealso
 #' \code{\link{get_conservation_status}},
 #' \code{\link{add_nativeness_to_occ}},
-#' \code{\link{add_eunis_legal_to_occ}},
+#' \code{\link{add_legal_to_occ}},
 #' \code{\link{obs_SO_pie_chart}}
 #'
 #' @details
@@ -1169,7 +1169,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
 #' @seealso
 #' \code{\link{get_nativeness_degree}},
 #' \code{\link{add_iucn_to_occ}},
-#' \code{\link{add_eunis_legal_to_occ}},
+#' \code{\link{add_legal_to_occ}},
 #' \code{\link{obs_SO_pie_chart}}
 #'
 #' @note Progress messages are printed to the console for each taxon
@@ -1384,11 +1384,11 @@ add_nativeness_to_occ <- function(occ_eLTER, country) {
 #' occ_legal <- iNat_occ$inat |>
 #'   add_iucn_to_occ() |>
 #'   add_nativeness_to_occ(country = site_boundary$country) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #' }
 #'
-### add_eunis_legal_to_occ
-add_eunis_legal_to_occ <- function(occ_eLTER) {
+### add_legal_to_occ
+add_legal_to_occ <- function(occ_eLTER) {
   
   if (!"taxon.id" %in% names(occ_eLTER)) {
     stop("The input tibble must contain a column named 'taxon.id'")
@@ -1457,7 +1457,7 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' Takes a tibble of iNaturalist occurrences already enriched with species
 #' nativeness, IUCN conservation status (\code{\link{add_iucn_to_occ}}),
 #' nativeness (\code{\link{add_nativeness_to_occ}}), and EUNIS legal
-#' information (\code{\link{add_eunis_legal_to_occ}}), and eLTER Standard
+#' information (\code{\link{add_legal_to_occ}}), and eLTER Standard
 #' Observations (SOs) assignments. Verifies that all required columns are
 #' present, builds observation-level HTML popups with linked references to
 #' iNaturalist, IUCN Red List, and EUR-Lex directive pages, and returns an
@@ -1477,9 +1477,9 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'       \code{authority}, \code{scope_of_assesment} (geographic scope), and \code{url},
 #'       produced by \code{\link{add_iucn_to_occ}}.}
 #'     \item{directive}{character. EU directive name, produced by
-#'       \code{\link{add_eunis_legal_to_occ}}.}
+#'       \code{\link{add_legal_to_occ}}.}
 #'     \item{annex}{character. EU directive annex, produced by
-#'       \code{\link{add_eunis_legal_to_occ}}.}
+#'       \code{\link{add_legal_to_occ}}.}
 #'     \item{SOBIO_014}{logical. Whether the observation contributes to the
 #'       eLTER Standard Observation Flying insects (SOBIO_014), assigned by
 #'       the enrichment pipeline via \code{.assign_eLTER_SOs}.}
@@ -1558,7 +1558,7 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #' @seealso
 #' \code{\link{add_iucn_to_occ}},
 #' \code{\link{add_nativeness_to_occ}},
-#' \code{\link{add_eunis_legal_to_occ}},
+#' \code{\link{add_legal_to_occ}},
 #' \code{\link{obs_SO_pie_chart}}
 #'
 #' @export
@@ -1593,7 +1593,7 @@ add_eunis_legal_to_occ <- function(occ_eLTER) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'
 #' map <- create_leaflet_occ_map(
 #'   occ_enriched = occ_eLTER_enrich,

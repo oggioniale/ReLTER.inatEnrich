@@ -44,7 +44,7 @@
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'   
 #' iconic_taxa(occ_eLTER_enrich)
 #' }
@@ -155,7 +155,7 @@ iconic_taxa <- function(df) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'   
 #' top_n_species(occ_eLTER_enrich)
 #' top_n_species(occ_eLTER_enrich, n = 20)
@@ -264,7 +264,7 @@ top_n_species <- function(df, n = 10) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'   
 #' obs_per_year(occ_eLTER_enrich)
 #' }
@@ -382,7 +382,7 @@ obs_per_year <- function(df) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'   
 #' obs_per_month(occ_eLTER_enrich)
 #' }
@@ -521,7 +521,7 @@ obs_per_month <- function(df) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'   
 #' obs_per_hour(occ_eLTER_enrich)
 #' }
@@ -671,7 +671,7 @@ obs_per_hour <- function(df) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'
 #' species_richness_map(
 #'   df = occ_eLTER_enrich,
@@ -769,7 +769,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'   \describe{
 #'     \item{name}{character. Scientific name.}
 #'     \item{directive}{character. EU directive name, produced by
-#'       \code{\link{add_eunis_legal_to_occ}}. Expected values:
+#'       \code{\link{add_legal_to_occ}}. Expected values:
 #'       \code{"Habitats Directive (92/43/EEC)"},
 #'       \code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
 #'     \item{establishmentMeans}{list-column of tibbles with a
@@ -793,7 +793,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #' highest-priority category.
 #'
 #' @details
-#' The \code{directive} column is populated by \code{\link{add_eunis_legal_to_occ}}
+#' The \code{directive} column is populated by \code{\link{add_legal_to_occ}}
 #' using the bundled EEA Natura 2000 species dataset
 #' (\code{eu_directives_species}), which replaced the retired EUNIS web
 #' application in 2024. Directive values follow the format
@@ -804,7 +804,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #' @author Alice Lenzi, phD \email{alice.lenzi@@crea.gov.it}
 #'
 #' @seealso
-#' \code{\link{add_nativeness_to_occ}}, \code{\link{add_eunis_legal_to_occ}}
+#' \code{\link{add_nativeness_to_occ}}, \code{\link{add_legal_to_occ}}
 #'
 #' @export
 #'
@@ -835,7 +835,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'
 #' obs_pie_chart(occ_eLTER_enrich)
 #' }
@@ -850,7 +850,7 @@ obs_pie_chart <- function(df) {
       "The following required columns are missing: ",
       paste(missing_cols, collapse = ", "),
       "\nRun the enrichment pipeline first ",
-      "(add_iucn_to_occ, add_nativeness_to_occ, add_eunis_legal_to_occ)."
+      "(add_iucn_to_occ, add_nativeness_to_occ, add_legal_to_occ)."
     )
   }
   
@@ -983,7 +983,7 @@ obs_pie_chart <- function(df) {
 #'   add_nativeness_to_occ(
 #'     country = site_boundary$country
 #'   ) |>
-#'   add_eunis_legal_to_occ()
+#'   add_legal_to_occ()
 #'   
 #' obs_SO_pie_chart(occ_eLTER_enrich)
 #' }
