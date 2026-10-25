@@ -14,12 +14,13 @@ occ_eLTER <- get_site_speciesOccurrences(
   deimsid = deimsid,
   list_DS = "inat",
   show_map = FALSE,
-  limit = 500
+  limit = 10000
 )
 
 # Enrich with IUCN conservation status
 occ_eLTER_IUCN <- add_iucn_to_occ(
-  occ_eLTER = occ_eLTER$inat
+  occ_eLTER = occ_eLTER$inat,
+  country = site_boundary$country
 )
 
 # Enrich with establishment means by iNaturalist, IUCN and EASIN

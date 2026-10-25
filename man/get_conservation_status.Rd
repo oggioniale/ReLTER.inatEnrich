@@ -3,32 +3,43 @@
 \name{get_conservation_status}
 \alias{get_conservation_status}
 \title{Function to obtain IUCN conservation status for a single taxon.id from
-iNaturalist API}
+iNaturalist API
+This function generates a request to the iNaturalist API of a given
+\code{taxon.id} to obtain, if available, the IUCN conservation status.
+By default only the global assessment (authority: \code{"IUCN Red List"})
+is returned. If a \code{country} is specified, the country-level assessment
+is also included when available.}
 \usage{
-get_conservation_status(taxon.id)
+get_conservation_status(taxon.id, country = NULL)
 }
 \arguments{
 \item{taxon.id}{A \code{number} value representing the taxon.id of the taxa in
 iNaturalist database.}
+
+\item{country}{An optional character string specifying the country name
+(e.g. \code{"Italy"}) to include country-level IUCN assessments alongside
+the global one. When provided, rows from the iNaturalist conservation
+statuses API whose place name matches the given country are included even
+if their authority is not \code{"IUCN Red List"} (e.g.
+\code{"IUCN Liste Rosse Italiane"}). If \code{NULL} (default), only the
+global IUCN Red List assessment is returned.}
 }
 \value{
 A \code{tibble} containing the conservation status information of the taxa
 retrieved from iNaturalist. The tibble includes the columns \code{status},
-\code{authority}, \code{name}, and \code{url}. If the parsing fails or no IUCN Red List
-conservation status is available, the function returns a tibble with
-\code{NA} values in all fields.
+\code{authority}, \code{scope_of_assesment}, and \code{url}. When \code{country} is
+provided, the tibble may contain both a global row (authority
+\code{"IUCN Red List"}) and a country-level row. If the parsing fails or no
+matching conservation status is available, the function returns a tibble
+with \code{NA} values in all fields.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
-This function generates a request to the iNaturalist API of a given
-\code{taxon.id} to obtain, if updated, the IUCN conservation status, where
-the authority is the "IUCN Red List".
-
 Registered user can update iNaturalist IUCN conservation status.
 For more information about the procedure for updating the IUCN conservation
 status in iNaturalist community, please refer to the following link:
 https://forum.inaturalist.org/t/updating-iucn-red-list-conservation-statuses/25712
-
+}
+\details{
 For more information about iNaturalist API of Taxa, please refer to the
 following link: https://api.inaturalist.org/v1/docs/#!/Taxa/get_taxa_id
 using as "id" value 517449. The JSON key that contains info about IUCN

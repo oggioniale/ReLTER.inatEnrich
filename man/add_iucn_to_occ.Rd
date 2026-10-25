@@ -4,13 +4,22 @@
 \alias{add_iucn_to_occ}
 \title{Enrich eLTER site iNaturalist occurrences with IUCN conservation status}
 \usage{
-add_iucn_to_occ(occ_eLTER)
+add_iucn_to_occ(occ_eLTER, country = NULL)
 }
 \arguments{
 \item{occ_eLTER}{A \code{data.frame} or \code{sf} object representing the
 occurrences of an eLTER site acquired by the
 \code{ReLTER::get_site_speciesOccurrences()} function (typically
 \code{occ_eLTER$inat}).}
+
+\item{country}{An optional character string specifying the country name
+(e.g. \code{"Italy"}) to include country-level IUCN Red List assessments
+alongside the global assessment. When provided, entries from the
+iNaturalist conservation statuses API matching the given country are
+included in \code{status_IUCN}, even if their authority is not
+\code{"IUCN Red List"} (e.g. \code{"IUCN Liste Rosse Italiane"}).
+If \code{NULL} (default), only the global IUCN Red List assessment is
+returned.}
 }
 \value{
 A \code{data.frame} or \code{sf} object with the same structure as
@@ -19,8 +28,11 @@ the input, enriched with the following additional columns:
 \item{status_IUCN}{A list-column (\code{list} of \code{tibble}s)
 containing the IUCN Red List assessments retrieved from iNaturalist
 for each \code{taxon.id}. Each tibble has the columns \code{status},
-\code{authority}, \code{name}, and \code{url}. If no IUCN information
-is available, a tibble with \code{NA} values is stored.}
+\code{authority}, \code{scope_of_assesment}, and \code{url}.
+When \code{country} is provided, a country-level assessment row
+(e.g. from \code{"IUCN Liste Rosse Italiane"}) is included alongside
+the global assessment when available. If no IUCN information is
+available, a tibble with \code{NA} values is stored.}
 \item{has_IUCN}{A \code{logical} value indicating whether at least one
 valid (non-\code{NA}) IUCN status is available for the given
 \code{taxon.id}.}

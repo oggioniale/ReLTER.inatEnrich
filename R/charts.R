@@ -762,7 +762,7 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #' and EU directive information, and produces a donut chart showing the
 #' proportion of species assigned to each conservation category. Each species
 #' is assigned to exactly one category following a fixed priority order:
-#' Alien (IAS) > Habitats Directive > Birds Directive > Other.
+#' Alien (IAS) > Habitats Directive > Birds Directive > Bern Convention > Other.
 #'
 #' @param df An \code{sf} tibble of iNaturalist occurrences containing at least
 #'   the columns:
@@ -771,7 +771,8 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'     \item{directive}{character. EU directive name, produced by
 #'       \code{\link{add_legal_to_occ}}. Expected values:
 #'       \code{"Habitats Directive (92/43/EEC)"},
-#'       \code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+#'       \code{"Birds Directive (2009/147/EC)"},
+#'       \code{"Bern Convention"}, or \code{NA}.}
 #'     \item{establishmentMeans}{list-column of tibbles with a
 #'       \code{iNat_nativeness} field, produced by
 #'       \code{\link{add_nativeness_to_occ}}.}
@@ -787,7 +788,8 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #'   \item Alien (IAS) -- \code{nativeness == "introduced"}
 #'   \item Habitats Directive -- \code{directive} contains \code{"Habitats"}
 #'   \item Birds Directive -- \code{directive} contains \code{"Birds"}
-#'   \item Other -- all remaining species
+#'   \item Bern Convention -- \code{directive} contains \code{"Bern"} or
+#'     \code{"European wildlife"}
 #' }
 #' A species meeting multiple criteria will appear only in the
 #' highest-priority category.
@@ -797,8 +799,9 @@ species_richness_map <- function(df, site_boundary = NULL, cell_size = 0.001) {
 #' using the bundled EEA Natura 2000 species dataset
 #' (\code{eu_directives_species}), which replaced the retired EUNIS web
 #' application in 2024. Directive values follow the format
-#' \code{"Habitats Directive (92/43/EEC)"} and
-#' \code{"Birds Directive (2009/147/EC)"}.
+#' \code{"Habitats Directive (92/43/EEC)"},
+#' \code{"Birds Directive (2009/147/EC)"}, and
+#' \code{"Bern Convention"}.
 #'
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @author Alice Lenzi, phD \email{alice.lenzi@@crea.gov.it}
@@ -867,6 +870,7 @@ obs_pie_chart <- function(df) {
         !is.na(nativeness) & nativeness == "introduced"   ~ "Alien (IAS)",
         !is.na(directive)  & grepl("Habitats", directive) ~ "Habitats Directive",
         !is.na(directive)  & grepl("Birds",    directive) ~ "Birds Directive",
+        !is.na(directive)  & grepl("Bern|European wildlife", directive, ignore.case = TRUE) ~ "Bern Convention",
         TRUE                                              ~ "Other"
       )
     ) |>
@@ -881,6 +885,7 @@ obs_pie_chart <- function(df) {
     "Alien (IAS)"        = "#E24B4A",
     "Habitats Directive" = "#1D9E75",
     "Birds Directive"    = "#378ADD",
+    "Bern Convention"    = "#F5A623",
     "Other"              = "#888780"
   )
   
@@ -913,8 +918,8 @@ obs_pie_chart <- function(df) {
       subtitle = paste0(
         "Each species is assigned to one category only, in order of priority:\n",
         "Alien (IAS) > Habitats Directive (92/43/EEC) > ",
-        "Birds Directive (2009/147/EC) > Other\n",
-        "Source: EEA Natura 2000 species lists (eu_directives_species)"
+        "Birds Directive (2009/147/EC) > Bern Convention > Other\n",
+        "Source: EEA Natura 2000 species lists (eu_directives_species) and BISE"
       ),
       x = NULL,
       y = NULL

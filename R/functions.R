@@ -156,7 +156,7 @@
     "Russia" = "RU", "San Marino" = "SM", "Serbia" = "RS",
     "Slovakia" = "SK", "Slovenia" = "SI", "Spain" = "ES",
     "Sweden" = "SE", "Switzerland" = "CH", "Turkey" = "TR",
-    "Ukraine" = "UA", "United Kingdom" = "GB", "Vatican" = "VA"
+    "Ukraine" = "UA", "United Kingdom" = "GB", "UK" = "GB", "Vatican" = "VA"
   )
   
   if (is.na(country) || country == "-") return("-")
@@ -187,10 +187,11 @@
 
 #' Function to obtain IUCN conservation status for a single taxon.id from
 #' iNaturalist API
-#' @description `r lifecycle::badge("stable")`
 #' This function generates a request to the iNaturalist API of a given
-#' `taxon.id` to obtain, if updated, the IUCN conservation status, where
-#' the authority is the "IUCN Red List".
+#' `taxon.id` to obtain, if available, the IUCN conservation status.
+#' By default only the global assessment (authority: \code{"IUCN Red List"})
+#' is returned. If a \code{country} is specified, the country-level assessment
+#' is also included when available.
 #'
 #' Registered user can update iNaturalist IUCN conservation status.
 #' For more information about the procedure for updating the IUCN conservation
@@ -203,11 +204,20 @@
 #' conservation staus is 'conservation_statuses[]'.
 #' @param taxon.id A `number` value representing the taxon.id of the taxa in
 #' iNaturalist database.
+#' @param country An optional character string specifying the country name
+#'   (e.g. \code{"Italy"}) to include country-level IUCN assessments alongside
+#'   the global one. When provided, rows from the iNaturalist conservation
+#'   statuses API whose place name matches the given country are included even
+#'   if their authority is not \code{"IUCN Red List"} (e.g.
+#'   \code{"IUCN Liste Rosse Italiane"}). If \code{NULL} (default), only the
+#'   global IUCN Red List assessment is returned.
 #' @return A `tibble` containing the conservation status information of the taxa
 #' retrieved from iNaturalist. The tibble includes the columns `status`,
-#' `authority`, `name`, and `url`. If the parsing fails or no IUCN Red List
-#' conservation status is available, the function returns a tibble with
-#' `NA` values in all fields.
+#' `authority`, `scope_of_assesment`, and `url`. When \code{country} is
+#' provided, the tibble may contain both a global row (authority
+#' \code{"IUCN Red List"}) and a country-level row. If the parsing fails or no
+#' matching conservation status is available, the function returns a tibble
+#' with \code{NA} values in all fields.
 #' @author Alessandro Oggioni, PhD \email{alessandro.oggioni@@cnr.it}
 #' @author Alice Lenzi, PhD \email{alice.lenzi@@crea.gov.it}
 #' @author Alessandro Campanaro, PhD \email{alessandro.campanaro@@crea.gov.it}
@@ -239,7 +249,7 @@
 #' ## End (Not run)
 #'
 ### get_conservation_status
-get_conservation_status <- function(taxon.id) {
+get_conservation_status <- function(taxon.id, country = NULL) {
   # helper: empty tibble with consistent structure
   empty_tbl <- dplyr::tibble(
     status = NA_character_,
@@ -285,22 +295,12 @@ get_conservation_status <- function(taxon.id) {
     return(empty_tbl)
   }
   
-  # filter only IUCN
-  cons_status <- cons_status[cons_status$authority == "IUCN Red List", ]
-  
-  if (nrow(cons_status) == 0) {
-    return(empty_tbl)
-  }
-  
-  # clean output
-  cons_status <- cons_status[cons_status$authority == "IUCN Red List", ]
-  
-  if (nrow(cons_status) == 0) {
-    return(empty_tbl)
-  }
-  
-  place_name <- vapply(seq_len(nrow(cons_status)), function(i) {
-    p <- cons_status$place[i,]
+  place_name_all <- vapply(seq_len(nrow(cons_status)), function(i) {
+    p <- if (is.data.frame(cons_status$place)) {
+      cons_status$place[i, ]
+    } else {
+      cons_status$place[[i]]
+    }
     if (is.null(p)) return("Globally")
     if (is.data.frame(p) && "name" %in% names(p)) {
       name_val <- p$name[1]
@@ -314,6 +314,22 @@ get_conservation_status <- function(taxon.id) {
     }
     "Globally"
   }, FUN.VALUE = character(1))
+  
+  # only keep the global IUCN Red List row (place = NULL or "Globally")
+  iucn_idx <- cons_status$authority == "IUCN Red List" & place_name_all == "Globally"
+  # optionally add the row matching the site country (any authority)
+  country_idx <- if (!is.null(country)) {
+    !iucn_idx & !is.na(place_name_all) & place_name_all == country
+  } else {
+    rep(FALSE, nrow(cons_status))
+  }
+  keep_idx <- iucn_idx | country_idx
+  cons_status <- cons_status[keep_idx, ]
+  place_name  <- place_name_all[keep_idx]
+  
+  if (nrow(cons_status) == 0) {
+    return(empty_tbl)
+  }
   
   return(tibble::tibble(
     status = as.character(cons_status$status),
@@ -498,8 +514,18 @@ get_nativeness_degree <- function(taxon.id, country = NULL) {
   )
   
   # Return empty tibble if no record matches the specified country
+  # but keep EASIN info if available
   if (length(record) == 0) {
-    return(empty_nested)
+    return(dplyr::tibble(
+      establishmentMeans = list(
+        dplyr::tibble(
+          iNat_nativeness    = NA_character_,
+          iNat_authority     = NA_character_,
+          iNat_checkList_uri = NA_character_,
+          easin_info
+        )
+      )
+    ))
   }
   
   # Take the first matching record for the specified country
@@ -738,9 +764,13 @@ get_eunis_legal_info <- function(taxon.id) {
     else rep(NA_character_, n)
   )
   
-  # Keep only EU Habitats Directive and EU Birds Directive rows
-  df_eu <- df[df$legal_instrument %in%
-                c("EU Habitats Directive", "EU Birds Directive"), ]
+  # Keep EU Directives and Bern Convention rows
+  KEEP_INSTRUMENTS <- c(
+    "EU Habitats Directive",
+    "EU Birds Directive",
+    "Bern Convention"
+  )
+  df_eu <- df[df$legal_instrument %in% KEEP_INSTRUMENTS, ]
   
   if (nrow(df_eu) == 0) {
     return(safe_return(taxon.id, scientific_name))
@@ -754,6 +784,8 @@ get_eunis_legal_info <- function(taxon.id) {
           "Habitats Directive (92/43/EEC)",
         legal_instrument == "EU Birds Directive"    ~
           "Birds Directive (2009/147/EC)",
+        legal_instrument == "Bern Convention" ~
+          "Convention on the conservation of European wildlife and natural habitats",
         TRUE ~ NA_character_
       ),
       annex = vapply(annex_raw, .parse_annex_code, FUN.VALUE = character(1))
@@ -933,6 +965,14 @@ add_iucn_to_obs <- function(project_name) {
 #'   occurrences of an eLTER site acquired by the
 #'   \code{ReLTER::get_site_speciesOccurrences()} function (typically
 #'   \code{occ_eLTER$inat}).
+#' @param country An optional character string specifying the country name
+#'   (e.g. \code{"Italy"}) to include country-level IUCN Red List assessments
+#'   alongside the global assessment. When provided, entries from the
+#'   iNaturalist conservation statuses API matching the given country are
+#'   included in \code{status_IUCN}, even if their authority is not
+#'   \code{"IUCN Red List"} (e.g. \code{"IUCN Liste Rosse Italiane"}).
+#'   If \code{NULL} (default), only the global IUCN Red List assessment is
+#'   returned.
 #'
 #' @return A \code{data.frame} or \code{sf} object with the same structure as
 #'   the input, enriched with the following additional columns:
@@ -940,8 +980,11 @@ add_iucn_to_obs <- function(project_name) {
 #'     \item{status_IUCN}{A list-column (\code{list} of \code{tibble}s)
 #'       containing the IUCN Red List assessments retrieved from iNaturalist
 #'       for each \code{taxon.id}. Each tibble has the columns \code{status},
-#'       \code{authority}, \code{name}, and \code{url}. If no IUCN information
-#'       is available, a tibble with \code{NA} values is stored.}
+#'       \code{authority}, \code{scope_of_assesment}, and \code{url}.
+#'       When \code{country} is provided, a country-level assessment row
+#'       (e.g. from \code{"IUCN Liste Rosse Italiane"}) is included alongside
+#'       the global assessment when available. If no IUCN information is
+#'       available, a tibble with \code{NA} values is stored.}
 #'     \item{has_IUCN}{A \code{logical} value indicating whether at least one
 #'       valid (non-\code{NA}) IUCN status is available for the given
 #'       \code{taxon.id}.}
@@ -1002,7 +1045,7 @@ add_iucn_to_obs <- function(project_name) {
 #' ## End (Not run)
 #'
 ### add_iucn_to_occ
-add_iucn_to_occ <- function(occ_eLTER) {
+add_iucn_to_occ <- function(occ_eLTER, country = NULL) {
   # assign eLTER SOs if not already present
   if (!"SOBIO_014" %in% names(occ_eLTER)) {
     message("\u2139\ufe0f Assigning eLTER Standard Observations (SOBIO_014, SOBIO_017, and SOBIO_018)...\n----\n")
@@ -1033,7 +1076,7 @@ add_iucn_to_occ <- function(occ_eLTER) {
   status_results <- purrr::map_dfr(unique_taxon.ids, function(taxon.id) {
     record_counter <<- record_counter + 1
     status_tbl <- tryCatch(
-      get_conservation_status(taxon.id),
+      get_conservation_status(taxon.id, country = country),
       error = function(e) NULL
     )
     # Check validity
@@ -1407,10 +1450,14 @@ add_legal_to_occ <- function(occ_eLTER) {
   unique_taxon.ids <- unique(occ_eLTER$taxon.id)
   record_counter   <- 0L
   
+  # Build lookup: taxon.id -> taxon.min_species_taxon_id (for subspecies fallback)
+  species_fallback <- occ_eLTER |>
+    sf::st_drop_geometry() |>
+    dplyr::select(taxon.id, taxon.min_species_taxon_id) |>
+    dplyr::distinct()
+  
   legal_results <- purrr::map_dfr(unique_taxon.ids, function(tid) {
     record_counter <<- record_counter + 1L
-    
-    # Throttle: iNaturalist + BISE each see ~3 requests/taxon, keep it gentle
     Sys.sleep(0.2)
     
     legal <- tryCatch(
@@ -1425,6 +1472,30 @@ add_legal_to_occ <- function(occ_eLTER) {
         )
       }
     )
+    legal <- legal |> dplyr::mutate(bise_lookup_taxon_id = tid)
+    
+    # Fallback: if no directive found and taxon is a subspecies, try parent species
+    if (all(is.na(legal$directive))) {
+      parent_id <- species_fallback |>
+        dplyr::filter(taxon.id == tid) |>
+        dplyr::pull(taxon.min_species_taxon_id)
+      parent_id <- parent_id[1]
+      
+      if (!is.na(parent_id) && parent_id != tid) {
+        Sys.sleep(0.2)
+        legal_parent <- tryCatch(
+          get_eunis_legal_info(parent_id),
+          error = function(e) NULL
+        )
+        if (!is.null(legal_parent) && !all(is.na(legal_parent$directive))) {
+          message("\u2139\ufe0f  [", record_counter, "] taxon.id ", tid,
+                  " | No BISE entry -- using parent species taxon.id ", parent_id)
+          legal <- legal_parent |>
+            dplyr::mutate(taxon.id = tid,
+                          bise_lookup_taxon_id = parent_id)  # keep original tid for the join
+        }
+      }
+    }
     
     if (all(is.na(legal$directive))) {
       message("\u26a0\ufe0f  [", record_counter, "] taxon.id ", tid,
@@ -1444,7 +1515,7 @@ add_legal_to_occ <- function(occ_eLTER) {
   # Join back to occurrences -- one row per occurrence x directive entry
   occ_eLTER |>
     dplyr::left_join(
-      legal_results |> dplyr::select(taxon.id, directive, annex),
+      legal_results |> dplyr::select(taxon.id, directive, annex, bise_lookup_taxon_id),
       by = "taxon.id",
       relationship = "many-to-many"
     )
@@ -1647,7 +1718,8 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
                    all(is.na(scope_of_assesment)) || identical(scope_of_assesment, "")) {
         "-"
       } else {
-        as.character(scope_of_assesment[[1]])
+        s <- as.character(scope_of_assesment[[1]])
+        if (s == "Globally") "\U0001F30D Globally" else .country_to_flag(s)
       }
       label <- if (is.null(iucn_labels[status]) || all(is.na(iucn_labels[status])) ||
                    identical(iucn_labels[status], "")) {
@@ -1759,18 +1831,26 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         annexes <- annex
         parts <- purrr::map2_chr(dirs, annexes, function(d, a) {
           if (is.na(d)) return("")
-          # Prefisso "EU " necessario per il gsub EUR-Lex nel popup
-          d_eu <- dplyr::case_when(
-            grepl("Habitats", d) ~ "EU Habitats Directive (92/43/EEC)",
-            grepl("Birds",    d) ~ "EU Birds Directive (2009/147/EC)",
-            TRUE                 ~ d
-          )
+          
           annex_str <- if (!is.na(a) && nzchar(a)) {
             paste0(" &mdash; <b>Annex ", a, "</b>")
+          } else ""
+          
+          if (grepl("Bern|European wildlife", d, ignore.case = TRUE)) {
+            paste0(
+              "<div style='font-size:12px;'>",
+              '<a href="https://eur-lex.europa.eu/EN/legal-content/summary/bern-convention.html" target="_blank">',
+              "Bern Convention</a>",
+              annex_str, ".</div>"
+            )
           } else {
-            ""
+            d_eu <- dplyr::case_when(
+              grepl("Habitats", d) ~ "EU Habitats Directive (92/43/EEC)",
+              grepl("Birds",    d) ~ "EU Birds Directive (2009/147/EC)",
+              TRUE                 ~ d
+            )
+            paste0("<div style='font-size:12px;'>", d_eu, annex_str, ".</div>")
           }
-          paste0("<div style='font-size:12px;'>", d_eu, annex_str, ".</div>")
         })
         paste(parts[nzchar(parts)], collapse = "")
       },
@@ -1799,6 +1879,8 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       obs_url = occ_map$obs_url,
       photo_url = occ_map$photo_url,
       directive_html = occ_map$directive_html,
+      bise_lookup_taxon_id = occ_map$bise_lookup_taxon_id,
+      taxon_id = occ_map$taxon.id, 
       so_lbl = occ_map$so_lbl,
       EASIN_url = occ_map$EASIN_url_lbl,
       EASIN_id = occ_map$EASIN_id_lbl,
@@ -1811,8 +1893,9 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
     function(obs_quality, taxon_name, taxon_url, iucn_html, nativeness, em_authority,
              em_authority_uri,
              common_name, observed_on, geopriv, posacc,
-             observer, observer_url, obs_url, photo_url, directive_html, so_lbl,
-             EASIN_url, EASIN_id, EASIN_status, EASIN_impact, EASIN_concern,
+             observer, observer_url, obs_url, photo_url, directive_html,
+             bise_lookup_taxon_id, taxon_id,
+             so_lbl, EASIN_url, EASIN_id, EASIN_status, EASIN_impact, EASIN_concern,
              EASIN_intro_year, EASIN_intro_country) {
       
       # Build directive HTML block with links to EUR-Lex
@@ -1832,6 +1915,8 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       
       
       paste0(
+        # --- Wrapper + Photo ---
+        '<div style="width:560px;padding:4px 6px 0 6px;box-sizing:border-box;">',
         # --- Photo ---
         if (nzchar(photo_url))
           sprintf(
@@ -1839,7 +1924,9 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
          <img src="%s" style="width:110px;height:auto;border-radius:8px;">
        </div>', photo_url)
         else "",
-        
+        # --- 2-column layout ---
+        '<div style="display:flex;gap:8px;">',
+        '<div style="flex:1;min-width:0;">',  # colonna sinistra
         # --- Section: iNaturalist observation data ---
         '<div style="background:#f0f7f0;border-left:3px solid #74ac00;
                padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
@@ -1972,7 +2059,8 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
             '</div>'
           )
         },
-        
+        '</div>',  # fine colonna sinistra
+        '<div style="flex:1;min-width:0;">',  # colonna destra
         # --- Section: Establishment means (iNaturalist) ---
         if (nativeness == "-" && em_authority == "-") {
           paste0(
@@ -2016,8 +2104,15 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         },
         
         # --- Section: EU Directives (BISE) ---
-        if (nzchar(directive_block)) {
-          paste0(
+        {
+          inherited_note <- if (!is.na(bise_lookup_taxon_id) &&
+                                bise_lookup_taxon_id != taxon_id) {
+            sprintf(
+              '<div style="font-size:11px;color:#666;font-style:italic;margin-top:4px;">&#8505; Directive inherited from parent species (<a href="https://www.inaturalist.org/taxa/%s" target="_blank">taxon %s</a>)</div>',
+              bise_lookup_taxon_id, bise_lookup_taxon_id
+            )
+          } else ""
+          bise_header <- paste0(
             '<div style="background:#f0f4ff;border-left:3px solid #004b87;
                    padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
             '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
@@ -2029,27 +2124,13 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
         <a href="https://biodiversity.europa.eu" target="_blank"
            style="font-size:11px;text-decoration:none;">\u2139\ufe0f</a>
       </span>',
-            '</div>',
-            directive_block,
             '</div>'
           )
-        } else {
-          paste0(
-            '<div style="background:#f0f4ff;border-left:3px solid #004b87;
-                   padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">',
-            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">',
-            '<img src="https://biodiversity.europa.eu/static/media/bise-logo-white.0ad0757f.svg"
-            style="height:18px;width:auto;vertical-align:middle;background:#004b87;
-                   padding:2px 4px;border-radius:3px;">',
-            '<span style="font-size:11px;color:#555;font-weight:500;">EU Legal framework
-        <span style="font-weight:300;font-style:italic;">(via BISE)</span>
-        <a href="https://biodiversity.europa.eu" target="_blank"
-           style="font-size:11px;text-decoration:none;">\u2139\ufe0f</a>
-      </span>',
-            '</div>',
-            'This taxon is not included in any Directives',
-            '</div>'
-          )
+          if (nzchar(directive_block)) {
+            paste0(bise_header, directive_block, inherited_note, '</div>')
+          } else {
+            paste0(bise_header, 'This taxon is not included in any Directives', '</div>')
+          }
         },
         
         # --- Section: eLTER Standard Observations ---
@@ -2083,7 +2164,10 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
                  "<div style='font-size:12px;'>This observation can contribute to: ",
                  so_lbl, "</div>",
                  '</div>')
-        }
+        },
+        '</div>',  # fine colonna destra
+        '</div>',  # fine flex
+        '</div>'   # fine wrapper esterno
       )
     }
   )
@@ -2130,19 +2214,22 @@ create_leaflet_occ_map <- function(occ_enriched, site_boundary = NULL) {
       data        = occ_open,
       radius      = 6, fill = TRUE, color = "white", weight = 3,
       fillColor   = ~pal(iconic), fillOpacity = 1,
-      popup       = ~popup, group = "open", clusterOptions = cluster_opts
+      popup       = ~popup, group = "open", clusterOptions = cluster_opts,
+      popupOptions = leaflet::popupOptions(maxWidth = 600)
     ) |>
     leaflet::addCircleMarkers(
       data        = occ_obscured,
       radius      = 10, fill = TRUE, color = "white", weight = 3,
       fillColor   = ~pal(iconic), fillOpacity = 0.35,
-      popup       = ~popup, group = "obscured", clusterOptions = cluster_opts
+      popup       = ~popup, group = "obscured", clusterOptions = cluster_opts,
+      popupOptions = leaflet::popupOptions(maxWidth = 600)
     ) |>
     leaflet::addCircleMarkers(
       data        = occ_private,
       radius      = 8, fill = TRUE, color = "white", weight = 3,
       fillColor   = ~pal(iconic), fillOpacity = 0.2,
-      popup       = ~popup, group = "unknown", clusterOptions = cluster_opts
+      popup       = ~popup, group = "unknown", clusterOptions = cluster_opts,
+      popupOptions = leaflet::popupOptions(maxWidth = 600)
     ) |>
     leaflet::addLegend(
       position = "bottomright",

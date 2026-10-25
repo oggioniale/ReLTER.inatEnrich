@@ -14,7 +14,8 @@ the columns:
 \item{directive}{character. EU directive name, produced by
 \code{\link{add_legal_to_occ}}. Expected values:
 \code{"Habitats Directive (92/43/EEC)"},
-\code{"Birds Directive (2009/147/EC)"}, or \code{NA}.}
+\code{"Birds Directive (2009/147/EC)"},
+\code{"Bern Convention"}, or \code{NA}.}
 \item{establishmentMeans}{list-column of tibbles with a
 \code{iNat_nativeness} field, produced by
 \code{\link{add_nativeness_to_occ}}.}
@@ -32,15 +33,16 @@ Takes a tibble of iNaturalist occurrences enriched with establishment means
 and EU directive information, and produces a donut chart showing the
 proportion of species assigned to each conservation category. Each species
 is assigned to exactly one category following a fixed priority order:
-Alien (IAS) > Habitats Directive > Birds Directive > Other.
+Alien (IAS) > Habitats Directive > Birds Directive > Bern Convention > Other.
 }
 \details{
 The \code{directive} column is populated by \code{\link{add_legal_to_occ}}
 using the bundled EEA Natura 2000 species dataset
 (\code{eu_directives_species}), which replaced the retired EUNIS web
 application in 2024. Directive values follow the format
-\code{"Habitats Directive (92/43/EEC)"} and
-\code{"Birds Directive (2009/147/EC)"}.
+\code{"Habitats Directive (92/43/EEC)"},
+\code{"Birds Directive (2009/147/EC)"}, and
+\code{"Bern Convention"}.
 }
 \note{
 Species are assigned to one category only, in order of priority:
@@ -48,7 +50,8 @@ Species are assigned to one category only, in order of priority:
 \item Alien (IAS) -- \code{nativeness == "introduced"}
 \item Habitats Directive -- \code{directive} contains \code{"Habitats"}
 \item Birds Directive -- \code{directive} contains \code{"Birds"}
-\item Other -- all remaining species
+\item Bern Convention -- \code{directive} contains \code{"Bern"} or
+\code{"European wildlife"}
 }
 A species meeting multiple criteria will appear only in the
 highest-priority category.
