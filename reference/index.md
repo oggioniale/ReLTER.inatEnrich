@@ -3,23 +3,35 @@
 ## Enrichment functions
 
 - [`get_conservation_status()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_conservation_status.md)
-  **\[stable\]** : Function to obtain IUCN conservation status for a
-  single taxon.id from iNaturalist API
+  :
+
+  Function to obtain IUCN conservation status for a single taxon.id from
+  iNaturalist API This function generates a request to the iNaturalist
+  API of a given `taxon.id` to obtain, if available, the IUCN
+  conservation status. By default only the global assessment (authority:
+  `"IUCN Red List"`) is returned. If a `country` is specified, the
+  country-level assessment is also included when available.
+
 - [`get_nativeness_degree()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_nativeness_degree.md)
   **\[stable\]** : Get nativeness degree for a taxon from iNaturalist
   and EASIN
+
 - [`get_eunis_legal_info()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/get_eunis_legal_info.md)
   **\[stable\]** : Get EU directive legal information for a species
   using the BISE API
+
 - [`add_iucn_to_obs()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_obs.md)
   **\[experimental\]** : Enrich iNaturalist specific project
   observations with IUCN conservation status
+
 - [`add_iucn_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_iucn_to_occ.md)
   **\[stable\]** : Enrich eLTER site iNaturalist occurrences with IUCN
   conservation status
+
 - [`add_nativeness_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_nativeness_to_occ.md)
   **\[stable\]** : Add nativeness information to iNaturalist occurrence
   records
+
 - [`add_legal_to_occ()`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md)
   **\[stable\]** : Enrich eLTER site iNaturalist occurrences with EU
   directive legal information

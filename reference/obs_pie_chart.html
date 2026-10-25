@@ -4,12 +4,12 @@ Takes a tibble of iNaturalist occurrences enriched with establishment means
 and EU directive information, and produces a donut chart showing the
 proportion of species assigned to each conservation category. Each species
 is assigned to exactly one category following a fixed priority order:
-Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Other."><meta property="og:description" content="
+Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Bern Convention &amp;gt; Other."><meta property="og:description" content="
 Takes a tibble of iNaturalist occurrences enriched with establishment means
 and EU directive information, and produces a donut chart showing the
 proportion of species assigned to each conservation category. Each species
 is assigned to exactly one category following a fixed priority order:
-Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Other."><meta property="og:image" content="https://oggioniale.github.io/ReLTER.inatEnrich/logo.png"></head><body>
+Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Bern Convention &amp;gt; Other."><meta property="og:image" content="https://oggioniale.github.io/ReLTER.inatEnrich/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -17,7 +17,7 @@ Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Other.
 
     <a class="navbar-brand me-2" href="../index.html">ReLTER.inatEnrich</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@ Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Other.
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot a donut chart of species by conservation category</h1>
-      <small class="dont-index">Source: <a href="https://github.com/oggioniale/ReLTER.inatEnrich/blob/v1.1.2/R/charts.R" class="external-link"><code>R/charts.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/oggioniale/ReLTER.inatEnrich/blob/main/R/charts.R" class="external-link"><code>R/charts.R</code></a></small>
       <div class="d-none name"><code>obs_pie_chart.Rd</code></div>
     </div>
 
@@ -46,7 +46,7 @@ Alien (IAS) &amp;gt; Habitats Directive &amp;gt; Birds Directive &amp;gt; Other.
 and EU directive information, and produces a donut chart showing the
 proportion of species assigned to each conservation category. Each species
 is assigned to exactly one category following a fixed priority order:
-Alien (IAS) &gt; Habitats Directive &gt; Birds Directive &gt; Other.</p>
+Alien (IAS) &gt; Habitats Directive &gt; Birds Directive &gt; Bern Convention &gt; Other.</p>
     </div>
 
     <div class="section level2">
@@ -67,7 +67,8 @@ the columns:</p><dl><dt>name</dt>
 <dd><p>character. EU directive name, produced by
 <code><a href="add_legal_to_occ.html">add_legal_to_occ</a></code>. Expected values:
 <code>"Habitats Directive (92/43/EEC)"</code>,
-<code>"Birds Directive (2009/147/EC)"</code>, or <code>NA</code>.</p></dd>
+<code>"Birds Directive (2009/147/EC)"</code>,
+<code>"Bern Convention"</code>, or <code>NA</code>.</p></dd>
 
 <dt>establishmentMeans</dt>
 <dd><p>list-column of tibbles with a
@@ -90,15 +91,17 @@ Category counts and percentages are shown in the legend.</p>
 using the bundled EEA Natura 2000 species dataset
 (<code>eu_directives_species</code>), which replaced the retired EUNIS web
 application in 2024. Directive values follow the format
-<code>"Habitats Directive (92/43/EEC)"</code> and
-<code>"Birds Directive (2009/147/EC)"</code>.</p>
+<code>"Habitats Directive (92/43/EEC)"</code>,
+<code>"Birds Directive (2009/147/EC)"</code>, and
+<code>"Bern Convention"</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Species are assigned to one category only, in order of priority:</p><ol><li><p>Alien (IAS) – <code>nativeness == "introduced"</code></p></li>
 <li><p>Habitats Directive – <code>directive</code> contains <code>"Habitats"</code></p></li>
 <li><p>Birds Directive – <code>directive</code> contains <code>"Birds"</code></p></li>
-<li><p>Other – all remaining species</p></li>
+<li><p>Bern Convention – <code>directive</code> contains <code>"Bern"</code> or
+<code>"European wildlife"</code></p></li>
 </ol><p>A species meeting multiple criteria will appear only in the
 highest-priority category.</p>
     </div>

@@ -6,7 +6,8 @@ Takes a tibble of iNaturalist occurrences enriched with establishment
 means and EU directive information, and produces a donut chart showing
 the proportion of species assigned to each conservation category. Each
 species is assigned to exactly one category following a fixed priority
-order: Alien (IAS) \> Habitats Directive \> Birds Directive \> Other.
+order: Alien (IAS) \> Habitats Directive \> Birds Directive \> Bern
+Convention \> Other.
 
 ## Usage
 
@@ -30,7 +31,7 @@ obs_pie_chart(df)
   :   character. EU directive name, produced by
       [`add_legal_to_occ`](https://oggioniale.github.io/ReLTER.inatEnrich/reference/add_legal_to_occ.md).
       Expected values: `"Habitats Directive (92/43/EEC)"`,
-      `"Birds Directive (2009/147/EC)"`, or `NA`.
+      `"Birds Directive (2009/147/EC)"`, `"Bern Convention"`, or `NA`.
 
   establishmentMeans
 
@@ -51,8 +52,8 @@ The `directive` column is populated by
 using the bundled EEA Natura 2000 species dataset
 (`eu_directives_species`), which replaced the retired EUNIS web
 application in 2024. Directive values follow the format
-`"Habitats Directive (92/43/EEC)"` and
-`"Birds Directive (2009/147/EC)"`.
+`"Habitats Directive (92/43/EEC)"`, `"Birds Directive (2009/147/EC)"`,
+and `"Bern Convention"`.
 
 ## Note
 
@@ -64,7 +65,8 @@ Species are assigned to one category only, in order of priority:
 
 3.  Birds Directive – `directive` contains `"Birds"`
 
-4.  Other – all remaining species
+4.  Bern Convention – `directive` contains `"Bern"` or
+    `"European wildlife"`
 
 A species meeting multiple criteria will appear only in the
 highest-priority category.

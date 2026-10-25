@@ -33,7 +33,7 @@ step is skipped.
 ## Usage
 
 ``` r
-add_iucn_to_occ(occ_eLTER)
+add_iucn_to_occ(occ_eLTER, country = NULL)
 ```
 
 ## Arguments
@@ -44,6 +44,16 @@ add_iucn_to_occ(occ_eLTER)
   site acquired by the `ReLTER::get_site_speciesOccurrences()` function
   (typically `occ_eLTER$inat`).
 
+- country:
+
+  An optional character string specifying the country name (e.g.
+  `"Italy"`) to include country-level IUCN Red List assessments
+  alongside the global assessment. When provided, entries from the
+  iNaturalist conservation statuses API matching the given country are
+  included in `status_IUCN`, even if their authority is not
+  `"IUCN Red List"` (e.g. `"IUCN Liste Rosse Italiane"`). If `NULL`
+  (default), only the global IUCN Red List assessment is returned.
+
 ## Value
 
 A `data.frame` or `sf` object with the same structure as the input,
@@ -53,8 +63,11 @@ enriched with the following additional columns:
 
   A list-column (`list` of `tibble`s) containing the IUCN Red List
   assessments retrieved from iNaturalist for each `taxon.id`. Each
-  tibble has the columns `status`, `authority`, `name`, and `url`. If no
-  IUCN information is available, a tibble with `NA` values is stored.
+  tibble has the columns `status`, `authority`, `scope_of_assesment`,
+  and `url`. When `country` is provided, a country-level assessment row
+  (e.g. from `"IUCN Liste Rosse Italiane"`) is included alongside the
+  global assessment when available. If no IUCN information is available,
+  a tibble with `NA` values is stored.
 
 - has_IUCN:
 
