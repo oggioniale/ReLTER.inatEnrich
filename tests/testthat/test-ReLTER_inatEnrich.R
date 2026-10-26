@@ -267,7 +267,7 @@ test_that("add_legal_to_occ() directive values match expected pattern when not N
     sf::st_drop_geometry() |>
     dplyr::filter(!is.na(directive))
   if (nrow(non_na) > 0) {
-    expect_true(all(grepl("92/43/EEC|2009/147/EC", non_na$directive)))
+    expect_true(all(grepl("92/43/EEC|2009/147/EC|Convention on the conservation of European wildlife and natural habitats", non_na$directive)))
   } else {
     skip("No directive values in dataset")
   }

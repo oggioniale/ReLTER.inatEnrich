@@ -14,5 +14,5 @@ utils::globalVariables(c(
   "status", "status_IUCN", "taxon.ancestor_ids", "taxon.common_name.name",
   "taxon.default_photo.square_url", "taxon.iconic_taxon_name", "taxon.id",
   "taxon.name", "taxon.preferred_common_name", "taxon_geoprivacy", "total",
-  "uri", "user.login", "value", "year"
+  "uri", "user.login", "value", "year", "bise_lookup_taxon_id", "taxon.min_species_taxon_id"
 ))

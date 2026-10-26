@@ -32,5 +32,4 @@ renv/staging/
 other_files/
 
 # data files
-data-raw/Article17_2020_species_check_list.csv
-data-raw/Article12_2020_bird_check_list.csv
+data/occ_eLTER_cache.rds
